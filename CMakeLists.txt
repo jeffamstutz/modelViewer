@@ -16,6 +16,8 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+PROJECT(modelViewer)
+
 IF(COMMAND cmake_policy)
   CMAKE_POLICY(SET CMP0003 NEW)
 
@@ -29,16 +31,16 @@ ENDIF(COMMAND cmake_policy)
 ##############################################################
 
 # compiler selection for the non-MIC part
-IF (WIN32)
-  SET(OSPRAY_COMPILER "MSVC" CACHE INTERNAL "MSVC used on Windows.")
+IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/icc.cmake)
+ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/gcc.cmake)
+ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/clang.cmake)
+ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/msvc.cmake)
 ELSE()
-  IF (APPLE)
-    SET(OSPRAY_COMPILER "CLANG" CACHE STRING "compiler to use (ICC,GCC, or CLANG)")
-    SET_PROPERTY(CACHE OSPRAY_COMPILER PROPERTY STRINGS ICC GCC CLANG)
-  ELSE(APPLE)
-    SET(OSPRAY_COMPILER "GCC" CACHE STRING "compiler to use (ICC or GCC)")
-    SET_PROPERTY(CACHE OSPRAY_COMPILER PROPERTY STRINGS ICC GCC)
-  ENDIF(APPLE)
+  MESSAGE(FATAL_ERROR "Unsupported compiler: '${OSPRAY_COMPILER}'")
 ENDIF()
 
 # the arch we're targeting for the non-MIC/non-xeon phi part of ospray
@@ -55,6 +57,7 @@ ENDIF()
 ##############################################################
 
 INCLUDE(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
+
 INCLUDE(${CMAKE_SOURCE_DIR}/cmake/ospray.cmake)
 
 SET(LIBRARY_OUTPUT_PATH lib)
@@ -62,13 +65,22 @@ SET(EXECUTABLE_OUTPUT_PATH bin)
 
 CONFIGURE_OSPRAY()
 
-#TODO: use find_package config
-INCLUDE_DIRECTORIES(
-  ${CMAKE_SOURCE_DIR}
+#TODO: use find_package config to populate includes and libs
+set(OSPRAY_INCLUDE_DIRS
   /opt
   /opt/ospray/include
   /opt/ospray/include/ospray/embree
   /opt/ospray/include/ospray/embree/common
+)
+
+SET(OSPRAY_LIBRARIES
+  /opt/ospray/lib/libospray${CMAKE_SHARED_LIBRARY_SUFFIX}
+  /opt/ospray/lib/libospray_embree${CMAKE_SHARED_LIBRARY_SUFFIX}
+)
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_SOURCE_DIR}
+  ${OSPRAY_INCLUDE_DIRS}
 )
 
 ##############################################################

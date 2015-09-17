@@ -53,8 +53,7 @@ IF (NOT THIS_IS_MIC)
     importRIVL.cpp
     )
   TARGET_LINK_LIBRARIES(ospray_minisg ospray_xml
-    /opt/ospray/lib/libospray.dylib
-    /opt/ospray/lib/libospray_embree.dylib
+    ${OSPRAY_LIBRARIES}
     ${MAGICK_LIBRARIES}
   )
   # ------------------------------------------------------------

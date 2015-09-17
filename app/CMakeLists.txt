@@ -32,8 +32,7 @@ TARGET_LINK_LIBRARIES(ospModelViewer
   ospray_glut3d
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
-  /opt/ospray/lib/libospray.dylib
-  /opt/ospray/lib/libospray_embree.dylib
+  ${OSPRAY_LIBRARIES}
   )
 # ------------------------------------------------------------
 INSTALL(TARGETS ospModelViewer DESTINATION bin)

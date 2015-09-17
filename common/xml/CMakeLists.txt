@@ -24,8 +24,7 @@ ADD_LIBRARY(ospray_xml${OSPRAY_LIB_SUFFIX} SHARED
 )
 
 TARGET_LINK_LIBRARIES(ospray_xml${OSPRAY_LIB_SUFFIX}
-    /opt/ospray/lib/libospray.dylib
-    /opt/ospray/lib/libospray_embree.dylib
+  ${OSPRAY_LIBRARIES}
 )
 
 # ------------------------------------------------------------

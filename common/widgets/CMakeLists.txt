@@ -23,8 +23,7 @@ ADD_LIBRARY(ospray_glut3d SHARED glut3D.cpp)
 TARGET_LINK_LIBRARIES(ospray_glut3d 
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
-  /opt/ospray/lib/libospray.dylib
-  /opt/ospray/lib/libospray_embree.dylib
+  ${OSPRAY_LIBRARIES}
 )
 # ------------------------------------------------------------
 SET_TARGET_PROPERTIES(ospray_glut3d${OSPRAY_LIB_SUFFIX} 
