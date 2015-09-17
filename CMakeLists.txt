@@ -61,18 +61,7 @@ INCLUDE(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
 SET(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-#TODO: use find_package config to populate includes and libs
-set(OSPRAY_INCLUDE_DIRS
-  /opt
-  /opt/ospray/include
-  /opt/ospray/include/ospray/embree
-  /opt/ospray/include/ospray/embree/common
-)
-
-SET(OSPRAY_LIBRARIES
-  /opt/ospray/lib/libospray${CMAKE_SHARED_LIBRARY_SUFFIX}
-  /opt/ospray/lib/libospray_embree${CMAKE_SHARED_LIBRARY_SUFFIX}
-)
+find_package(ospray)
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}
