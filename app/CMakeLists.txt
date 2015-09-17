@@ -14,10 +14,6 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-CONFIGURE_OSPRAY()
-
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/apps/common)
-
 ADD_SUBDIRECTORY(miniSG)
 
 # --------------------------------------------
@@ -26,13 +22,15 @@ ADD_SUBDIRECTORY(miniSG)
 ADD_EXECUTABLE(ospModelViewer
   # CPP sources
   modelViewer.cpp
-  )
+)
+
 TARGET_LINK_LIBRARIES(ospModelViewer
   ospray_minisg
   ospray_glut3d
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}
-  )
+)
 # ------------------------------------------------------------
+
 INSTALL(TARGETS ospModelViewer DESTINATION bin)

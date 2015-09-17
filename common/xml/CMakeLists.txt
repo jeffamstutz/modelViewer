@@ -14,21 +14,17 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-CONFIGURE_OSPRAY()
-
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray/include)
 
-ADD_LIBRARY(ospray_xml${OSPRAY_LIB_SUFFIX} SHARED
+ADD_LIBRARY(ospray_xml
   XML.cpp
 )
 
-TARGET_LINK_LIBRARIES(ospray_xml${OSPRAY_LIB_SUFFIX}
+TARGET_LINK_LIBRARIES(ospray_xml
   ${OSPRAY_LIBRARIES}
 )
 
 # ------------------------------------------------------------
-SET_TARGET_PROPERTIES(ospray_xml${OSPRAY_LIB_SUFFIX} 
-  PROPERTIES VERSION ${OSPRAY_VERSION} SOVERSION ${OSPRAY_SOVERSION})
-INSTALL(TARGETS ospray_xml${OSPRAY_LIB_SUFFIX} DESTINATION lib)
+INSTALL(TARGETS ospray_xml DESTINATION lib)
 
