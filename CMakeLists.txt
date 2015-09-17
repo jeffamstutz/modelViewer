@@ -58,12 +58,8 @@ ENDIF()
 
 INCLUDE(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
 
-INCLUDE(${CMAKE_SOURCE_DIR}/cmake/ospray.cmake)
-
 SET(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-
-CONFIGURE_OSPRAY()
 
 #TODO: use find_package config to populate includes and libs
 set(OSPRAY_INCLUDE_DIRS
@@ -97,7 +93,6 @@ IF(NOT THIS_IS_MIC)
 
   ADD_SUBDIRECTORY(app)
 
-  CONFIGURE_OSPRAY()
   INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray/include)
 
 ENDIF()
