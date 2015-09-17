@@ -83,16 +83,10 @@ INCLUDE_DIRECTORIES(
 # Build app
 ##############################################################
 
-IF(NOT THIS_IS_MIC)
+# common utility classes for 3D viewer widget
+ADD_SUBDIRECTORY(common/widgets)
 
-  # common utility classes for 3D viewer widget
-  ADD_SUBDIRECTORY(common/widgets)
+# common xml utility classes
+ADD_SUBDIRECTORY(common/xml)
 
-  # common xml utility classes
-  ADD_SUBDIRECTORY(common/xml)
-
-  ADD_SUBDIRECTORY(app)
-
-  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray/include)
-
-ENDIF()
+ADD_SUBDIRECTORY(app)
