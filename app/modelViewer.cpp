@@ -16,9 +16,6 @@
 
 #include "MSGViewer.h"
 
-// stl
-#include <algorithm>
-
 int main(int ac, const char **av)
 {
   ospInit(&ac,av);
