@@ -8,6 +8,8 @@
 // ospray, for rendering
 #include "ospray/ospray.h"
 
+#include "ViewerConfig.h"
+
 namespace ospray {
 
 /*! mini scene graph viewer widget. \internal Note that all handling
@@ -17,13 +19,10 @@ class MSGViewer : public ospray::glut3D::Glut3DWidget
 {
 public:
 
-  MSGViewer(int ac, const char **&av);
+  MSGViewer(miniSG::Model *sgmodel, OSPModel model, OSPRenderer renderer,
+            OSPCamera camera, ViewerConfig config = ViewerConfig());
 
 private:
-
-  void parseCommandLine(int ac, const char **&av);
-  void reportParsedData();
-  void createScene();
 
   void reshape(const ospray::vec2i &newSize);
   void keypress(char key, const vec2f where);
@@ -34,58 +33,21 @@ private:
 
   // Data //
 
+  miniSG::Model *m_sgmodel;
   OSPModel       m_model;
   OSPFrameBuffer m_fb;
   OSPRenderer    m_renderer;
   OSPCamera      m_camera;
   ospray::glut3D::FPSCounter m_fps;
 
-  // Previously global data //
-
-  Ref<miniSG::Model> msgModel;
-  std::vector<miniSG::Model *> msgAnimation;
-
-  /*! when using the OBJ renderer, we create a automatic dirlight with this
-   * direction; use ''--sun-dir x y z' to change */
-  vec3f defaultDirLight_direction;
-
-  bool doShadows;
-
-  float g_near_clip;
-  bool  g_fullScreen;
-  glut3D::Glut3DWidget::ViewPort g_viewPort;
+  ViewerConfig m_config;
 
   vec2i g_windowSize;
-
-  int g_benchWarmup;
-  int g_benchFrames;
-  bool g_alpha;
-  bool g_createDefaultMaterial;
-
-  int spp; /*! number of samples per pixel */
-  bool alwaysRedraw;
-
   int accumID;
-  int maxAccum;
+  bool g_fullScreen;
+  glut3D::Glut3DWidget::ViewPort g_viewPort;
+  float g_near_clip;
   int maxDepth; // only set with home/end
-  unsigned int maxObjectsToConsider;
-  // if turned on, we'll put each triangle mesh into its own instance,
-  // no matter what
-  bool forceInstancing;
-  /*! if turned on we're showing the depth buffer rather than the (accum'ed)
-   *  color buffer */
-  bool showDepthBuffer;
-  glut3D::Glut3DWidget::FrameBufferMode g_frameBufferMode;
-
-  const char *outFileName;
-
-  size_t numAccumsFrameInFileOutput;
-  size_t numSPPinFileOutput;
-
-  std::string rendererType;
-
-  OSPMaterial createDefaultMaterial(OSPRenderer renderer);
-  OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
 };
 
 }// namespace ospray

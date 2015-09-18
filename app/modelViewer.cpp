@@ -14,13 +14,16 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include "CommandLineSceneBuilder.h"
 #include "MSGViewer.h"
 
 int main(int ac, const char **av)
 {
   ospInit(&ac,av);
   ospray::glut3D::initGLUT(&ac,av);
-  ospray::MSGViewer window(ac, av);
+  ospray::CommandLineSceneBuilder clb(ac, av);
+  ospray::MSGViewer window(clb.sgmodel(), clb.model(), clb.renderer(),
+                           clb.camera(), clb.viewerConfig());
   window.create("ospModelViewer: OSPRay Mini-Scene Graph test viewer");
   ospray::glut3D::runGLUT();
 }
