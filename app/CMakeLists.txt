@@ -20,7 +20,8 @@ ADD_SUBDIRECTORY(miniSG)
 # main executable
 # --------------------------------------------
 ADD_EXECUTABLE(ospModelViewer
-  # CPP sources
+  MSGViewer.cpp
+  MSGViewer.h
   modelViewer.cpp
 )
 
