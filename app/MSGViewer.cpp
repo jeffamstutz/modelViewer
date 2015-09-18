@@ -39,10 +39,10 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
       m_renderer(renderer),
       m_camera(camera),
       m_config(config),
-      accumID(-1),
-      g_fullScreen(false),
-      g_near_clip(1e-6f),
-      maxDepth(2)
+      m_accumID(-1),
+      m_fullScreen(false),
+      m_nearClip(1e-6f),
+      m_maxDepth(2)
 {
     const box3f worldBounds(m_sgmodel->getBBox());
     setWorldBounds(worldBounds);
@@ -58,7 +58,7 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
 void MSGViewer::reshape(const vec2i &newSize)
 {
     Glut3DWidget::reshape(newSize);
-    g_windowSize = newSize;
+    m_windowSize = newSize;
     if (m_fb) ospFreeFrameBuffer(m_fb);
     m_fb = ospNewFrameBuffer(newSize, OSP_RGBA_I8,
                              OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
@@ -83,7 +83,7 @@ void MSGViewer::keypress(char key, const vec2f where)
         cout << "Switching shadows " << (m_config.doShadows?"ON":"OFF") << endl;
         ospSet1i(m_renderer,"shadowsEnabled", m_config.doShadows);
         ospCommit(m_renderer);
-        accumID=0;
+        m_accumID=0;
         ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
         forceRedraw();
         break;
@@ -102,9 +102,10 @@ void MSGViewer::keypress(char key, const vec2f where)
         break;
     case '!': {
         const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-        writePPM("ospmodelviewer.ppm", g_windowSize.x, g_windowSize.y, p);
+        writePPM("ospmodelviewer.ppm", m_windowSize.x, m_windowSize.y, p);
         // ospUnmapFrameBuffer(fb,p);
-        printf("#ospModelViewer: saved current frame to 'ospmodelviewer.ppm'\n");
+        cout << "#ospModelViewer: saved current frame to 'ospmodelviewer.ppm'"
+             << endl;
     } break;
     case 'X':
         if (viewPort.up == vec3f(1,0,0) || viewPort.up == vec3f(-1.f,0,0))
@@ -131,12 +132,12 @@ void MSGViewer::keypress(char key, const vec2f where)
         forceRedraw();
         break;
     case 'f':
-        g_fullScreen = !g_fullScreen;
-        if(g_fullScreen) glutFullScreen();
+        m_fullScreen = !m_fullScreen;
+        if(m_fullScreen) glutFullScreen();
         else glutPositionWindow(0,10);
         break;
     case 'r':
-        viewPort = g_viewPort;
+        viewPort = m_viewPort;
         break;
     case 'p':
         printf("-vp %f %f %f -vu %f %f %f -vi %f %f %f\n",
@@ -154,24 +155,24 @@ void ospray::MSGViewer::specialkey(int32 key, const vec2f where)
 {
     switch(key) {
     case GLUT_KEY_PAGE_UP:
-        g_near_clip += 20.f * motionSpeed;
+        m_nearClip += 20.f * motionSpeed;
     case GLUT_KEY_PAGE_DOWN:
-        g_near_clip -= 10.f * motionSpeed;
-        g_near_clip = std::max(g_near_clip, 1e-6f);
-        ospSet1f(m_camera, "near_clip", g_near_clip);
+        m_nearClip -= 10.f * motionSpeed;
+        m_nearClip = std::max(m_nearClip, 1e-6f);
+        ospSet1f(m_camera, "near_clip", m_nearClip);
         ospCommit(m_camera);
-        accumID=0;
+        m_accumID=0;
         ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
         forceRedraw();
         break;
     case GLUT_KEY_HOME:
-        maxDepth += 2;
+        m_maxDepth += 2;
     case GLUT_KEY_END:
-        maxDepth--;
-        ospSet1i(m_renderer, "maxDepth", maxDepth);
-        PRINT(maxDepth);
+        m_maxDepth--;
+        ospSet1i(m_renderer, "maxDepth", m_maxDepth);
+        PRINT(m_maxDepth);
         ospCommit(m_renderer);
-        accumID=0;
+        m_accumID=0;
         ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
         forceRedraw();
         break;
@@ -217,20 +218,20 @@ void MSGViewer::display()
     //}
     static double benchStart=0;
     static double fpsSum=0;
-    if (m_config.g_benchFrames > 0 && frameID == m_config.g_benchWarmup)
+    if (m_config.benchFrames > 0 && frameID == m_config.benchWarmup)
         benchStart = ospray::getSysTime();
-    if (m_config.g_benchFrames > 0 && frameID >= m_config.g_benchWarmup)
+    if (m_config.benchFrames > 0 && frameID >= m_config.benchWarmup)
         fpsSum += m_fps.getFPS();
-    if (m_config.g_benchFrames > 0 &&
-        frameID== m_config.g_benchWarmup + m_config.g_benchFrames)
+    if (m_config.benchFrames > 0 &&
+        frameID== m_config.benchWarmup + m_config.benchFrames)
     {
         double time = ospray::getSysTime()-benchStart;
-        double avgFps = fpsSum / double(frameID - m_config.g_benchWarmup);
+        double avgFps = fpsSum / double(frameID - m_config.benchWarmup);
         printf("Benchmark: time: %f avg fps: %f avg frame time: %f\n", time,
-               avgFps, time / double(frameID - m_config.g_benchWarmup));
+               avgFps, time / double(frameID - m_config.benchWarmup));
 
         const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-        writePPM("benchmark.ppm", g_windowSize.x, g_windowSize.y, p);
+        writePPM("benchmark.ppm", m_windowSize.x, m_windowSize.y, p);
 
         exit(0);
     }
@@ -240,7 +241,7 @@ void MSGViewer::display()
     if (viewPort.modified) {
         static bool once = true;
         if(once) {
-            g_viewPort = viewPort;
+            m_viewPort = viewPort;
             once = false;
         }
         Assert2(m_camera,"ospray camera is null");
@@ -250,7 +251,7 @@ void MSGViewer::display()
         ospSetf(m_camera,"aspect",viewPort.aspect);
         ospCommit(m_camera);
         viewPort.modified = false;
-        accumID=0;
+        m_accumID=0;
         ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
     }
 
@@ -269,30 +270,23 @@ void MSGViewer::display()
             ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
             std::cout << "#ospModelViewer: Saved rendered image (w/ " << i
                       << " accums) in " << m_config.outFileName << std::endl;
-            writePPM(m_config.outFileName, g_windowSize.x,
-                     g_windowSize.y, ucharFB);
+            writePPM(m_config.outFileName, m_windowSize.x,
+                     m_windowSize.y, ucharFB);
             ospUnmapFrameBuffer(ucharFB, m_fb);
         }
-        // std::cout << "#ospModelViewer: Saved rendered image in " << outFileName << std::endl;
-        // writePPM(outFileName, g_windowSize.x, g_windowSize.y, ucharFB);
         exit(0);
     }
 
     ospRenderFrame(m_fb, m_renderer, OSP_FB_COLOR |
                    (m_config.showDepthBuffer ? OSP_FB_DEPTH : 0) |
                    OSP_FB_ACCUM);
-    ++accumID;
+    ++m_accumID;
 
-    // set the glut3d widget's frame buffer to the opsray frame buffer, then display
+    // set the glut3d widget's frame buffer to the opsray frame buffer,
+    // then display
     ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
     frameBufferMode = Glut3DWidget::FRAMEBUFFER_UCHAR;
     Glut3DWidget::display();
-
-    // if (outFileName && accumID == maxAccum) {
-    //   std::cout << "#ospModelViewer: Saved rendered image in " << outFileName << std::endl;
-    //   writePPM(outFileName, g_windowSize.x, g_windowSize.y, ucharFB);
-    //   exit(0);
-    // }
 
     // that pointer is no longer valid, so set it to null
     ucharFB = NULL;
@@ -304,7 +298,7 @@ void MSGViewer::display()
                 m_fps.getFPS());
         setTitle(title);
         forceRedraw();
-    } else if (accumID < m_config.maxAccum) {
+    } else if (m_accumID < m_config.maxAccum) {
         forceRedraw();
     } else {
         // sprintf(title,"OSPRay Model Viewer");

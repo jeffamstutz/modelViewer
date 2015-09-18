@@ -32,6 +32,9 @@ private:
   void reportParsedData();
   void createScene();
 
+  OSPMaterial createDefaultMaterial(OSPRenderer renderer);
+  OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
+
   // Data //
 
   OSPModel    m_model;
@@ -42,39 +45,36 @@ private:
 
   // Previously global data //
 
-  Ref<miniSG::Model> msgModel;
-  std::vector<miniSG::Model *> msgAnimation;
+  Ref<miniSG::Model> m_msgModel;
+  std::vector<miniSG::Model *> m_msgAnimation;
 
   /*! when using the OBJ renderer, we create a automatic dirlight with this
    * direction; use ''--sun-dir x y z' to change */
-  vec3f defaultDirLight_direction;
+  vec3f m_defaultDirLight_direction;
 
-  bool g_fullScreen;
+  bool m_fullScreen;
 
-  bool g_alpha;
-  bool g_createDefaultMaterial;
+  bool m_alpha;
+  bool m_createDefaultMaterial;
 
-  int spp; /*! number of samples per pixel */
+  int m_spp; /*! number of samples per pixel */
 
-  unsigned int maxObjectsToConsider;
+  unsigned int m_maxObjectsToConsider;
   // if turned on, we'll put each triangle mesh into its own instance,
   // no matter what
-  bool forceInstancing;
+  bool m_forceInstancing;
   /*! if turned on we're showing the depth buffer rather than the (accum'ed)
    *  color buffer */
-  glut3D::Glut3DWidget::FrameBufferMode g_frameBufferMode;
+  glut3D::Glut3DWidget::FrameBufferMode m_frameBufferMode;
 
-  std::string rendererType;
-
-  OSPMaterial createDefaultMaterial(OSPRenderer renderer);
-  OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
+  std::string m_rendererType;
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
 
 inline miniSG::Model *CommandLineSceneBuilder::sgmodel()
 {
-  return msgModel.ptr;
+  return m_msgModel.ptr;
 }
 
 inline OSPModel CommandLineSceneBuilder::model()

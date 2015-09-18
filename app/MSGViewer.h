@@ -42,12 +42,12 @@ private:
 
   ViewerConfig m_config;
 
-  vec2i g_windowSize;
-  int accumID;
-  bool g_fullScreen;
-  glut3D::Glut3DWidget::ViewPort g_viewPort;
-  float g_near_clip;
-  int maxDepth; // only set with home/end
+  vec2i m_windowSize;
+  int m_accumID;
+  bool m_fullScreen;
+  glut3D::Glut3DWidget::ViewPort m_viewPort;
+  float m_nearClip;
+  int m_maxDepth; // only set with home/end
 };
 
 }// namespace ospray

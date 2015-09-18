@@ -8,8 +8,8 @@ struct ViewerConfig
   bool alwaysRedraw;
   bool doShadows;
   bool showDepthBuffer;
-  int g_benchWarmup;
-  int g_benchFrames;
+  int benchWarmup;
+  int benchFrames;
 
   const char *outFileName;
   size_t numAccumsFrameInFileOutput;
@@ -21,8 +21,8 @@ struct ViewerConfig
     alwaysRedraw(false),
     doShadows(true),
     showDepthBuffer(false),
-    g_benchWarmup(0),
-    g_benchFrames(0),
+    benchWarmup(0),
+    benchFrames(0),
     outFileName(NULL),
     numAccumsFrameInFileOutput(1),
     numSPPinFileOutput(1),
