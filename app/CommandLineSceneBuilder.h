@@ -58,6 +58,8 @@ private:
   bool m_createDefaultMaterial;
 
   int m_spp; /*! number of samples per pixel */
+  int m_naos; /*! number of ambient occlusion samples */
+  float m_aorl; /*! ambient occlusion secondary ray length */
 
   unsigned int m_maxObjectsToConsider;
   // if turned on, we'll put each triangle mesh into its own instance,
