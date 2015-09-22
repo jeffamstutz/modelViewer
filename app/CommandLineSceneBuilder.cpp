@@ -81,7 +81,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     m_alpha(false),
     m_createDefaultMaterial(true),
     m_spp(1),
-    m_naos(16),
+    m_naos(0),
     m_aorl(1e20f),
     m_maxObjectsToConsider((uint32)-1),
     m_forceInstancing(false),
@@ -105,7 +105,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     ospSetObject(m_renderer, "model", m_model);
     ospSetObject(m_renderer, "camera",m_camera);
     ospSet1i(m_renderer, "spp", m_spp);
-    ospSet1i(m_renderer, "aoSamples", m_naos);
+    if (m_naos > 0) ospSet1i(m_renderer, "aoSamples", m_naos);
     ospSet1f(m_renderer, "aoRayLength", m_aorl);
     ospCommit(m_camera);
     ospCommit(m_renderer);
