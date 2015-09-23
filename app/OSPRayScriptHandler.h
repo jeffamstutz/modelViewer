@@ -27,10 +27,6 @@ private:
   void registerScriptObjects();
   void registerScriptFunctions();
 
-  // Script callback functions //
-
-  void saySomething();
-
   // Data //
 
   OSPModel       m_model;

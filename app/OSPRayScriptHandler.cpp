@@ -128,23 +128,13 @@ void OSPRayScriptHandler::registerScriptObjects()
 
 void OSPRayScriptHandler::registerScriptFunctions()
 {
-  m_chai.add(chaiscript::fun(&OSPRayScriptHandler::saySomething, this),
-             "saySomething");
-
-  // ospray functions //
-
   m_chai.add(chaiscript::fun(&chaiospray::ospSet1f),  "ospSet1f");
   m_chai.add(chaiscript::fun(&chaiospray::ospSet1i),  "ospSet1i");
   m_chai.add(chaiscript::fun(&chaiospray::ospSet2f),  "ospSet2f");
-  m_chai.add(chaiscript::fun(&chaiospray::ospSet2f),  "ospSet2i");
-  m_chai.add(chaiscript::fun(&chaiospray::ospSet3i),  "ospSet3f");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet2i),  "ospSet2i");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet3f),  "ospSet3f");
   m_chai.add(chaiscript::fun(&chaiospray::ospSet3i),  "ospSet3i");
   m_chai.add(chaiscript::fun(&chaiospray::ospCommit), "ospCommit");
-}
-
-void OSPRayScriptHandler::saySomething()
-{
-  cout << "CALLBACK FUNCTION" << endl;
 }
 
 }// namespace ospray
