@@ -1,7 +1,11 @@
-#include "MSGViewer.h"
+﻿#include "MSGViewer.h"
 
+using std::cin;
 using std::cout;
 using std::endl;
+
+#include <string>
+using std::string;
 
 // Static local helper functions //////////////////////////////////////////////
 
@@ -74,6 +78,12 @@ void MSGViewer::reshape(const vec2i &newSize)
 void MSGViewer::keypress(char key, const vec2f where)
 {
     switch (key) {
+    case ':':
+        cout << endl << "...pause rendering..." << endl << endl;
+        cout << "**** MODEL VIEWER COMMAND MODE ****" << endl;
+        getConsoleCommands();
+        cout << endl << "...resume rendering..." << endl << endl;
+        break;
     case 'R':
         m_config.alwaysRedraw = !m_config.alwaysRedraw;
         forceRedraw();
@@ -304,6 +314,23 @@ void MSGViewer::display()
         // sprintf(title,"OSPRay Model Viewer");
         // setTitle(title);
     }
+}
+
+void MSGViewer::getConsoleCommands()
+{
+  string input;
+  string line;
+
+  do
+  {
+    getline(cin, line);
+    if (line == "done")
+      break;
+    input += line + '\n';
+  } while (1);
+
+  cout << "INPUT: " << endl;
+  cout << input << endl;
 }
 
 }// namepace ospray

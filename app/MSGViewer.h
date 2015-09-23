@@ -31,6 +31,8 @@ private:
 
   void display();
 
+  void getConsoleCommands();
+
   // Data //
 
   miniSG::Model *m_sgmodel;
