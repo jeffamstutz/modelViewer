@@ -16,6 +16,19 @@
 
 ADD_SUBDIRECTORY(miniSG)
 
+# TODO: write the find_package module for ChaiScript...
+#find_package(ChaiScript)
+
+SET(ChaiScript_ROOT "/opt/chaiscript" CACHE PATH "install path of ChaiScript")
+
+SET(ChaiScript_INCLUDE_DIR ${ChaiScript_ROOT}/include)
+SET(ChaiScript_LIBRARIES
+  ${ChaiScript_ROOT}/lib/chaiscript/libchaiscript_stdlib-5.7.2${CMAKE_SHARED_LIBRARY_SUFFIX}
+  #${ChaiScript_ROOT}/lib/chaiscript/libstl_extra${CMAKE_SHARED_LIBRARY_SUFFIX}
+)
+
+INCLUDE_DIRECTORIES(${ChaiScript_INCLUDE_DIR})
+
 # --------------------------------------------
 # main executable
 # --------------------------------------------
@@ -24,6 +37,8 @@ ADD_EXECUTABLE(ospModelViewer
   CommandLineSceneBuilder.h
   MSGViewer.cpp
   MSGViewer.h
+  OSPRayScriptHandler.cpp
+  OSPRayScriptHandler.h
   ViewerConfig.h
   modelViewer.cpp
 )
@@ -34,6 +49,7 @@ TARGET_LINK_LIBRARIES(ospModelViewer
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}
+  ${ChaiScript_LIBRARIES}
 )
 # ------------------------------------------------------------
 
