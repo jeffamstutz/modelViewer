@@ -202,11 +202,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
 
 void CommandLineSceneBuilder::reportParsedData()
 {
-    // -------------------------------------------------------
-    // done parsing
-    // -------------------------------------------------------]
     cout << "#ospModelViewer: done parsing. found model with" << endl;
-    // cout << "  - num materials: " << msgModel->material.size() << endl;
     cout << "  - num meshes   : " << m_msgModel->mesh.size() << " ";
     size_t numUniqueTris = 0;
     size_t numInstancedTris = 0;
@@ -219,7 +215,7 @@ void CommandLineSceneBuilder::reportParsedData()
     }
     cout << endl;
     cout << "  - num instances: " << m_msgModel->instance.size() << " ";
-    for (size_t  i=0;i<m_msgModel->instance.size();i++) {
+    for (size_t i = 0; i < m_msgModel->instance.size(); i++) {
         if (i < 10) {
             cout << "["
                  << m_msgModel->mesh[m_msgModel->instance[i].meshID]->size()
@@ -227,9 +223,9 @@ void CommandLineSceneBuilder::reportParsedData()
         } else {
             if (i == 10)
               cout << "...";
-            numInstancedTris +=
-                m_msgModel->mesh[m_msgModel->instance[i].meshID]->size();
         }
+        numInstancedTris +=
+            m_msgModel->mesh[m_msgModel->instance[i].meshID]->size();
     }
     cout << endl;
     cout << "  - num unique triangles   : " << numUniqueTris << endl;
