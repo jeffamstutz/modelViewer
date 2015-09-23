@@ -106,7 +106,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     ospSetObject(m_renderer, "camera",m_camera);
     ospSet1i(m_renderer, "spp", m_spp);
     if (m_naos > 0) ospSet1i(m_renderer, "aoSamples", m_naos);
-    ospSet1f(m_renderer, "aoRayLength", m_aorl);
+    ospSet1f(m_renderer, "aoOcclusionDistance", m_aorl);
     ospCommit(m_camera);
     ospCommit(m_renderer);
 
@@ -135,7 +135,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
             m_spp = atoi(av[++i]);
         } else if (arg == "--aos" || arg == "-aos") {
             m_naos = atoi(av[++i]);
-        } else if (arg == "--aorl" || arg == "-aorl") {
+        } else if (arg == "--aod" || arg == "-aod") {
             m_aorl = atof(av[++i]);
         } else if (arg == "--force-instancing") {
             m_forceInstancing = true;
