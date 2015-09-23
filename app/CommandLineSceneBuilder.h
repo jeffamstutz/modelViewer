@@ -70,6 +70,7 @@ private:
   glut3D::Glut3DWidget::FrameBufferMode m_frameBufferMode;
 
   std::string m_rendererType;
+  std::string m_cameraType;
 };
 
 // Inlined function definitions ///////////////////////////////////////////////

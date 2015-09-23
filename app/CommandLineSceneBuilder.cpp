@@ -86,7 +86,8 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     m_maxObjectsToConsider((uint32)-1),
     m_forceInstancing(false),
     m_frameBufferMode(glut3D::Glut3DWidget::FRAMEBUFFER_UCHAR),
-    m_rendererType("obj")
+    m_rendererType("ao1"),
+    m_cameraType("perspective")
 {
     m_msgModel = new miniSG::Model;
 
@@ -95,7 +96,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     reportParsedData();
     createScene();
 
-    m_camera = ospNewCamera("perspective");
+    m_camera = ospNewCamera(m_cameraType.c_str());
     Assert(m_camera != NULL && "could not create camera");
     ospSet3f(m_camera, "pos", -1,  1, -1);
     ospSet3f(m_camera, "dir",  1, -1,  1);
@@ -137,6 +138,8 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
             m_naos = atoi(av[++i]);
         } else if (arg == "--aod" || arg == "-aod") {
             m_aorl = atof(av[++i]);
+        } else if (arg == "--camera" || arg == "-c") {
+            m_cameraType = std::string(av[++i]);
         } else if (arg == "--force-instancing") {
             m_forceInstancing = true;
         } else if (arg == "--pt") {
