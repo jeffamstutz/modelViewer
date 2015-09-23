@@ -1,3 +1,18 @@
+// ======================================================================== //
+// Copyright 2009-2015 Intel Corporation                                    //
+//                                                                          //
+// Licensed under the Apache License, Version 2.0 (the "License");          //
+// you may not use this file except in compliance with the License.         //
+// You may obtain a copy of the License at                                  //
+//                                                                          //
+//     http://www.apache.org/licenses/LICENSE-2.0                           //
+//                                                                          //
+// Unless required by applicable law or agreed to in writing, software      //
+// distributed under the License is distributed on an "AS IS" BASIS,        //
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. //
+// See the License for the specific language governing permissions and      //
+// limitations under the License.                                           //
+// ======================================================================== //
 
 #pragma once
 
@@ -10,8 +25,7 @@
 
 #include "ViewerConfig.h"
 
-// ChaiScript
-#include <chaiscript/chaiscript.hpp>
+#include "OSPRayScriptHandler.h"
 
 namespace ospray {
 
@@ -34,14 +48,6 @@ private:
 
   void display();
 
-  void getConsoleCommands();
-  void registerScriptObjects();
-  void registerScriptFunctions();
-
-  // Script callback functions //
-
-  void saySomething();
-
   // Data //
 
   miniSG::Model *m_sgmodel;
@@ -60,7 +66,7 @@ private:
   float m_nearClip;
   int m_maxDepth; // only set with home/end
 
-  chaiscript::ChaiScript m_chai;
+  OSPRayScriptHandler m_scriptHandler;
 };
 
 }// namespace ospray

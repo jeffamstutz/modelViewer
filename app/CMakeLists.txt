@@ -37,6 +37,8 @@ ADD_EXECUTABLE(ospModelViewer
   CommandLineSceneBuilder.h
   MSGViewer.cpp
   MSGViewer.h
+  OSPRayScriptHandler.cpp
+  OSPRayScriptHandler.h
   ViewerConfig.h
   modelViewer.cpp
 )
