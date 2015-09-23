@@ -30,6 +30,54 @@ static void writePPM(const char *fileName, const int sizeX, const int sizeY,
   fclose(file);
 }
 
+// Scripting callback functions ///////////////////////////////////////////////
+
+namespace chaiospray {
+
+/*! add 1-float parameter to given object */
+void ospSet1f(OSPObject _object, const string id, float x)
+{
+  ::ospSet1f(_object, id.c_str(), x);
+}
+
+/*! add 1-int parameter to given object */
+void ospSet1i(OSPObject _object, const string &id, int32 x)
+{
+  ::ospSet1i(_object, id.c_str(), x);
+}
+
+/*! add a 2-float parameter to a given object */
+void ospSet2f(OSPObject _object, const string &id, float x, float y)
+{
+  ::ospSet2f(_object, id.c_str(), x, y);
+}
+
+/*! add a 2-int parameter to a given object */
+void ospSet2i(OSPObject _object, const string &id, int x, int y)
+{
+  ::ospSet2i(_object, id.c_str(), x, y);
+}
+
+/*! add 3-float parameter to given object */
+void ospSet3f(OSPObject _object, const string &id, float x, float y, float z)
+{
+  ::ospSet3f(_object, id.c_str(), x, y, z);
+}
+
+/*! add 3-int parameter to given object */
+void ospSet3i(OSPObject _object, const string &id, int x, int y, int z)
+{
+  ::ospSet3i(_object, id.c_str(), x, y, z);
+}
+
+/*! \brief commit changes to an object */
+void ospCommit(OSPObject object)
+{
+  ::ospCommit(object);
+}
+
+}
+
 // MSGViewer definitions //////////////////////////////////////////////////////
 
 namespace ospray {
@@ -58,6 +106,9 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
         m_sgmodel->camera[0]->at,
         m_sgmodel->camera[0]->up);
   }
+
+  registerScriptObjects();
+  registerScriptFunctions();
 }
 
 void MSGViewer::reshape(const vec2i &newSize)
@@ -340,6 +391,33 @@ void MSGViewer::getConsoleCommands()
       cerr << e.what() << endl;
     }
   } while (1);
+}
+
+void MSGViewer::registerScriptObjects()
+{
+  m_chai.add(chaiscript::var((osp::ManagedObject*)m_model),    "model"   );
+  m_chai.add(chaiscript::var((osp::ManagedObject*)m_renderer), "renderer");
+  m_chai.add(chaiscript::var((osp::ManagedObject*)m_camera),   "camera"  );
+}
+
+void MSGViewer::registerScriptFunctions()
+{
+  m_chai.add(chaiscript::fun(&MSGViewer::saySomething, this), "saySomething");
+
+  // ospray functions //
+
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet1f),  "ospSet1f");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet1i),  "ospSet1i");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet2f),  "ospSet2f");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet2f),  "ospSet2i");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet3i),  "ospSet3f");
+  m_chai.add(chaiscript::fun(&chaiospray::ospSet3i),  "ospSet3i");
+  m_chai.add(chaiscript::fun(&chaiospray::ospCommit), "ospCommit");
+}
+
+void MSGViewer::saySomething()
+{
+  cout << "CALLBACK FUNCTION" << endl;
 }
 
 }// namepace ospray

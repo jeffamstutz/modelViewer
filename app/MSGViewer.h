@@ -35,6 +35,12 @@ private:
   void display();
 
   void getConsoleCommands();
+  void registerScriptObjects();
+  void registerScriptFunctions();
+
+  // Script callback functions //
+
+  void saySomething();
 
   // Data //
 
