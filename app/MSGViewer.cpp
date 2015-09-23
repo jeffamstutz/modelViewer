@@ -1,5 +1,6 @@
 ﻿#include "MSGViewer.h"
 
+using std::cerr;
 using std::cin;
 using std::cout;
 using std::endl;
@@ -318,19 +319,23 @@ void MSGViewer::display()
 
 void MSGViewer::getConsoleCommands()
 {
-  string input;
   string line;
 
   do
   {
+    cout << "% ";
+
     getline(cin, line);
+
     if (line == "done")
       break;
-    input += line + '\n';
-  } while (1);
 
-  cout << "INPUT: " << endl;
-  cout << input << endl;
+    try {
+      m_chai.eval(line);
+    } catch (const chaiscript::exception::eval_error &e) {
+      cerr << e.what() << endl;
+    }
+  } while (1);
 }
 
 }// namepace ospray

@@ -10,6 +10,9 @@
 
 #include "ViewerConfig.h"
 
+// ChaiScript
+#include <chaiscript/chaiscript.hpp>
+
 namespace ospray {
 
 /*! mini scene graph viewer widget. \internal Note that all handling
@@ -50,6 +53,8 @@ private:
   glut3D::Glut3DWidget::ViewPort m_viewPort;
   float m_nearClip;
   int m_maxDepth; // only set with home/end
+
+  chaiscript::ChaiScript m_chai;
 };
 
 }// namespace ospray
