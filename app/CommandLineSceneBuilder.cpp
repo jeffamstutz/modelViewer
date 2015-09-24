@@ -1,5 +1,6 @@
 #include "CommandLineSceneBuilder.h"
 
+using std::cerr;
 using std::cout;
 using std::endl;
 
@@ -7,12 +8,12 @@ using std::endl;
 
 static void error(const std::string &msg)
 {
-  cout << "#ospModelViewer fatal error : " << msg << endl;
-  cout << endl;
-  cout << "Proper usage: " << endl;
-  cout << "  ./ospModelViewer"
+  cerr << "#ospModelViewer fatal error : " << msg << endl;
+  cerr << endl;
+  cerr << "Proper usage: " << endl;
+  cerr << "  ./ospModelViewer"
        << " [-bench <warmpup>x<numFrames>] [-model] <inFileName>" << endl;
-  cout << endl;
+  cerr << endl;
   exit(1);
 }
 
@@ -21,7 +22,7 @@ static void warnMaterial(const std::string &type)
   static std::map<std::string,int> numOccurances;
   if (numOccurances[type] == 0)
   {
-    cout << "could not create material type '"<<  type <<
+    cerr << "could not create material type '"<<  type <<
             "'. Replacing with default material." << endl;
   }
   numOccurances[type]++;
@@ -34,7 +35,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
     static int numWarnings = 0;
     if (++numWarnings < 10)
     {
-      cout << "WARNING: material does not have Textures"
+      cerr << "WARNING: material does not have Textures"
            << " (only warning for the first 10 times)!" << endl;
     }
     return NULL;
@@ -82,7 +83,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   m_createDefaultMaterial(true),
   m_spp(1),
   m_naos(0),
-  m_aorl(1e20f),
+  m_aorl(-1.f),
   m_maxObjectsToConsider((uint32)-1),
   m_forceInstancing(false),
   m_frameBufferMode(glut3D::Glut3DWidget::FRAMEBUFFER_UCHAR),
@@ -93,7 +94,10 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
 
   parseCommandLine(ac, av);
 
-  reportParsedData();
+  if (m_config.verboseOutput) {
+    reportParsedData();
+  }
+
   createScene();
 
   m_camera = ospNewCamera(m_cameraType.c_str());
@@ -106,17 +110,35 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   ospSetObject(m_renderer, "model", m_model);
   ospSetObject(m_renderer, "camera",m_camera);
   ospSet1i(m_renderer, "spp", m_spp);
-  if (m_naos > 0) ospSet1i(m_renderer, "aoSamples", m_naos);
-  ospSet1f(m_renderer, "aoOcclusionDistance", m_aorl);
+  if (m_naos > 0)   ospSet1i(m_renderer, "aoSamples", m_naos);
+  if (m_aorl > 0.f) ospSet1f(m_renderer, "aoOcclusionDistance", m_aorl);
   ospCommit(m_camera);
   ospCommit(m_renderer);
 
-  printf("#ospModelViewer: done creating window. Press 'Q' to quit.\n");
+  if (m_config.verboseOutput) {
+    cout << "#ospModelViewer: done creating window. Press 'Q' to quit." << endl;
+  }
 }
 
 void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
 {
-  cout << "#ospModelViewer: starting to process cmdline arguments" << endl;
+  // Check if verbose output is turned on //
+
+  for (int i = 1; i < ac; ++i)
+  {
+    const std::string arg = av[i];
+    if (arg == "-v") {
+      m_config.verboseOutput = true;
+      break;
+    }
+  }
+
+  // Parse the rest of the arguments
+
+  if (m_config.verboseOutput) {
+    cout << "#ospModelViewer: starting to process cmdline arguments" << endl;
+  }
+
   for (int i=1;i<ac;i++) {
     const std::string arg = av[i];
     if (arg == "--renderer") {
@@ -124,6 +146,8 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
       m_rendererType = av[++i];
     } else if (arg == "--always-redraw" || arg == "-fps") {
       m_config.alwaysRedraw = true;
+    } else if (arg == "-v") {
+      m_config.verboseOutput = true;
     } else if (arg == "-o") {
       m_config.outFileName = strdup(av[++i]);
     } else if (arg == "-o:nacc") {
@@ -143,7 +167,6 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     } else if (arg == "--force-instancing") {
       m_forceInstancing = true;
     } else if (arg == "--pt") {
-      // shortcut for '--renderer pathtracer'
       m_config.maxAccum = 1024;
       m_rendererType = "pathtracer";
     } else if (arg == "--sun-dir") {
@@ -157,7 +180,9 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     } else if (arg == "--module" || arg == "--plugin") {
       assert(i+1 < ac);
       const char *moduleName = av[++i];
-      cout << "loading ospray module '" << moduleName << "'" << endl;
+      if (m_config.verboseOutput) {
+        cout << "loading ospray module '" << moduleName << "'" << endl;
+      }
       ospLoadModule(moduleName);
     } else if (arg == "--alpha") {
       m_alpha = true;
@@ -255,23 +280,29 @@ void CommandLineSceneBuilder::createScene()
   bool doesInstancing = 0;
 
   if (m_forceInstancing) {
-    std::cout << "#ospModelViewer: forced instancing - instances on."
-              << std::endl;
+    if (m_config.verboseOutput) {
+      cout << "#ospModelViewer: forced instancing - instances on." << endl;
+    }
     doesInstancing = true;
   } else if (m_msgModel->instance.size() > m_msgModel->mesh.size()) {
-    std::cout << "#ospModelViewer: found more object instances than meshes "
-              << "- turning on instancing" << std::endl;
+    if (m_config.verboseOutput) {
+      cout << "#ospModelViewer: found more object instances than meshes "
+           << "- turning on instancing" << endl;
+    }
     doesInstancing = true;
   } else {
-    std::cout << "#ospModelViewer: number of instances matches number of "
-              << "meshes, creating single model that contains all meshes"
-              << std::endl;
+    if (m_config.verboseOutput) {
+      cout << "#ospModelViewer: number of instances matches number of "
+           << "meshes, creating single model that contains all meshes" << endl;
+    }
     doesInstancing = false;
   }
 
   if (m_msgModel->instance.size() > m_maxObjectsToConsider) {
-    cout << "cutting down on the number of meshes as requested "
-         << "on cmdline..." << endl;
+    if (m_config.verboseOutput) {
+      cout << "cutting down on the number of meshes as requested "
+           << "on cmdline..." << endl;
+    }
     m_msgModel->instance.resize(m_maxObjectsToConsider);
   }
 
@@ -280,11 +311,12 @@ void CommandLineSceneBuilder::createScene()
   }
 
 
-  cout << "#ospModelViewer: adding parsed geometries to ospray model" << endl;
+  if (m_config.verboseOutput) {
+    cout << "#ospModelViewer: adding parsed geometries to ospray model" << endl;
+  }
   std::vector<OSPModel> instanceModels;
 
   for (size_t i=0;i<m_msgModel->mesh.size();i++) {
-    //      printf("Mesh %i/%li\n",i,msgModel->mesh.size());
     Ref<miniSG::Mesh> msgMesh = m_msgModel->mesh[i];
 
     // create ospray mesh
@@ -295,12 +327,12 @@ void CommandLineSceneBuilder::createScene()
     // check if we have to transform the vertices:
     if (doesInstancing == false &&
         m_msgModel->instance[i] != miniSG::Instance(i)) {
-      // cout << "Transforming vertex array ..." << endl;
       for (size_t vID=0;vID<msgMesh->position.size();vID++) {
         msgMesh->position[vID] = xfmPoint(m_msgModel->instance[i].xfm,
                                           msgMesh->position[vID]);
       }
     }
+
     // add position array to mesh
     OSPData position = ospNewData(msgMesh->position.size(),
                                   OSP_FLOAT3A,
@@ -317,7 +349,6 @@ void CommandLineSceneBuilder::createScene()
       ospSetData(ospMesh,"prim.materialID",primMatID);
     }
 
-    // cout << "INDEX" << endl;
     // add triangle index array to mesh
     OSPData index = ospNewData(msgMesh->triangle.size(),
                                OSP_INT3,
@@ -334,8 +365,6 @@ void CommandLineSceneBuilder::createScene()
           OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->normal.size() > 0);
       ospSetData(ospMesh,"vertex.normal",normal);
-    } else {
-      // cout << "no vertex normals!" << endl;
     }
 
     // add color array to mesh
@@ -346,10 +375,7 @@ void CommandLineSceneBuilder::createScene()
           OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->color.size() > 0);
       ospSetData(ospMesh,"vertex.color",color);
-    } else {
-      // cout << "no vertex colors!" << endl;
     }
-
     // add texcoord array to mesh
     if (!msgMesh->texcoord.empty()) {
       OSPData texcoord = ospNewData(msgMesh->texcoord.size(),
@@ -443,16 +469,25 @@ void CommandLineSceneBuilder::createScene()
       ospAddGeometry(m_model,inst);
     }
   }
-  cout << "#m_modelViewer: committing model" << endl;
+
+  if (m_config.verboseOutput) {
+    cout << "#m_modelViewer: committing model" << endl;
+  }
+
   ospCommit(m_model);
-  cout << "#m_modelViewer: done creating ospray model." << endl;
+
+  if (m_config.verboseOutput) {
+    cout << "#m_modelViewer: done creating ospray model." << endl;
+  }
 
   //TODO: Need to figure out where we're going to read lighting data from
   //begin light test
   std::vector<OSPLight> lights;
   if (m_defaultDirLight_direction != vec3f(0.f)) {
-    cout << "#m_modelViewer: Adding a hard coded directional "
-         << "light as the sun." << endl;
+    if (m_config.verboseOutput) {
+      cout << "#m_modelViewer: Adding a hard coded directional "
+           << "light as the sun." << endl;
+    }
     OSPLight ospLight = ospNewLight(m_renderer, "DirectionalLight");
     ospSetString(ospLight, "name", "sun" );
     ospSet3f(ospLight, "color", 1, 1, 1);
@@ -472,17 +507,19 @@ OSPMaterial
 ospray::CommandLineSceneBuilder::createDefaultMaterial(OSPRenderer renderer)
 {
   if(!m_createDefaultMaterial) return NULL;
+
   static OSPMaterial ospMat = NULL;
+
   if (ospMat) return ospMat;
 
   ospMat = ospNewMaterial(renderer, "OBJMaterial");
+
   if (!ospMat)
   {
     std::string msg = "could not create default material 'OBJMaterial'";
     throw std::runtime_error(msg);
-    //cout << "given renderer does not know material type 'OBJMaterial'"
-    //     << endl;
   }
+
   ospSet3f(ospMat, "Kd", .8f, 0.f, 0.f);
   ospCommit(ospMat);
   return ospMat;
@@ -496,7 +533,7 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
     static int numWarnings = 0;
     if (++numWarnings < 10)
     {
-      cout << "WARNING: model does not have materials! "
+      cerr << "WARNING: model does not have materials! "
            << "(assigning default)" << endl;
     }
     return createDefaultMaterial(renderer);

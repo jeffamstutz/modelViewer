@@ -136,6 +136,11 @@ void OSPRayScriptHandler::stop()
     m_thread.join();
 }
 
+bool OSPRayScriptHandler::running()
+{
+  return m_running;
+}
+
 void OSPRayScriptHandler::registerScriptObjects()
 {
   m_chai.add(chaiscript::var(m_model),    "model"   );

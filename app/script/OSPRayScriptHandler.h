@@ -20,6 +20,8 @@ public:
   void start();
   void stop();
 
+  bool running();
+
 private:
 
   void consoleLoop();

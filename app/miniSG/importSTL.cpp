@@ -58,8 +58,6 @@ namespace ospray {
       int32 numTriangles;
       rc = fread(&numTriangles,sizeof(int),1,file);
       Assert(rc == 1 && "could not read num triangles from STL file");
-      cout << "miniSG::importSTL: #tris="
-           << numTriangles << " (" << fileName.c_str() << ")" << endl;
 
       ImportHelper importer(model,fileName.c_str());
 

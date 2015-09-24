@@ -29,7 +29,7 @@
 
 namespace ospray {
   namespace miniSG {
-    using std::cout;
+    using std::cerr;
     using std::endl;
 
     /*! Three-index vertex, indexing start at 0, -1 means invalid vertex. */
@@ -268,7 +268,7 @@ namespace ospray {
 
           if (!cur) {
             //throw std::runtime_error("invalid material file: newmtl expected first");
-            cout << "#osp:minisg:parseOBJ (Warning): cannot parse input line " << line << endl;
+            cerr << "#osp:minisg:parseOBJ (Warning): cannot parse input line " << line << endl;
             continue;
           }
 
@@ -420,9 +420,7 @@ namespace ospray {
     void importOBJ(Model &model,
                    const embree::FileName &fileName)
     {
-      std::cout << "ospray::miniSG::importOBJ: importing from " << fileName << endl;
-      OBJLoader loader(model,fileName);
-      std::cout << "ospray::miniSG::importOBJ: found " << model.numUniqueTriangles() << " in " << model.numMeshes() << std::endl;
+      OBJLoader loader(model, fileName);
     }
 
   } // ::ospray::minisg

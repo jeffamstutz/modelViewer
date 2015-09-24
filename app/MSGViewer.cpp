@@ -47,8 +47,12 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
 {
   const box3f worldBounds(m_sgmodel->getBBox());
   setWorldBounds(worldBounds);
-  cout << "#ospModelViewer: set world bounds " << worldBounds
-       << ", motion speed " << motionSpeed << endl;
+
+  if (m_config.verboseOutput) {
+    cout << "#ospModelViewer: set world bounds " << worldBounds
+         << ", motion speed " << motionSpeed << endl;
+  }
+
   if (m_sgmodel->camera.size() > 0) {
     setViewPort(m_sgmodel->camera[0]->from,
         m_sgmodel->camera[0]->at,
@@ -76,7 +80,9 @@ void MSGViewer::keypress(char key, const vec2f where)
 {
   switch (key) {
   case ':':
-    m_scriptHandler.start();
+    if (!m_scriptHandler.running()) {
+      m_scriptHandler.start();
+    }
     break;
   case 'R':
     m_config.alwaysRedraw = !m_config.alwaysRedraw;
@@ -93,21 +99,12 @@ void MSGViewer::keypress(char key, const vec2f where)
     break;
   case 'D':
     m_config.showDepthBuffer = !m_config.showDepthBuffer;
-    // switch(g_frameBufferMode) {
-    //   case Glut3DWidget::FRAMEBUFFER_DEPTH:
-    //     g_frameBufferMode = Glut3DWidget::FRAMEBUFFER_UCHAR;
-    //     break;
-    //   case Glut3DWidget::FRAMEBUFFER_UCHAR:
-    //     g_frameBufferMode = Glut3DWidget::FRAMEBUFFER_DEPTH;
-    //     break;
-    // }
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
     forceRedraw();
     break;
   case '!': {
     const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
     writePPM("ospmodelviewer.ppm", m_windowSize.x, m_windowSize.y, p);
-    // ospUnmapFrameBuffer(fb,p);
     cout << "#ospModelViewer: saved current frame to 'ospmodelviewer.ppm'"
          << endl;
   } break;
@@ -304,9 +301,6 @@ void MSGViewer::display()
     forceRedraw();
   } else if (m_accumID < m_config.maxAccum) {
     forceRedraw();
-  } else {
-    // sprintf(title,"OSPRay Model Viewer");
-    // setTitle(title);
   }
 }
 
