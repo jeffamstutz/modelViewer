@@ -16,17 +16,7 @@
 
 ADD_SUBDIRECTORY(miniSG)
 
-# TODO: write the find_package module for ChaiScript...
-#find_package(ChaiScript)
-
-SET(ChaiScript_ROOT "/opt/chaiscript" CACHE PATH "install path of ChaiScript")
-
-SET(ChaiScript_INCLUDE_DIR ${ChaiScript_ROOT}/include)
-
-INCLUDE_DIRECTORIES(
-  ${ChaiScript_INCLUDE_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/script
-)
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/script)
 
 # --------------------------------------------
 # main executable

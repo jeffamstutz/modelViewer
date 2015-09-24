@@ -6,7 +6,7 @@
 #include "app/ospray_cpp.h"
 
 // ChaiScript
-#include <chaiscript/chaiscript.hpp>
+#include "chaiscript/chaiscript.hpp"
 
 namespace ospray {
 

@@ -1,7 +1,7 @@
 #include "OSPRayScriptHandler.h"
 
-#include <chaiscript/chaiscript_stdlib.hpp>
-#include <chaiscript/utility/utility.hpp>
+#include "chaiscript/chaiscript_stdlib.hpp"
+#include "chaiscript/utility/utility.hpp"
 
 using std::cerr;
 using std::cin;
