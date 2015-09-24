@@ -22,6 +22,7 @@
 #include "common/sys/filename.h"
 // stl
 #include <stack>
+#include <vector>
 
 #ifdef _WIN32
 #  ifdef ospray_xml_EXPORTS
