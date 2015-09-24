@@ -3,10 +3,10 @@
 
 #include <thread>
 
-#include "ospray/ospray.h"
+#include "app/ospray_cpp.h"
 
 // ChaiScript
-#include <chaiscript/chaiscript.hpp>
+#include "chaiscript/chaiscript.hpp"
 
 namespace ospray {
 
@@ -25,13 +25,14 @@ private:
   void consoleLoop();
 
   void registerScriptObjects();
+  void registerScriptTypes();
   void registerScriptFunctions();
 
   // Data //
 
-  OSPModel       m_model;
-  OSPRenderer    m_renderer;
-  OSPCamera      m_camera;
+  osp::cpp::Model    m_model;
+  osp::cpp::Renderer m_renderer;
+  osp::cpp::Camera   m_camera;
 
   chaiscript::ChaiScript m_chai;
 
