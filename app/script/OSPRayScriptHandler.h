@@ -30,13 +30,9 @@ private:
 
   // Data //
 
-  OSPModel       m_model;
-  OSPRenderer    m_renderer;
-  OSPCamera      m_camera;
-
-  osp::cpp::Model    m_cppmodel;
-  osp::cpp::Renderer m_cpprenderer;
-  osp::cpp::Camera   m_cppcamera;
+  osp::cpp::Model    m_model;
+  osp::cpp::Renderer m_renderer;
+  osp::cpp::Camera   m_camera;
 
   chaiscript::ChaiScript m_chai;
 

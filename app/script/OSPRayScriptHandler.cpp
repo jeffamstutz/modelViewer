@@ -78,9 +78,6 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
   m_model(model),
   m_renderer(renderer),
   m_camera(camera),
-  m_cppmodel(model),
-  m_cpprenderer(renderer),
-  m_cppcamera(camera),
   m_running(false)
 {
   registerScriptTypes();
@@ -139,9 +136,9 @@ void OSPRayScriptHandler::stop()
 
 void OSPRayScriptHandler::registerScriptObjects()
 {
-  m_chai.add(chaiscript::var(m_cppmodel),    "model"   );
-  m_chai.add(chaiscript::var(m_cpprenderer), "renderer");
-  m_chai.add(chaiscript::var(m_cppcamera),   "camera"  );
+  m_chai.add(chaiscript::var(m_model),    "model"   );
+  m_chai.add(chaiscript::var(m_renderer), "renderer");
+  m_chai.add(chaiscript::var(m_camera),   "camera"  );
 }
 
 void OSPRayScriptHandler::registerScriptTypes()
