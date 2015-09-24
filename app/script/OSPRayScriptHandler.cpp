@@ -1,5 +1,6 @@
 #include "OSPRayScriptHandler.h"
 
+#include <chaiscript/chaiscript_stdlib.hpp>
 #include <chaiscript/utility/utility.hpp>
 
 using std::cerr;
@@ -78,6 +79,7 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
   m_model(model),
   m_renderer(renderer),
   m_camera(camera),
+  m_chai(chaiscript::Std_Lib::library()),
   m_running(false)
 {
   registerScriptTypes();

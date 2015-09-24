@@ -22,10 +22,6 @@ ADD_SUBDIRECTORY(miniSG)
 SET(ChaiScript_ROOT "/opt/chaiscript" CACHE PATH "install path of ChaiScript")
 
 SET(ChaiScript_INCLUDE_DIR ${ChaiScript_ROOT}/include)
-SET(ChaiScript_LIBRARIES
-  ${ChaiScript_ROOT}/lib/chaiscript/libchaiscript_stdlib-5.7.2${CMAKE_SHARED_LIBRARY_SUFFIX}
-  #${ChaiScript_ROOT}/lib/chaiscript/libstl_extra${CMAKE_SHARED_LIBRARY_SUFFIX}
-)
 
 INCLUDE_DIRECTORIES(
   ${ChaiScript_INCLUDE_DIR}
@@ -53,7 +49,6 @@ TARGET_LINK_LIBRARIES(ospModelViewer
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}
-  ${ChaiScript_LIBRARIES}
 )
 # ------------------------------------------------------------
 
