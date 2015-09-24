@@ -1,5 +1,7 @@
 #include "OSPRayScriptHandler.h"
 
+#include <chaiscript/utility/utility.hpp>
+
 using std::cerr;
 using std::cin;
 using std::cout;
@@ -55,6 +57,13 @@ void ospCommit(OSPObject object)
 }
 
 }
+
+class testClass
+{
+public:
+  void sayHello() { cout << "HELLO!!" << endl; }
+  void sayHello(int x) { cout << "HELLO with x!!..." << x << endl; }
+};
 
 namespace ospray {
 
@@ -135,6 +144,17 @@ void OSPRayScriptHandler::registerScriptFunctions()
   m_chai.add(chaiscript::fun(&chaiospray::ospSet3f),  "ospSet3f");
   m_chai.add(chaiscript::fun(&chaiospray::ospSet3i),  "ospSet3i");
   m_chai.add(chaiscript::fun(&chaiospray::ospCommit), "ospCommit");
+
+  chaiscript::ModulePtr m = chaiscript::ModulePtr(new chaiscript::Module());
+  chaiscript::utility::add_class<testClass>(*m, "testClass",
+     {chaiscript::constructor<testClass()>()},
+     {
+       {chaiscript::fun(static_cast<void (testClass::*)()>(&testClass::sayHello)), "sayHello"},
+       {chaiscript::fun(static_cast<void (testClass::*)(int)>(&testClass::sayHello)), "sayHello"}
+     }
+     );
+
+  m_chai.add(m);
 }
 
 }// namespace ospray
