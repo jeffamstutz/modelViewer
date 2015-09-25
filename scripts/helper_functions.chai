@@ -1,0 +1,14 @@
+
+// Function to make it easier to create a renderer from an existing camera
+// and model.
+//
+// NOTE: The returned renderer is commited before returning
+def createRenderer(type, camera, model) {
+  var r = Renderer(type)
+  r.set("camera", camera)
+  r.set("world", model)
+  r.set("model", model)
+  r.commit()
+
+  return r
+}
