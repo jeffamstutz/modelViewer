@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <mutex>
 
 // viewer widget
@@ -42,6 +43,7 @@ public:
             OSPCamera camera, ViewerConfig config = ViewerConfig());
 
   void setRenderer(OSPRenderer renderer);
+  void resetAccumulation();
 
 private:
 
@@ -76,6 +78,8 @@ private:
   int m_maxDepth; // only set with home/end
 
   DebugViewerScriptHandler m_scriptHandler;
+
+  std::atomic<bool> m_resetAccum;
 };
 
 }// namespace ospray

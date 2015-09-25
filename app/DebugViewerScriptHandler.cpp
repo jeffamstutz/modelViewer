@@ -23,7 +23,13 @@ void DebugViewerScriptHandler::registerScriptFunctions()
     m_viewer->setRenderer((OSPRenderer)r.handle());
   };
 
+  // refresh()
+  auto refresh = [this]() {
+    m_viewer->resetAccumulation();
+  };
+
   chai.add(chaiscript::fun(setRenderer), "setRenderer");
+  chai.add(chaiscript::fun(refresh),     "refresh"    );
 }
 
 }// namespace ospray

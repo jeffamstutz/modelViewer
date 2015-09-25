@@ -68,6 +68,8 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
   if (!m_config.scriptFileName.empty()) {
     m_scriptHandler.runScriptFromFile(m_config.scriptFileName);
   }
+
+  m_resetAccum = false;
 }
 
 void MSGViewer::setRenderer(OSPRenderer renderer)
@@ -76,6 +78,11 @@ void MSGViewer::setRenderer(OSPRenderer renderer)
   (void)lock;// NOTE(jda) - squash "unused variable" warning...
 
   m_queuedRenderer = renderer;
+}
+
+void MSGViewer::resetAccumulation()
+{
+  m_resetAccum = true;
 }
 
 void MSGViewer::reshape(const vec2i &newSize)
@@ -236,6 +243,11 @@ void MSGViewer::display()
 
   // NOTE: consume a new renderer if one has been queued by another thread
   switchRenderers();
+
+  if (m_resetAccum) {
+    ospFrameBufferClear(m_fb, OSP_FB_ACCUM);
+    m_resetAccum = false;
+  }
 
   m_fps.startRender();
   //}
