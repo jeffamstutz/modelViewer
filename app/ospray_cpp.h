@@ -46,6 +46,11 @@ public:
   void set(const std::string &name, float v1, float v2);
   void set(const std::string &name, float v1, float v2, float v3);
 
+  // double
+  void set(const std::string &name, double v);
+  void set(const std::string &name, double v1, double v2);
+  void set(const std::string &name, double v1, double v2, double v3);
+
   // void*
   void set(const std::string &name, void *v);
 
@@ -113,6 +118,22 @@ inline void ManagedObject::set(const std::string &name, float v1, float v2)
 
 inline void ManagedObject::set(const std::string &name,
                                float v1, float v2, float v3)
+{
+  ospSet3f(m_object, name.c_str(), v1, v2, v3);
+}
+
+inline void ManagedObject::set(const std::string &name, double v)
+{
+  ospSet1f(m_object, name.c_str(), v);
+}
+
+inline void ManagedObject::set(const std::string &name, double v1, double v2)
+{
+  ospSet2f(m_object, name.c_str(), v1, v2);
+}
+
+inline void ManagedObject::set(const std::string &name,
+                               double v1, double v2, double v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
 }
