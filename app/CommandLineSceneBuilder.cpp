@@ -8,10 +8,10 @@ using std::endl;
 
 static void error(const std::string &msg)
 {
-  cerr << "#ospModelViewer fatal error : " << msg << endl;
+  cerr << "#ospDebugViewer fatal error : " << msg << endl;
   cerr << endl;
   cerr << "Proper usage: " << endl;
-  cerr << "  ./ospModelViewer"
+  cerr << "  ./ospDebugViewer"
        << " [-bench <warmpup>x<numFrames>] [-model] <inFileName>" << endl;
   cerr << endl;
   exit(1);
@@ -116,7 +116,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   ospCommit(m_renderer);
 
   if (m_config.verboseOutput) {
-    cout << "#ospModelViewer: done creating window. Press 'Q' to quit." << endl;
+    cout << "#ospDebugViewer: done creating window. Press 'Q' to quit." << endl;
   }
 }
 
@@ -136,7 +136,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
   // Parse the rest of the arguments
 
   if (m_config.verboseOutput) {
-    cout << "#ospModelViewer: starting to process cmdline arguments" << endl;
+    cout << "#ospDebugViewer: starting to process cmdline arguments" << endl;
   }
 
   for (int i=1;i<ac;i++) {
@@ -224,7 +224,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
 
 void CommandLineSceneBuilder::reportParsedData()
 {
-  cout << "#ospModelViewer: done parsing. found model with" << endl;
+  cout << "#ospDebugViewer: done parsing. found model with" << endl;
   cout << "  - num meshes   : " << m_msgModel->mesh.size() << " ";
   size_t numUniqueTris = 0;
   size_t numInstancedTris = 0;
@@ -278,18 +278,18 @@ void CommandLineSceneBuilder::createScene()
 
   if (m_forceInstancing) {
     if (m_config.verboseOutput) {
-      cout << "#ospModelViewer: forced instancing - instances on." << endl;
+      cout << "#ospDebugViewer: forced instancing - instances on." << endl;
     }
     doesInstancing = true;
   } else if (m_msgModel->instance.size() > m_msgModel->mesh.size()) {
     if (m_config.verboseOutput) {
-      cout << "#ospModelViewer: found more object instances than meshes "
+      cout << "#ospDebugViewer: found more object instances than meshes "
            << "- turning on instancing" << endl;
     }
     doesInstancing = true;
   } else {
     if (m_config.verboseOutput) {
-      cout << "#ospModelViewer: number of instances matches number of "
+      cout << "#ospDebugViewer: number of instances matches number of "
            << "meshes, creating single model that contains all meshes" << endl;
     }
     doesInstancing = false;
@@ -309,7 +309,7 @@ void CommandLineSceneBuilder::createScene()
 
 
   if (m_config.verboseOutput) {
-    cout << "#ospModelViewer: adding parsed geometries to ospray model" << endl;
+    cout << "#ospDebugViewer: adding parsed geometries to ospray model" << endl;
   }
   std::vector<OSPModel> instanceModels;
 

@@ -43,15 +43,6 @@ ELSE()
   MESSAGE(FATAL_ERROR "Unsupported compiler: '${OSPRAY_COMPILER}'")
 ENDIF()
 
-# the arch we're targeting for the non-MIC/non-xeon phi part of ospray
-SET(OSPRAY_BUILD_ISA "ALL" CACHE STRING "Target ISA (SSE, AVX, AVX2, or ALL)")
-IF (OSPRAY_BUILD_ENABLE_KNL)
-  SET_PROPERTY(CACHE OSPRAY_BUILD_ISA PROPERTY STRINGS ALL SSE AVX AVX2 AVX512)
-  OPTION(OSPRAY_ISPC_KNL_NATIVE "Enable ISPC's native KNL build") # TODO: autodetect
-ELSE()
-  SET_PROPERTY(CACHE OSPRAY_BUILD_ISA PROPERTY STRINGS ALL SSE AVX AVX2)
-ENDIF()
-
 ##############################################################
 # Project configuration
 ##############################################################

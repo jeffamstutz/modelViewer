@@ -24,6 +24,6 @@ int main(int ac, const char **av)
   ospray::CommandLineSceneBuilder clb(ac, av);
   ospray::MSGViewer window(clb.sgmodel(), clb.model(), clb.renderer(),
                            clb.camera(), clb.viewerConfig());
-  window.create("ospModelViewer: OSPRay Mini-Scene Graph test viewer");
+  window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
   ospray::glut3D::runGLUT();
 }

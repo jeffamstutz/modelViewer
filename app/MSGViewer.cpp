@@ -49,7 +49,7 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
   setWorldBounds(worldBounds);
 
   if (m_config.verboseOutput) {
-    cout << "#ospModelViewer: set world bounds " << worldBounds
+    cout << "#ospDebugViewer: set world bounds " << worldBounds
          << ", motion speed " << motionSpeed << endl;
   }
 
@@ -105,7 +105,7 @@ void MSGViewer::keypress(char key, const vec2f where)
   case '!': {
     const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
     writePPM("ospmodelviewer.ppm", m_windowSize.x, m_windowSize.y, p);
-    cout << "#ospModelViewer: saved current frame to 'ospmodelviewer.ppm'"
+    cout << "#ospDebugViewer: saved current frame to 'ospmodelviewer.ppm'"
          << endl;
   } break;
   case 'X':
@@ -260,7 +260,7 @@ void MSGViewer::display()
     ospSet1i(m_renderer, "spp", m_config.numSPPinFileOutput);
     ospCommit(m_renderer);
 
-    std::cout << "#ospModelViewer: Renderering offline image with "
+    std::cout << "#ospDebugViewer: Renderering offline image with "
               << m_config.numSPPinFileOutput
               << " samples per pixel per frame, and accumulation of "
               << m_config.numAccumsFrameInFileOutput << " such frames"
@@ -269,7 +269,7 @@ void MSGViewer::display()
     for (int i = 0; i < m_config.numAccumsFrameInFileOutput; i++) {
       ospRenderFrame(m_fb,m_renderer,OSP_FB_COLOR|OSP_FB_ACCUM);
       ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-      std::cout << "#ospModelViewer: Saved rendered image (w/ " << i
+      std::cout << "#ospDebugViewer: Saved rendered image (w/ " << i
                 << " accums) in " << m_config.outFileName << std::endl;
       writePPM(m_config.outFileName, m_windowSize.x,
                m_windowSize.y, ucharFB);
@@ -295,7 +295,7 @@ void MSGViewer::display()
   char title[1000];
 
   if (m_config.alwaysRedraw) {
-    sprintf(title,"OSPRay Model Viewer (%f fps)",
+    sprintf(title,"OSPRay Debug Viewer (%f fps)",
             m_fps.getFPS());
     setTitle(title);
     forceRedraw();
