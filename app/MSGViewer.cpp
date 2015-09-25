@@ -299,8 +299,6 @@ void MSGViewer::display()
             m_fps.getFPS());
     setTitle(title);
     forceRedraw();
-  } else if (m_accumID < m_config.maxAccum) {
-    forceRedraw();
   }
 }
 

@@ -15,7 +15,6 @@ struct ViewerConfig
   size_t numAccumsFrameInFileOutput;
   size_t numSPPinFileOutput;
 
-  int maxAccum;
   bool verboseOutput;
 
   ViewerConfig() :
@@ -27,7 +26,6 @@ struct ViewerConfig
     outFileName(NULL),
     numAccumsFrameInFileOutput(1),
     numSPPinFileOutput(1),
-    maxAccum(64),
     verboseOutput(false)
   {
   }

@@ -156,8 +156,6 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
       m_maxObjectsToConsider = atoi(av[++i]);
     } else if (arg == "--spp" || arg == "-spp") {
       m_spp = atoi(av[++i]);
-    } else if (arg == "--nacc" || arg == "-nacc") {
-      m_config.maxAccum = atoi(av[++i]);
     } else if (arg == "--aos" || arg == "-aos") {
       m_naos = atoi(av[++i]);
     } else if (arg == "--aod" || arg == "-aod") {
@@ -167,7 +165,6 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     } else if (arg == "--force-instancing") {
       m_forceInstancing = true;
     } else if (arg == "--pt") {
-      m_config.maxAccum = 1024;
       m_rendererType = "pathtracer";
     } else if (arg == "--sun-dir") {
       if (!strcmp(av[i+1],"none")) {
