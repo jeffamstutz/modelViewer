@@ -5,6 +5,9 @@ using std::endl;
 
 using std::string;
 
+using std::lock_guard;
+using std::mutex;
+
 // Static local helper functions //////////////////////////////////////////////
 
 // helper function to write the rendered image as PPM file
@@ -40,12 +43,13 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
     m_fb(NULL),
     m_renderer(renderer),
     m_camera(camera),
+    m_queuedRenderer(NULL),
     m_config(config),
     m_accumID(-1),
     m_fullScreen(false),
     m_nearClip(1e-6f),
     m_maxDepth(2),
-    m_scriptHandler(model, renderer, camera)
+    m_scriptHandler(model, renderer, camera, this)
 {
   const box3f worldBounds(m_sgmodel->getBBox());
   setWorldBounds(worldBounds);
@@ -64,6 +68,14 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
   if (!m_config.scriptFileName.empty()) {
     m_scriptHandler.runScriptFromFile(m_config.scriptFileName);
   }
+}
+
+void MSGViewer::setRenderer(OSPRenderer renderer)
+{
+  lock_guard<mutex> lock{m_rendererMutex};
+  (void)lock;// NOTE(jda) - squash "unused variable" warning...
+
+  m_queuedRenderer = renderer;
 }
 
 void MSGViewer::reshape(const vec2i &newSize)
@@ -221,6 +233,10 @@ void MSGViewer::display()
   // work), but the average time between ttwo calls is roughly the
   // frame rate (including display overhead, of course)
   if (frameID > 0) m_fps.doneRender();
+
+  // NOTE: consume a new renderer if one has been queued by another thread
+  switchRenderers();
+
   m_fps.startRender();
   //}
   static double benchStart=0;
@@ -304,6 +320,18 @@ void MSGViewer::display()
             m_fps.getFPS());
     setTitle(title);
     forceRedraw();
+  }
+}
+
+void MSGViewer::switchRenderers()
+{
+  lock_guard<mutex> lock{m_rendererMutex};
+  (void)lock;// NOTE(jda) - squash "unused variable" warning...
+
+  if (m_queuedRenderer) {
+    m_renderer = m_queuedRenderer;
+    m_queuedRenderer = NULL;
+    ospFrameBufferClear(m_fb, OSP_FB_ACCUM);
   }
 }
 

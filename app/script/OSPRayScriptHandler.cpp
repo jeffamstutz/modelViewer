@@ -160,6 +160,14 @@ bool OSPRayScriptHandler::running()
   return m_running;
 }
 
+chaiscript::ChaiScript &OSPRayScriptHandler::scriptEngine()
+{
+  if (m_running)
+    throw runtime_error("Cannot modify the script env while running!");
+
+  return m_chai;
+}
+
 void OSPRayScriptHandler::registerScriptObjects()
 {
   m_chai.add(chaiscript::var(m_model),    "model"   );

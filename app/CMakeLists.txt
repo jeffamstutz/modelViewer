@@ -18,7 +18,10 @@ SET(APP_NAME ospDebugViewer)
 
 ADD_SUBDIRECTORY(miniSG)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/script)
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/script
+)
 
 # --------------------------------------------
 # main executable
@@ -26,6 +29,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/script)
 ADD_EXECUTABLE(${APP_NAME}
   script/OSPRayScriptHandler.cpp
   script/OSPRayScriptHandler.h
+  DebugViewerScriptHandler.cpp
+  DebugViewerScriptHandler.h
   CommandLineSceneBuilder.cpp
   CommandLineSceneBuilder.h
   MSGViewer.cpp

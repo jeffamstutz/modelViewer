@@ -16,58 +16,32 @@
 
 #pragma once
 
-#include <thread>
-
-#include "app/ospray_cpp.h"
-
-// ChaiScript
-#include "chaiscript/chaiscript.hpp"
+#include "OSPRayScriptHandler.h"
 
 namespace ospray {
 
-class OSPRayScriptHandler
+class MSGViewer;
+
+class DebugViewerScriptHandler : public OSPRayScriptHandler
 {
 public:
 
-  OSPRayScriptHandler(OSPModel model, OSPRenderer renderer, OSPCamera camera);
-  ~OSPRayScriptHandler();
-
-  void runScriptFromFile(const std::string &file);
-
-  void start();
-  void stop();
-
-  bool running();
-
-protected:
-
-  //! \brief ChaiScript engine, only accessable if the interactive thread isn't
-  //!        running.
-  //!
-  //! \note Allow anyone who extends (inherits from) OSPRayScriptHandler to
-  //!       have access to the engine to let them add custom functions or types.
-  chaiscript::ChaiScript &scriptEngine();
+  DebugViewerScriptHandler(OSPModel     model,
+                           OSPRenderer  renderer,
+                           OSPCamera    camera,
+                           MSGViewer   *viewer);
 
 private:
 
-  void consoleLoop();
-
-  void registerScriptObjects();
-  void registerScriptTypes();
   void registerScriptFunctions();
+
+  // Script callback functions //
+
+  void setRenderer(osp::cpp::Renderer &renderer);
 
   // Data //
 
-  osp::cpp::Model    m_model;
-  osp::cpp::Renderer m_renderer;
-  osp::cpp::Camera   m_camera;
-
-  chaiscript::ChaiScript m_chai;
-
-  bool m_running;
-
-  //! \brief background thread to handle the scripting commands from the console
-  std::thread m_thread;
+  MSGViewer *m_viewer;
 };
 
 }// namespace ospray

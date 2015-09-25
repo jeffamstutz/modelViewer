@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <mutex>
+
 // viewer widget
 #include "common/widgets/glut3D.h"
 // mini scene graph for loading the model
@@ -25,7 +27,7 @@
 
 #include "ViewerConfig.h"
 
-#include "OSPRayScriptHandler.h"
+#include "DebugViewerScriptHandler.h"
 
 namespace ospray {
 
@@ -39,6 +41,8 @@ public:
   MSGViewer(miniSG::Model *sgmodel, OSPModel model, OSPRenderer renderer,
             OSPCamera camera, ViewerConfig config = ViewerConfig());
 
+  void setRenderer(OSPRenderer renderer);
+
 private:
 
   void reshape(const ospray::vec2i &newSize);
@@ -47,6 +51,8 @@ private:
   void mouseButton(int32 whichButton, bool released, const vec2i &pos);
 
   void display();
+
+  void switchRenderers();
 
   // Data //
 
@@ -57,6 +63,9 @@ private:
   OSPCamera      m_camera;
   ospray::glut3D::FPSCounter m_fps;
 
+  std::mutex m_rendererMutex;
+  OSPRenderer m_queuedRenderer;
+
   ViewerConfig m_config;
 
   vec2i m_windowSize;
@@ -66,7 +75,7 @@ private:
   float m_nearClip;
   int m_maxDepth; // only set with home/end
 
-  OSPRayScriptHandler m_scriptHandler;
+  DebugViewerScriptHandler m_scriptHandler;
 };
 
 }// namespace ospray
