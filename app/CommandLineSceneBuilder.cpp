@@ -321,7 +321,7 @@ void CommandLineSceneBuilder::createScene()
     // create ospray mesh
     OSPGeometry ospMesh = m_alpha ?
           ospNewGeometry("alpha_aware_triangle_mesh") :
-          ospNewTriangleMesh();
+          ospNewGeometry("trianglemesh");
 
     // check if we have to transform the vertices:
     if (doesInstancing == false &&
