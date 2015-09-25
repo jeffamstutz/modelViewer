@@ -35,10 +35,6 @@ private:
 
   void registerScriptFunctions();
 
-  // Script callback functions //
-
-  void setRenderer(osp::cpp::Renderer &renderer);
-
   // Data //
 
   MSGViewer *m_viewer;
