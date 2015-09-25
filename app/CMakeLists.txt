@@ -14,6 +14,8 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
+SET(APP_NAME ospDebugViewer)
+
 ADD_SUBDIRECTORY(miniSG)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/script)
@@ -21,7 +23,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/script)
 # --------------------------------------------
 # main executable
 # --------------------------------------------
-ADD_EXECUTABLE(ospModelViewer
+ADD_EXECUTABLE(${APP_NAME}
   script/OSPRayScriptHandler.cpp
   script/OSPRayScriptHandler.h
   CommandLineSceneBuilder.cpp
@@ -33,7 +35,7 @@ ADD_EXECUTABLE(ospModelViewer
   ospray_cpp.h
 )
 
-TARGET_LINK_LIBRARIES(ospModelViewer
+TARGET_LINK_LIBRARIES(${APP_NAME}
   ospray_minisg
   ospray_glut3d
   ${OPENGL_LIBRARIES}
@@ -42,4 +44,4 @@ TARGET_LINK_LIBRARIES(ospModelViewer
 )
 # ------------------------------------------------------------
 
-INSTALL(TARGETS ospModelViewer DESTINATION bin)
+INSTALL(TARGETS ${APP_NAME} DESTINATION bin)
