@@ -19,7 +19,7 @@ struct ViewerConfig
   bool verboseOutput;
 
   ViewerConfig() :
-    alwaysRedraw(false),
+    alwaysRedraw(true),
     doShadows(true),
     showDepthBuffer(false),
     benchWarmup(0),

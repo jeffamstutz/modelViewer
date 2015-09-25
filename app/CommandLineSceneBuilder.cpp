@@ -144,8 +144,6 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     if (arg == "--renderer") {
       assert(i+1 < ac);
       m_rendererType = av[++i];
-    } else if (arg == "--always-redraw" || arg == "-fps") {
-      m_config.alwaysRedraw = true;
     } else if (arg == "-v") {
       m_config.verboseOutput = true;
     } else if (arg == "-o") {
