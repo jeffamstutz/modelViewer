@@ -3,13 +3,15 @@
 using std::cout;
 using std::endl;
 
+using std::string;
+
 // Static local helper functions //////////////////////////////////////////////
 
 // helper function to write the rendered image as PPM file
-static void writePPM(const char *fileName, const int sizeX, const int sizeY,
+static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
 {
-  FILE *file = fopen(fileName, "wb");
+  FILE *file = fopen(fileName.c_str(), "wb");
   fprintf(file, "P6\n%i %i\n255\n", sizeX, sizeY);
   unsigned char *out = (unsigned char *)alloca(3*sizeX);
   for (int y = 0; y < sizeY; y++) {
@@ -57,6 +59,10 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
     setViewPort(m_sgmodel->camera[0]->from,
         m_sgmodel->camera[0]->at,
         m_sgmodel->camera[0]->up);
+  }
+
+  if (!m_config.scriptFileName.empty()) {
+    m_scriptHandler.runScriptFromFile(m_config.scriptFileName);
   }
 }
 
@@ -256,23 +262,22 @@ void MSGViewer::display()
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
   }
 
-  if (m_config.outFileName) {
+  if (!m_config.outFileName.empty()) {
     ospSet1i(m_renderer, "spp", m_config.numSPPinFileOutput);
     ospCommit(m_renderer);
 
-    std::cout << "#ospDebugViewer: Renderering offline image with "
-              << m_config.numSPPinFileOutput
-              << " samples per pixel per frame, and accumulation of "
-              << m_config.numAccumsFrameInFileOutput << " such frames"
-              << endl;
+    cout << "#ospDebugViewer: Renderering offline image with "
+         << m_config.numSPPinFileOutput
+         << " samples per pixel per frame, and accumulation of "
+         << m_config.numAccumsFrameInFileOutput << " such frames"
+         << endl;
 
     for (int i = 0; i < m_config.numAccumsFrameInFileOutput; i++) {
       ospRenderFrame(m_fb,m_renderer,OSP_FB_COLOR|OSP_FB_ACCUM);
       ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-      std::cout << "#ospDebugViewer: Saved rendered image (w/ " << i
-                << " accums) in " << m_config.outFileName << std::endl;
-      writePPM(m_config.outFileName, m_windowSize.x,
-               m_windowSize.y, ucharFB);
+      cout << "#ospDebugViewer: Saved rendered image (w/ " << i
+           << " accums) in " << m_config.outFileName << endl;
+      writePPM(m_config.outFileName, m_windowSize.x, m_windowSize.y, ucharFB);
       ospUnmapFrameBuffer(ucharFB, m_fb);
     }
     exit(0);

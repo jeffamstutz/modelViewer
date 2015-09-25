@@ -3,6 +3,8 @@
 #include "chaiscript/chaiscript_stdlib.hpp"
 #include "chaiscript/utility/utility.hpp"
 
+using std::runtime_error;
+
 using std::cerr;
 using std::cin;
 using std::cout;
@@ -89,6 +91,23 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
 OSPRayScriptHandler::~OSPRayScriptHandler()
 {
   stop();
+}
+
+void OSPRayScriptHandler::runScriptFromFile(const std::string &file)
+{
+  if (m_running) {
+    throw runtime_error("Cannot execute a script file when"
+                        " running interactively!");
+  }
+
+  registerScriptObjects();
+
+  try {
+    m_chai.eval_file(file);
+  } catch (const chaiscript::exception::eval_error &e) {
+    cerr << "ERROR: script '" << file << "' executed with error(s):" << endl;
+    cerr << "    " << e.what() << endl;
+  }
 }
 
 void OSPRayScriptHandler::consoleLoop()

@@ -146,6 +146,8 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
       m_rendererType = av[++i];
     } else if (arg == "-v") {
       m_config.verboseOutput = true;
+    } else if (arg == "-s") {
+      m_config.scriptFileName = av[++i];
     } else if (arg == "-o") {
       m_config.outFileName = strdup(av[++i]);
     } else if (arg == "-o:nacc") {
