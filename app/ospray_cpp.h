@@ -57,6 +57,9 @@ public:
   // OSPObject*
   void set(const std::string &name, OSPObject v);
 
+  // osp::cpp::ManagedObject
+  void set(const std::string &name, const ManagedObject &v);
+
   //! \todo add get functions
 
   //! Commit to ospray
@@ -146,6 +149,11 @@ inline void ManagedObject::set(const std::string &name, void *v)
 inline void ManagedObject::set(const std::string &name, OSPObject v)
 {
   ospSetObject(m_object, name.c_str(), v);
+}
+
+inline void ManagedObject::set(const std::string &name, const ManagedObject &v)
+{
+  ospSetObject(m_object, name.c_str(), v.handle());
 }
 
 inline void ManagedObject::commit() const

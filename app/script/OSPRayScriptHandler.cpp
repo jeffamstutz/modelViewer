@@ -172,6 +172,7 @@ void OSPRayScriptHandler::registerScriptTypes()
        {chaiscript::fun(static_cast<void (osp::cpp::ManagedObject::*)(const std::string &, double, double, double)>(&osp::cpp::ManagedObject::set)), "set"},
        {chaiscript::fun(static_cast<void (osp::cpp::ManagedObject::*)(const std::string &, void*)>(&osp::cpp::ManagedObject::set)), "set"},
        {chaiscript::fun(static_cast<void (osp::cpp::ManagedObject::*)(const std::string &, OSPObject)>(&osp::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (osp::cpp::ManagedObject::*)(const std::string &, const osp::cpp::ManagedObject &)>(&osp::cpp::ManagedObject::set)), "set"},
        {chaiscript::fun(&osp::cpp::ManagedObject::commit), "commit"},
        {chaiscript::fun(&osp::cpp::ManagedObject::handle), "handle"}
      }
