@@ -199,6 +199,105 @@ inline Camera::Camera(OSPCamera existing) :
 {
 }
 
+// Data class ///////////////////////////////////////////////////////////////
+
+class Data : public ManagedObject
+{
+public:
+
+  Data(const Data &copy);
+  Data(OSPData existing);
+};
+
+// Data inlined members //
+
+inline Data::Data(const Data &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline Data::Data(OSPData existing) :
+  ManagedObject(existing)
+{
+}
+
+// FrameBuffer class //////////////////////////////////////////////////////////
+
+class FrameBuffer : public ManagedObject
+{
+public:
+
+  FrameBuffer(const FrameBuffer &copy);
+  FrameBuffer(OSPFrameBuffer existing);
+};
+
+// FrameBuffer inlined members //
+
+inline FrameBuffer::FrameBuffer(const FrameBuffer &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline FrameBuffer::FrameBuffer(OSPFrameBuffer existing) :
+  ManagedObject(existing)
+{
+}
+
+// Geometry class /////////////////////////////////////////////////////////////
+
+class Geometry : public ManagedObject
+{
+public:
+
+  Geometry(const std::string &type);
+  Geometry(const Geometry &copy);
+  Geometry(OSPGeometry existing);
+};
+
+// Geometry inlined members //
+
+inline Geometry::Geometry(const std::string &type)
+{
+  OSPGeometry c = ospNewGeometry(type.c_str());
+  if (c) {
+    m_object = c;
+  } else {
+    throw std::runtime_error("Failed to create OSPGeometry!");
+  }
+}
+
+inline Geometry::Geometry(const Geometry &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline Geometry::Geometry(OSPGeometry existing) :
+  ManagedObject(existing)
+{
+}
+
+// Light class ////////////////////////////////////////////////////////////////
+
+class Light : public ManagedObject
+{
+public:
+
+  Light(const Light &copy);
+  Light(OSPLight existing);
+};
+
+// Light inlined members //
+
+inline Light::Light(const Light &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline Light::Light(OSPLight existing) :
+  ManagedObject(existing)
+{
+}
+
 // Model class ////////////////////////////////////////////////////////////////
 
 class Model : public ManagedObject
@@ -232,6 +331,39 @@ inline Model::Model(OSPModel existing) :
 {
 }
 
+// PixelOp class /////////////////////////////////////////////////////////////
+
+class PixelOp : public ManagedObject
+{
+public:
+
+  PixelOp(const std::string &type);
+  PixelOp(const PixelOp &copy);
+  PixelOp(OSPPixelOp existing);
+};
+
+// PixelOp inlined members //
+
+inline PixelOp::PixelOp(const std::string &type)
+{
+  OSPPixelOp c = ospNewPixelOp(type.c_str());
+  if (c) {
+    m_object = c;
+  } else {
+    throw std::runtime_error("Failed to create OSPPixelOp!");
+  }
+}
+
+inline PixelOp::PixelOp(const PixelOp &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline PixelOp::PixelOp(OSPPixelOp existing) :
+  ManagedObject(existing)
+{
+}
+
 // Renderer class /////////////////////////////////////////////////////////////
 
 class Renderer : public ManagedObject
@@ -261,6 +393,94 @@ inline Renderer::Renderer(const Renderer &copy) :
 }
 
 inline Renderer::Renderer(OSPRenderer existing) :
+  ManagedObject(existing)
+{
+}
+
+// TransferFunction class /////////////////////////////////////////////////////
+
+class TransferFunction : public ManagedObject
+{
+public:
+
+  TransferFunction(const std::string &type);
+  TransferFunction(const TransferFunction &copy);
+  TransferFunction(OSPTransferFunction existing);
+};
+
+// TransferFunction inlined members //
+
+inline TransferFunction::TransferFunction(const std::string &type)
+{
+  OSPTransferFunction c = ospNewTransferFunction(type.c_str());
+  if (c) {
+    m_object = c;
+  } else {
+    throw std::runtime_error("Failed to create OSPTransferFunction!");
+  }
+}
+
+inline TransferFunction::TransferFunction(const TransferFunction &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline TransferFunction::TransferFunction(OSPTransferFunction existing) :
+  ManagedObject(existing)
+{
+}
+
+// Texture2D class ////////////////////////////////////////////////////////////
+
+class Texture2D : public ManagedObject
+{
+public:
+
+  Texture2D(const Texture2D &copy);
+  Texture2D(OSPTexture2D existing);
+};
+
+// Texture2D inlined members //
+
+inline Texture2D::Texture2D(const Texture2D &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline Texture2D::Texture2D(OSPTexture2D existing) :
+  ManagedObject(existing)
+{
+}
+
+// Volume class ///////////////////////////////////////////////////////////////
+
+class Volume : public ManagedObject
+{
+public:
+
+  Volume(const std::string &type);
+  Volume(const Volume &copy);
+  Volume(OSPVolume existing);
+};
+
+// Volume inlined members //
+
+inline Volume::Volume(const std::string &type)
+{
+  OSPVolume c = ospNewVolume(type.c_str());
+  if (c) {
+    m_object = c;
+  } else {
+    throw std::runtime_error("Failed to create OSPVolume!");
+  }
+}
+
+inline Volume::Volume(const Volume &copy) :
+  ManagedObject(copy.handle())
+{
+}
+
+inline Volume::Volume(OSPVolume existing) :
   ManagedObject(existing)
 {
 }

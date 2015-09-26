@@ -205,21 +205,48 @@ void OSPRayScriptHandler::registerScriptTypes()
      }
      );
 
-  chaiscript::utility::add_class<osp::cpp::Renderer>(*m, "Renderer",
-     {
-       chaiscript::constructor<osp::cpp::Renderer(const std::string &)>(),
-       chaiscript::constructor<osp::cpp::Renderer(const osp::cpp::Renderer &)>(),
-       chaiscript::constructor<osp::cpp::Renderer(OSPRenderer)>()
-     },
-     {
-     }
-     );
-
   chaiscript::utility::add_class<osp::cpp::Camera>(*m, "Camera",
      {
        chaiscript::constructor<osp::cpp::Camera(const std::string &)>(),
        chaiscript::constructor<osp::cpp::Camera(const osp::cpp::Camera &)>(),
        chaiscript::constructor<osp::cpp::Camera(OSPCamera)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Data>(*m, "Data",
+     {
+       chaiscript::constructor<osp::cpp::Data(const osp::cpp::Data &)>(),
+       chaiscript::constructor<osp::cpp::Data(OSPData)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::FrameBuffer>(*m, "FrameBuffer",
+     {
+       chaiscript::constructor<osp::cpp::FrameBuffer(const osp::cpp::FrameBuffer &)>(),
+       chaiscript::constructor<osp::cpp::FrameBuffer(OSPFrameBuffer)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Geometry>(*m, "Geometry",
+     {
+       chaiscript::constructor<osp::cpp::Geometry(const std::string &)>(),
+       chaiscript::constructor<osp::cpp::Geometry(const osp::cpp::Geometry &)>(),
+       chaiscript::constructor<osp::cpp::Geometry(OSPGeometry)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Light>(*m, "Light",
+     {
+       chaiscript::constructor<osp::cpp::Light(const osp::cpp::Light &)>(),
+       chaiscript::constructor<osp::cpp::Light(OSPLight)>()
      },
      {
      }
@@ -235,22 +262,96 @@ void OSPRayScriptHandler::registerScriptTypes()
      }
      );
 
+  chaiscript::utility::add_class<osp::cpp::PixelOp>(*m, "PixelOp",
+     {
+       chaiscript::constructor<osp::cpp::PixelOp(const std::string &)>(),
+       chaiscript::constructor<osp::cpp::PixelOp(const osp::cpp::PixelOp &)>(),
+       chaiscript::constructor<osp::cpp::PixelOp(OSPPixelOp)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Renderer>(*m, "Renderer",
+     {
+       chaiscript::constructor<osp::cpp::Renderer(const std::string &)>(),
+       chaiscript::constructor<osp::cpp::Renderer(const osp::cpp::Renderer &)>(),
+       chaiscript::constructor<osp::cpp::Renderer(OSPRenderer)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::TransferFunction>(*m, "TransferFunction",
+     {
+       chaiscript::constructor<osp::cpp::TransferFunction(const std::string &)>(),
+       chaiscript::constructor<osp::cpp::TransferFunction(const osp::cpp::TransferFunction &)>(),
+       chaiscript::constructor<osp::cpp::TransferFunction(OSPTransferFunction)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Texture2D>(*m, "Texture2D",
+     {
+       chaiscript::constructor<osp::cpp::Texture2D(const osp::cpp::Texture2D &)>(),
+       chaiscript::constructor<osp::cpp::Texture2D(OSPTexture2D)>()
+     },
+     {
+     }
+     );
+
+  chaiscript::utility::add_class<osp::cpp::Volume>(*m, "Volume",
+     {
+       chaiscript::constructor<osp::cpp::Volume(const std::string &)>(),
+       chaiscript::constructor<osp::cpp::Volume(const osp::cpp::Volume &)>(),
+       chaiscript::constructor<osp::cpp::Volume(OSPVolume)>()
+     },
+     {
+     }
+     );
+
   m_chai.add(m);
 
   // Inheritance relationships //
 
   // osp objects
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Camera>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Data>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::FrameBuffer>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Geometry>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Light>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Model>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::PixelOp>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Renderer>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject,
+                                    osp::TransferFunction>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Texture2D>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Volume>());
 
   // osp::cpp objects
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
                                     osp::cpp::Camera>());
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Data>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::FrameBuffer>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Geometry>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Light>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
                                     osp::cpp::Model>());
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::PixelOp>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
                                     osp::cpp::Renderer>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::TransferFunction>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Texture2D>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Volume>());
 }
 
 void OSPRayScriptHandler::registerScriptFunctions()
