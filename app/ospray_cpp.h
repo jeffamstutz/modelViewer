@@ -166,7 +166,24 @@ inline OSPObject ManagedObject::handle() const
   return m_object;
 }
 
-// Camera class ///////////////////////////////////////////////////////////////
+// Forward declarations ///////////////////////////////////////////////////////
+
+class Camera;
+class Data;
+class FrameBuffer;
+class Geometry;
+class Light;
+class Material;
+class Model;
+class PixelOp;
+class Renderer;
+class TransferFunction;
+class Texture2D;
+class Volume;
+
+// Class definitions //////////////////////////////////////////////////////////
+
+// Camera class //
 
 class Camera : public ManagedObject
 {
@@ -176,6 +193,139 @@ public:
   Camera(const Camera &copy);
   Camera(OSPCamera existing);
 };
+
+// Data class //
+
+class Data : public ManagedObject
+{
+public:
+
+  Data(const Data &copy);
+  Data(OSPData existing);
+};
+
+// FrameBuffer class //
+
+class FrameBuffer : public ManagedObject
+{
+public:
+
+  FrameBuffer(const FrameBuffer &copy);
+  FrameBuffer(OSPFrameBuffer existing);
+
+  void setPixelOp(PixelOp &p);
+  void setPixelOp(OSPPixelOp p);
+};
+
+// Geometry class //
+
+class Geometry : public ManagedObject
+{
+public:
+
+  Geometry(const std::string &type);
+  Geometry(const Geometry &copy);
+  Geometry(OSPGeometry existing);
+
+  void setMaterial(Material &m);
+  void setMaterial(OSPMaterial m);
+};
+
+// Light class //
+
+class Light : public ManagedObject
+{
+public:
+
+  Light(const Light &copy);
+  Light(OSPLight existing);
+};
+
+// Material class //
+
+class Material : public ManagedObject
+{
+public:
+
+  Material(const Material &copy);
+  Material(OSPMaterial existing);
+};
+
+// Model class //
+
+class Model : public ManagedObject
+{
+public:
+
+  Model();
+  Model(const Model &copy);
+  Model(OSPModel existing);
+
+  void addGeometry(Geometry &v);
+  void addGeometry(OSPGeometry v);
+
+  void addVolume(Volume &v);
+  void addVolume(OSPVolume v);
+};
+
+// PixelOp class //
+
+class PixelOp : public ManagedObject
+{
+public:
+
+  PixelOp(const std::string &type);
+  PixelOp(const PixelOp &copy);
+  PixelOp(OSPPixelOp existing);
+};
+
+// Renderer class //
+
+class Renderer : public ManagedObject
+{
+public:
+
+  Renderer(const std::string &type);
+  Renderer(const Renderer &copy);
+  Renderer(OSPRenderer existing);
+
+  Material newMaterial(const std::string &type);
+  Light    newLight(const std::string &type);
+};
+
+// TransferFunction class //
+
+class TransferFunction : public ManagedObject
+{
+public:
+
+  TransferFunction(const std::string &type);
+  TransferFunction(const TransferFunction &copy);
+  TransferFunction(OSPTransferFunction existing);
+};
+
+// Texture2D class //
+
+class Texture2D : public ManagedObject
+{
+public:
+
+  Texture2D(const Texture2D &copy);
+  Texture2D(OSPTexture2D existing);
+};
+
+// Volume class //
+
+class Volume : public ManagedObject
+{
+public:
+
+  Volume(const std::string &type);
+  Volume(const Volume &copy);
+  Volume(OSPVolume existing);
+};
+
+// Inlined function definitions ///////////////////////////////////////////////
 
 // Camera inlined members //
 
@@ -199,16 +349,6 @@ inline Camera::Camera(OSPCamera existing) :
 {
 }
 
-// Data class ///////////////////////////////////////////////////////////////
-
-class Data : public ManagedObject
-{
-public:
-
-  Data(const Data &copy);
-  Data(OSPData existing);
-};
-
 // Data inlined members //
 
 inline Data::Data(const Data &copy) :
@@ -220,16 +360,6 @@ inline Data::Data(OSPData existing) :
   ManagedObject(existing)
 {
 }
-
-// FrameBuffer class //////////////////////////////////////////////////////////
-
-class FrameBuffer : public ManagedObject
-{
-public:
-
-  FrameBuffer(const FrameBuffer &copy);
-  FrameBuffer(OSPFrameBuffer existing);
-};
 
 // FrameBuffer inlined members //
 
@@ -243,16 +373,15 @@ inline FrameBuffer::FrameBuffer(OSPFrameBuffer existing) :
 {
 }
 
-// Geometry class /////////////////////////////////////////////////////////////
-
-class Geometry : public ManagedObject
+inline void FrameBuffer::setPixelOp(PixelOp &p)
 {
-public:
+  setPixelOp((OSPPixelOp)p.handle());
+}
 
-  Geometry(const std::string &type);
-  Geometry(const Geometry &copy);
-  Geometry(OSPGeometry existing);
-};
+inline void FrameBuffer::setPixelOp(OSPPixelOp p)
+{
+  ospSetPixelOp((OSPFrameBuffer)handle(), p);
+}
 
 // Geometry inlined members //
 
@@ -276,15 +405,15 @@ inline Geometry::Geometry(OSPGeometry existing) :
 {
 }
 
-// Light class ////////////////////////////////////////////////////////////////
-
-class Light : public ManagedObject
+inline void Geometry::setMaterial(Material &m)
 {
-public:
+  setMaterial((OSPMaterial)m.handle());
+}
 
-  Light(const Light &copy);
-  Light(OSPLight existing);
-};
+inline void Geometry::setMaterial(OSPMaterial m)
+{
+  ospSetMaterial((OSPGeometry)handle(), m);
+}
 
 // Light inlined members //
 
@@ -298,16 +427,17 @@ inline Light::Light(OSPLight existing) :
 {
 }
 
-// Model class ////////////////////////////////////////////////////////////////
+// Material inlined members //
 
-class Model : public ManagedObject
+inline Material::Material(const Material &copy) :
+  ManagedObject(copy.handle())
 {
-public:
+}
 
-  Model();
-  Model(const Model &copy);
-  Model(OSPModel existing);
-};
+inline Material::Material(OSPMaterial existing) :
+  ManagedObject(existing)
+{
+}
 
 // Model inlined members //
 
@@ -331,16 +461,25 @@ inline Model::Model(OSPModel existing) :
 {
 }
 
-// PixelOp class /////////////////////////////////////////////////////////////
-
-class PixelOp : public ManagedObject
+inline void Model::addGeometry(Geometry &v)
 {
-public:
+  addGeometry((OSPGeometry)v.handle());
+}
 
-  PixelOp(const std::string &type);
-  PixelOp(const PixelOp &copy);
-  PixelOp(OSPPixelOp existing);
-};
+inline void Model::addGeometry(OSPGeometry v)
+{
+  ospAddGeometry((OSPModel)handle(), v);
+}
+
+inline void Model::addVolume(Volume &v)
+{
+  addVolume((OSPVolume)v.handle());
+}
+
+inline void Model::addVolume(OSPVolume v)
+{
+  ospAddVolume((OSPModel)handle(), v);
+}
 
 // PixelOp inlined members //
 
@@ -364,17 +503,6 @@ inline PixelOp::PixelOp(OSPPixelOp existing) :
 {
 }
 
-// Renderer class /////////////////////////////////////////////////////////////
-
-class Renderer : public ManagedObject
-{
-public:
-
-  Renderer(const std::string &type);
-  Renderer(const Renderer &copy);
-  Renderer(OSPRenderer existing);
-};
-
 // Renderer inlined members //
 
 inline Renderer::Renderer(const std::string &type)
@@ -397,16 +525,15 @@ inline Renderer::Renderer(OSPRenderer existing) :
 {
 }
 
-// TransferFunction class /////////////////////////////////////////////////////
-
-class TransferFunction : public ManagedObject
+inline Material Renderer::newMaterial(const std::string &type)
 {
-public:
+  return Material(ospNewMaterial((OSPRenderer)handle(), type.c_str()));
+}
 
-  TransferFunction(const std::string &type);
-  TransferFunction(const TransferFunction &copy);
-  TransferFunction(OSPTransferFunction existing);
-};
+inline Light Renderer::newLight(const std::string &type)
+{
+  return Light(ospNewLight((OSPRenderer)handle(), type.c_str()));
+}
 
 // TransferFunction inlined members //
 
@@ -430,16 +557,6 @@ inline TransferFunction::TransferFunction(OSPTransferFunction existing) :
 {
 }
 
-// Texture2D class ////////////////////////////////////////////////////////////
-
-class Texture2D : public ManagedObject
-{
-public:
-
-  Texture2D(const Texture2D &copy);
-  Texture2D(OSPTexture2D existing);
-};
-
 // Texture2D inlined members //
 
 inline Texture2D::Texture2D(const Texture2D &copy) :
@@ -451,17 +568,6 @@ inline Texture2D::Texture2D(OSPTexture2D existing) :
   ManagedObject(existing)
 {
 }
-
-// Volume class ///////////////////////////////////////////////////////////////
-
-class Volume : public ManagedObject
-{
-public:
-
-  Volume(const std::string &type);
-  Volume(const Volume &copy);
-  Volume(OSPVolume existing);
-};
 
 // Volume inlined members //
 

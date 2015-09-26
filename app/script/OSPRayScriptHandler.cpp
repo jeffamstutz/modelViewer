@@ -230,6 +230,8 @@ void OSPRayScriptHandler::registerScriptTypes()
        chaiscript::constructor<osp::cpp::FrameBuffer(OSPFrameBuffer)>()
      },
      {
+       {chaiscript::fun(static_cast<void (osp::cpp::FrameBuffer::*)(osp::cpp::PixelOp &)>(&osp::cpp::FrameBuffer::setPixelOp)), "setPixelOp"},
+       {chaiscript::fun(static_cast<void (osp::cpp::FrameBuffer::*)(OSPPixelOp)>(&osp::cpp::FrameBuffer::setPixelOp)), "setPixelOp"}
      }
      );
 
@@ -240,6 +242,8 @@ void OSPRayScriptHandler::registerScriptTypes()
        chaiscript::constructor<osp::cpp::Geometry(OSPGeometry)>()
      },
      {
+       {chaiscript::fun(static_cast<void (osp::cpp::Geometry::*)(osp::cpp::Material &)>(&osp::cpp::Geometry::setMaterial)), "setMaterial"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Geometry::*)(OSPMaterial)>(&osp::cpp::Geometry::setMaterial)), "setMaterial"}
      }
      );
 
@@ -252,6 +256,15 @@ void OSPRayScriptHandler::registerScriptTypes()
      }
      );
 
+  chaiscript::utility::add_class<osp::cpp::Material>(*m, "Material",
+     {
+       chaiscript::constructor<osp::cpp::Material(const osp::cpp::Material &)>(),
+       chaiscript::constructor<osp::cpp::Material(OSPMaterial)>()
+     },
+     {
+     }
+     );
+
   chaiscript::utility::add_class<osp::cpp::Model>(*m, "Model",
      {
        chaiscript::constructor<osp::cpp::Model()>(),
@@ -259,6 +272,10 @@ void OSPRayScriptHandler::registerScriptTypes()
        chaiscript::constructor<osp::cpp::Model(OSPModel)>()
      },
      {
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(osp::cpp::Geometry &)>(&osp::cpp::Model::addGeometry)), "addGeometry"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(OSPGeometry)>(&osp::cpp::Model::addGeometry)), "addGeometry"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(osp::cpp::Volume &)>(&osp::cpp::Model::addVolume)), "addVolume"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(OSPVolume)>(&osp::cpp::Model::addVolume)), "addVolume"}
      }
      );
 
@@ -279,6 +296,8 @@ void OSPRayScriptHandler::registerScriptTypes()
        chaiscript::constructor<osp::cpp::Renderer(OSPRenderer)>()
      },
      {
+       {chaiscript::fun(&osp::cpp::Renderer::newMaterial), "newMaterial"},
+       {chaiscript::fun(&osp::cpp::Renderer::newLight), "newLight"}
      }
      );
 
@@ -321,6 +340,7 @@ void OSPRayScriptHandler::registerScriptTypes()
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::FrameBuffer>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Geometry>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Light>());
+  m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Material>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Model>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::PixelOp>());
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Renderer>());
@@ -340,6 +360,8 @@ void OSPRayScriptHandler::registerScriptTypes()
                                     osp::cpp::Geometry>());
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
                                     osp::cpp::Light>());
+  m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
+                                    osp::cpp::Material>());
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
                                     osp::cpp::Model>());
   m_chai.add(chaiscript::base_class<osp::cpp::ManagedObject,
