@@ -143,7 +143,11 @@ void OSPRayScriptHandler::start()
 {
   stop();
   cout << "**** START COMMAND MODE ****" << endl << endl;
-  cout << "objects available: 'renderer', 'camera', 'model'" << endl << endl;
+  cout << "objects available:" << endl << endl;
+  cout << "    c --> Camera"   << endl;
+  cout << "    m --> Model"    << endl;
+  cout << "    r --> Renderer" << endl;
+  cout << endl;
   m_running = true;
   m_thread = std::thread(&OSPRayScriptHandler::consoleLoop, this);
 }
@@ -170,9 +174,9 @@ chaiscript::ChaiScript &OSPRayScriptHandler::scriptEngine()
 
 void OSPRayScriptHandler::registerScriptObjects()
 {
-  m_chai.add(chaiscript::var(m_model),    "model"   );
-  m_chai.add(chaiscript::var(m_renderer), "renderer");
-  m_chai.add(chaiscript::var(m_camera),   "camera"  );
+  m_chai.add(chaiscript::var(m_model),    "m");
+  m_chai.add(chaiscript::var(m_renderer), "r");
+  m_chai.add(chaiscript::var(m_camera),   "c");
 }
 
 void OSPRayScriptHandler::registerScriptTypes()
