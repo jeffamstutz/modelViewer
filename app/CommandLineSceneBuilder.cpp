@@ -146,7 +146,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     } else if (arg == "--max-objects") {
       m_maxObjectsToConsider = atoi(av[++i]);
     } else if (arg == "--camera" || arg == "-c") {
-      m_cameraType = std::string(av[++i]);
+      m_cameraType = av[++i];
     } else if (arg == "--force-instancing") {
       m_forceInstancing = true;
     } else if (arg == "--sun-dir") {

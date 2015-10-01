@@ -129,8 +129,8 @@ void MSGViewer::keypress(char key, const vec2f where)
     break;
   case '!': {
     const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-    writePPM("ospmodelviewer.ppm", m_windowSize.x, m_windowSize.y, p);
-    cout << "#ospDebugViewer: saved current frame to 'ospmodelviewer.ppm'"
+    writePPM("ospdebugviewer.ppm", m_windowSize.x, m_windowSize.y, p);
+    cout << "#ospDebugViewer: saved current frame to 'ospdebugviewer.ppm'"
          << endl;
   } break;
   case 'X':
