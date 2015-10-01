@@ -11,8 +11,7 @@ static void error(const std::string &msg)
   cerr << "#ospDebugViewer fatal error : " << msg << endl;
   cerr << endl;
   cerr << "Proper usage: " << endl;
-  cerr << "  ./ospDebugViewer"
-       << " [-bench <warmpup>x<numFrames>] [-model] <inFileName>" << endl;
+  cerr << "  ./ospDebugViewer" << " <inFileName> [options]" << endl;
   cerr << endl;
   exit(1);
 }
