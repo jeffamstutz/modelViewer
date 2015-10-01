@@ -48,6 +48,10 @@ protected:
   //!       have access to the engine to let them add custom functions or types.
   chaiscript::ChaiScript &scriptEngine();
 
+  //! \note Child classes should append this string with any additional help
+  //!       text that is desired when 'help' is invoked in the script engine.
+  std::string m_helpText;
+
 private:
 
   void consoleLoop();

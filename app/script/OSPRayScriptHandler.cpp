@@ -91,6 +91,30 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
 {
   registerScriptTypes();
   registerScriptFunctions();
+
+  std::stringstream ss;
+  ss << "Type 'exit' or 'done' to exit command mode." << endl << endl;
+
+  ss << "OSPRay viewer objects available:" << endl << endl;
+  ss << "c --> Camera"   << endl;
+  ss << "m --> Model"    << endl;
+  ss << "r --> Renderer" << endl << endl;
+
+  ss << "OSPRay API functions available:" << endl << endl;
+  ss << "ospLoadModule(module_name)"                << endl;
+  ss << "ospSetString(object, id, string)"          << endl;
+  ss << "ospSetObject(object, id, object)"          << endl;
+  ss << "ospSet1f(object, id, float)"               << endl;
+  ss << "ospSet2f(object, id, float, float)"        << endl;
+  ss << "ospSet3f(object, id, float, float, float)" << endl;
+  ss << "ospSet1i(object, id, int)"                 << endl;
+  ss << "ospSet2i(object, id, int, int)"            << endl;
+  ss << "ospSet3i(object, id, int, int, int)"       << endl;
+  ss << "ospSetVoidPtr(object, id, ptr)"            << endl;
+  ss << "ospCommit(object)"                         << endl;
+  ss << endl;
+
+  m_helpText = ss.str();
 }
 
 OSPRayScriptHandler::~OSPRayScriptHandler()
@@ -132,6 +156,9 @@ void OSPRayScriptHandler::consoleLoop()
 
     if (line == "done" || line == "exit") {
       break;
+    } else if (line == "help") {
+      cout << m_helpText << endl;
+      continue;
     }
 
     try {
@@ -148,10 +175,7 @@ void OSPRayScriptHandler::start()
 {
   stop();
   cout << "**** START COMMAND MODE ****" << endl << endl;
-  cout << "objects available:" << endl << endl;
-  cout << "    c --> Camera"   << endl;
-  cout << "    m --> Model"    << endl;
-  cout << "    r --> Renderer" << endl;
+  cout << "Type 'help' to see available objects and functions." << endl;
   cout << endl;
   m_running = true;
   m_thread = std::thread(&OSPRayScriptHandler::consoleLoop, this);
