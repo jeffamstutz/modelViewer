@@ -24,13 +24,8 @@ struct ViewerConfig
   bool alwaysRedraw;
   bool doShadows;
   bool showDepthBuffer;
-  int benchWarmup;
-  int benchFrames;
 
-  std::string outFileName;
   std::string scriptFileName;
-  size_t numAccumsFrameInFileOutput;
-  size_t numSPPinFileOutput;
 
   bool verboseOutput;
 
@@ -38,10 +33,6 @@ struct ViewerConfig
     alwaysRedraw(true),
     doShadows(true),
     showDepthBuffer(false),
-    benchWarmup(0),
-    benchFrames(0),
-    numAccumsFrameInFileOutput(1),
-    numSPPinFileOutput(1),
     verboseOutput(false)
   {
   }

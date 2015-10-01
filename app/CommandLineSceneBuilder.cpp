@@ -82,8 +82,6 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   m_alpha(false),
   m_createDefaultMaterial(true),
   m_spp(1),
-  m_naos(0),
-  m_aorl(-1.f),
   m_maxObjectsToConsider((uint32)-1),
   m_forceInstancing(false),
   m_frameBufferMode(glut3D::Glut3DWidget::FRAMEBUFFER_UCHAR),
@@ -110,8 +108,6 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   ospSetObject(m_renderer, "model", m_model);
   ospSetObject(m_renderer, "camera",m_camera);
   ospSet1i(m_renderer, "spp", m_spp);
-  if (m_naos > 0)   ospSet1i(m_renderer, "aoSamples", m_naos);
-  if (m_aorl > 0.f) ospSet1f(m_renderer, "aoOcclusionDistance", m_aorl);
   ospCommit(m_camera);
   ospCommit(m_renderer);
 
@@ -148,26 +144,12 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
       m_config.verboseOutput = true;
     } else if (arg == "-s") {
       m_config.scriptFileName = av[++i];
-    } else if (arg == "-o") {
-      m_config.outFileName = strdup(av[++i]);
-    } else if (arg == "-o:nacc") {
-      m_config.numAccumsFrameInFileOutput = atoi(av[++i]);
-    } else if (arg == "-o:spp") {
-      m_config.numSPPinFileOutput = atoi(av[++i]);
     } else if (arg == "--max-objects") {
       m_maxObjectsToConsider = atoi(av[++i]);
-    } else if (arg == "--spp" || arg == "-spp") {
-      m_spp = atoi(av[++i]);
-    } else if (arg == "--aos" || arg == "-aos") {
-      m_naos = atoi(av[++i]);
-    } else if (arg == "--aod" || arg == "-aod") {
-      m_aorl = atof(av[++i]);
     } else if (arg == "--camera" || arg == "-c") {
       m_cameraType = std::string(av[++i]);
     } else if (arg == "--force-instancing") {
       m_forceInstancing = true;
-    } else if (arg == "--pt") {
-      m_rendererType = "pathtracer";
     } else if (arg == "--sun-dir") {
       if (!strcmp(av[i+1],"none")) {
         m_defaultDirLight_direction = vec3f(0.f);
@@ -185,22 +167,10 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
       ospLoadModule(moduleName);
     } else if (arg == "--alpha") {
       m_alpha = true;
-    } else if (arg == "-bench") {
-      if (++i < ac)
-      {
-        std::string arg2(av[i]);
-        size_t pos = arg2.find("x");
-        if (pos != std::string::npos)
-        {
-          arg2.replace(pos, 1, " ");
-          std::stringstream ss(arg2);
-          ss >> m_config.benchWarmup >> m_config.benchFrames;
-        }
-      }
     } else if (arg == "--no-default-material") {
       m_createDefaultMaterial = false;
     } else if (av[i][0] == '-') {
-      error("unknown commandline argument '"+arg+"'");
+      error("unknown commandline argument '" + arg + "'");
     } else {
       embree::FileName fn = arg;
       if (fn.ext() == "stl") {

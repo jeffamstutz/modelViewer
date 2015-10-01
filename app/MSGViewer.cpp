@@ -237,7 +237,7 @@ void MSGViewer::display()
   // (intentionally) reversed: due to our asynchrounous rendering
   // you cannot place start() and end() _around_ the renderframe
   // call (which in itself will not do a lot other than triggering
-  // work), but the average time between ttwo calls is roughly the
+  // work), but the average time between the two calls is roughly the
   // frame rate (including display overhead, of course)
   if (frameID > 0) m_fps.doneRender();
 
@@ -251,25 +251,6 @@ void MSGViewer::display()
 
   m_fps.startRender();
   //}
-  static double benchStart=0;
-  static double fpsSum=0;
-  if (m_config.benchFrames > 0 && frameID == m_config.benchWarmup)
-    benchStart = ospray::getSysTime();
-  if (m_config.benchFrames > 0 && frameID >= m_config.benchWarmup)
-    fpsSum += m_fps.getFPS();
-  if (m_config.benchFrames > 0 &&
-      frameID== m_config.benchWarmup + m_config.benchFrames)
-  {
-    double time = ospray::getSysTime()-benchStart;
-    double avgFps = fpsSum / double(frameID - m_config.benchWarmup);
-    printf("Benchmark: time: %f avg fps: %f avg frame time: %f\n", time,
-           avgFps, time / double(frameID - m_config.benchWarmup));
-
-    const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-    writePPM("benchmark.ppm", m_windowSize.x, m_windowSize.y, p);
-
-    exit(0);
-  }
 
   ++frameID;
 
@@ -290,27 +271,6 @@ void MSGViewer::display()
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
   }
 
-  if (!m_config.outFileName.empty()) {
-    ospSet1i(m_renderer, "spp", m_config.numSPPinFileOutput);
-    ospCommit(m_renderer);
-
-    cout << "#ospDebugViewer: Renderering offline image with "
-         << m_config.numSPPinFileOutput
-         << " samples per pixel per frame, and accumulation of "
-         << m_config.numAccumsFrameInFileOutput << " such frames"
-         << endl;
-
-    for (int i = 0; i < m_config.numAccumsFrameInFileOutput; i++) {
-      ospRenderFrame(m_fb,m_renderer,OSP_FB_COLOR|OSP_FB_ACCUM);
-      ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-      cout << "#ospDebugViewer: Saved rendered image (w/ " << i
-           << " accums) in " << m_config.outFileName << endl;
-      writePPM(m_config.outFileName, m_windowSize.x, m_windowSize.y, ucharFB);
-      ospUnmapFrameBuffer(ucharFB, m_fb);
-    }
-    exit(0);
-  }
-
   ospRenderFrame(m_fb, m_renderer, OSP_FB_COLOR |
                  (m_config.showDepthBuffer ? OSP_FB_DEPTH : 0) |
                  OSP_FB_ACCUM);
@@ -325,13 +285,14 @@ void MSGViewer::display()
   // that pointer is no longer valid, so set it to null
   ucharFB = NULL;
 
-  char title[1000];
+  std::string title("OSPRay Debug Viewer");
 
   if (m_config.alwaysRedraw) {
-    sprintf(title,"OSPRay Debug Viewer (%f fps)",
-            m_fps.getFPS());
+    title += " (" + std::to_string(m_fps.getFPS()) + " fps)";
     setTitle(title);
     forceRedraw();
+  } else {
+      setTitle(title);
   }
 }
 
