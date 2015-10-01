@@ -19,6 +19,11 @@ using std::string;
 
 namespace chaiospray {
 
+void ospLoadModule(const string &name)
+{
+  ::ospLoadModule(name.c_str());
+}
+
 void ospSetString(OSPObject _object, const string &id, const string &s)
 {
   ::ospSetString(_object, id.c_str(), s.c_str());
@@ -278,6 +283,8 @@ void OSPRayScriptHandler::registerScriptTypes()
      {
        {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(osp::cpp::Geometry &)>(&osp::cpp::Model::addGeometry)), "addGeometry"},
        {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(OSPGeometry)>(&osp::cpp::Model::addGeometry)), "addGeometry"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(osp::cpp::Geometry &)>(&osp::cpp::Model::removeGeometry)), "removeGeometry"},
+       {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(OSPGeometry)>(&osp::cpp::Model::removeGeometry)), "removeGeometry"},
        {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(osp::cpp::Volume &)>(&osp::cpp::Model::addVolume)), "addVolume"},
        {chaiscript::fun(static_cast<void (osp::cpp::Model::*)(OSPVolume)>(&osp::cpp::Model::addVolume)), "addVolume"}
      }
@@ -382,6 +389,7 @@ void OSPRayScriptHandler::registerScriptTypes()
 
 void OSPRayScriptHandler::registerScriptFunctions()
 {
+  m_chai.add(chaiscript::fun(&chaiospray::ospLoadModule), "ospLoadModule");
   m_chai.add(chaiscript::fun(&chaiospray::ospSetString),  "ospSetString" );
   m_chai.add(chaiscript::fun(&chaiospray::ospSetObject),  "ospSetObject" );
   m_chai.add(chaiscript::fun(&chaiospray::ospSet1f),      "ospSet1f"     );

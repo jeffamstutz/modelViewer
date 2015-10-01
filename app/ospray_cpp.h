@@ -264,6 +264,9 @@ public:
   void addGeometry(Geometry &v);
   void addGeometry(OSPGeometry v);
 
+  void removeGeometry(Geometry &v);
+  void removeGeometry(OSPGeometry v);
+
   void addVolume(Volume &v);
   void addVolume(OSPVolume v);
 };
@@ -469,6 +472,16 @@ inline void Model::addGeometry(Geometry &v)
 inline void Model::addGeometry(OSPGeometry v)
 {
   ospAddGeometry((OSPModel)handle(), v);
+}
+
+inline void Model::removeGeometry(Geometry &v)
+{
+  removeGeometry((OSPGeometry)v.handle());
+}
+
+inline void Model::removeGeometry(OSPGeometry v)
+{
+  ospRemoveGeometry((OSPModel)handle(), v);
 }
 
 inline void Model::addVolume(Volume &v)
