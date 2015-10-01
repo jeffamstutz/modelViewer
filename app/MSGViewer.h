@@ -44,13 +44,15 @@ public:
 
   void setRenderer(OSPRenderer renderer);
   void resetAccumulation();
+  void toggleFullscreen();
+  void resetView();
+  void printViewport();
 
 private:
 
-  void reshape(const ospray::vec2i &newSize);
-  void keypress(char key, const vec2f where);
-  void specialkey(int32 key, const vec2f where);
-  void mouseButton(int32 whichButton, bool released, const vec2i &pos);
+  void reshape(const ospray::vec2i &newSize) override;
+  void keypress(char key, const vec2f where) override;
+  void mouseButton(int32 whichButton, bool released, const vec2i &pos) override;
 
   void display();
 
@@ -74,8 +76,6 @@ private:
   int m_accumID;
   bool m_fullScreen;
   glut3D::Glut3DWidget::ViewPort m_viewPort;
-  float m_nearClip;
-  int m_maxDepth; // only set with home/end
 
   DebugViewerScriptHandler m_scriptHandler;
 

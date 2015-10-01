@@ -16,24 +16,13 @@
 
 #pragma once
 
-#include <cstdlib>
 #include <string>
 
 struct ViewerConfig
 {
-  bool alwaysRedraw;
-  bool doShadows;
-  bool showDepthBuffer;
+  bool alwaysRedraw {true};
+  bool doShadows {true};
+  bool verboseOutput {false};
 
   std::string scriptFileName;
-
-  bool verboseOutput;
-
-  ViewerConfig() :
-    alwaysRedraw(true),
-    doShadows(true),
-    showDepthBuffer(false),
-    verboseOutput(false)
-  {
-  }
 };

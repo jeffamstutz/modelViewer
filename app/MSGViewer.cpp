@@ -47,8 +47,6 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
     m_config(config),
     m_accumID(-1),
     m_fullScreen(false),
-    m_nearClip(1e-6f),
-    m_maxDepth(2),
     m_scriptHandler(model, renderer, camera, this)
 {
   const box3f worldBounds(m_sgmodel->getBBox());
@@ -83,6 +81,30 @@ void MSGViewer::setRenderer(OSPRenderer renderer)
 void MSGViewer::resetAccumulation()
 {
   m_resetAccum = true;
+}
+
+void MSGViewer::toggleFullscreen()
+{
+  m_fullScreen = !m_fullScreen;
+  if(m_fullScreen) {
+    glutFullScreen();
+  } else {
+    glutPositionWindow(0,10);
+  }
+}
+
+void MSGViewer::resetView()
+{
+  viewPort = m_viewPort;
+}
+
+void MSGViewer::printViewport()
+{
+  printf("-vp %f %f %f -vu %f %f %f -vi %f %f %f\n",
+         viewPort.from.x, viewPort.from.y, viewPort.from.z, viewPort.up.x,
+         viewPort.up.y, viewPort.up.z, viewPort.at.x, viewPort.at.y,
+         viewPort.at.z);
+  fflush(stdout);
 }
 
 void MSGViewer::reshape(const vec2i &newSize)
@@ -122,11 +144,6 @@ void MSGViewer::keypress(char key, const vec2f where)
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
     forceRedraw();
     break;
-  case 'D':
-    m_config.showDepthBuffer = !m_config.showDepthBuffer;
-    ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
-    forceRedraw();
-    break;
   case '!': {
     const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
     writePPM("ospdebugviewer.ppm", m_windowSize.x, m_windowSize.y, p);
@@ -134,76 +151,43 @@ void MSGViewer::keypress(char key, const vec2f where)
          << endl;
   } break;
   case 'X':
-    if (viewPort.up == vec3f(1,0,0) || viewPort.up == vec3f(-1.f,0,0))
+    if (viewPort.up == vec3f(1,0,0) || viewPort.up == vec3f(-1.f,0,0)) {
       viewPort.up = - viewPort.up;
-    else
+    } else {
       viewPort.up = vec3f(1,0,0);
+    }
     viewPort.modified = true;
     forceRedraw();
     break;
   case 'Y':
-    if (viewPort.up == vec3f(0,1,0) || viewPort.up == vec3f(0,-1.f,0))
+    if (viewPort.up == vec3f(0,1,0) || viewPort.up == vec3f(0,-1.f,0)) {
       viewPort.up = - viewPort.up;
-    else
+    } else {
       viewPort.up = vec3f(0,1,0);
+    }
     viewPort.modified = true;
     forceRedraw();
     break;
   case 'Z':
-    if (viewPort.up == vec3f(0,0,1) || viewPort.up == vec3f(0,0,-1.f))
+    if (viewPort.up == vec3f(0,0,1) || viewPort.up == vec3f(0,0,-1.f)) {
       viewPort.up = - viewPort.up;
-    else
+    } else {
       viewPort.up = vec3f(0,0,1);
+    }
     viewPort.modified = true;
     forceRedraw();
     break;
   case 'f':
-    m_fullScreen = !m_fullScreen;
-    if(m_fullScreen) glutFullScreen();
-    else glutPositionWindow(0,10);
+    toggleFullscreen();
     break;
   case 'r':
-    viewPort = m_viewPort;
+    resetView();
     break;
   case 'p':
-    printf("-vp %f %f %f -vu %f %f %f -vi %f %f %f\n",
-           viewPort.from.x, viewPort.from.y, viewPort.from.z, viewPort.up.x,
-           viewPort.up.y, viewPort.up.z, viewPort.at.x, viewPort.at.y,
-           viewPort.at.z);
-    fflush(stdout);
+    printViewport();
     break;
   default:
     Glut3DWidget::keypress(key,where);
-  }
-}
-
-void ospray::MSGViewer::specialkey(int32 key, const vec2f where)
-{
-  switch(key) {
-  case GLUT_KEY_PAGE_UP:
-    m_nearClip += 20.f * motionSpeed;
-  case GLUT_KEY_PAGE_DOWN:
-    m_nearClip -= 10.f * motionSpeed;
-    m_nearClip = std::max(m_nearClip, 1e-6f);
-    ospSet1f(m_camera, "near_clip", m_nearClip);
-    ospCommit(m_camera);
-    m_accumID=0;
-    ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
-    forceRedraw();
-    break;
-  case GLUT_KEY_HOME:
-    m_maxDepth += 2;
-  case GLUT_KEY_END:
-    m_maxDepth--;
-    ospSet1i(m_renderer, "maxDepth", m_maxDepth);
-    PRINT(m_maxDepth);
-    ospCommit(m_renderer);
-    m_accumID=0;
-    ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
-    forceRedraw();
-    break;
-  default:
-    Glut3DWidget::specialkey(key,where);
   }
 }
 
@@ -271,9 +255,7 @@ void MSGViewer::display()
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
   }
 
-  ospRenderFrame(m_fb, m_renderer, OSP_FB_COLOR |
-                 (m_config.showDepthBuffer ? OSP_FB_DEPTH : 0) |
-                 OSP_FB_ACCUM);
+  ospRenderFrame(m_fb, m_renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
   ++m_accumID;
 
   // set the glut3d widget's frame buffer to the opsray frame buffer,
@@ -292,7 +274,7 @@ void MSGViewer::display()
     setTitle(title);
     forceRedraw();
   } else {
-      setTitle(title);
+    setTitle(title);
   }
 }
 

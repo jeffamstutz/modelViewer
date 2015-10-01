@@ -16,20 +16,38 @@ DebugViewerScriptHandler::DebugViewerScriptHandler(OSPModel    model,
 
 void DebugViewerScriptHandler::registerScriptFunctions()
 {
-  chaiscript::ChaiScript &chai = this->scriptEngine();
+  auto &chai = this->scriptEngine();
 
   // setRenderer()
-  auto setRenderer = [this](osp::cpp::Renderer &r) {
+  auto setRenderer = [&](osp::cpp::Renderer &r) {
     m_viewer->setRenderer((OSPRenderer)r.handle());
   };
 
   // refresh()
-  auto refresh = [this]() {
+  auto refresh = [&]() {
     m_viewer->resetAccumulation();
   };
 
-  chai.add(chaiscript::fun(setRenderer), "setRenderer");
-  chai.add(chaiscript::fun(refresh),     "refresh"    );
+  // toggleFullscreen()
+  auto toggleFullscreen = [&]() {
+    m_viewer->toggleFullscreen();
+  };
+
+  // resetView()
+  auto resetView = [&]() {
+    m_viewer->resetView();
+  };
+
+  // printViewport()
+  auto printViewport = [&]() {
+    m_viewer->printViewport();
+  };
+
+  chai.add(chaiscript::fun(setRenderer),      "setRenderer"     );
+  chai.add(chaiscript::fun(refresh),          "refresh"         );
+  chai.add(chaiscript::fun(toggleFullscreen), "toggleFullscreen");
+  chai.add(chaiscript::fun(resetView),        "resetView"       );
+  chai.add(chaiscript::fun(printViewport),    "printViewport"   );
 }
 
 }// namespace ospray
