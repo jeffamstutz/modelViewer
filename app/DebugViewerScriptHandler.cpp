@@ -24,6 +24,7 @@ DebugViewerScriptHandler::DebugViewerScriptHandler(OSPModel    model,
   ss << "toggleFullScreen()    --> toggle fullscreen mode" << endl;
   ss << "resetView()           --> reset camera view" << endl;
   ss << "printViewport()       --> print view params in the console" << endl;
+  ss << "screenshot(filename)  --> save a screenshot (adds '.ppm')" << endl;
 
   m_helpText += ss.str();
 }
