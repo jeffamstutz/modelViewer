@@ -56,6 +56,9 @@ private:
 
   void consoleLoop();
 
+  void runChaiLine(const std::string &line);
+  void runChaiFile(const std::string &file);
+
   void registerScriptObjects();
   void registerScriptTypes();
   void registerScriptFunctions();

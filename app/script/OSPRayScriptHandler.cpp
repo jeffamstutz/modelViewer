@@ -159,16 +159,39 @@ void OSPRayScriptHandler::consoleLoop()
     } else if (line == "help") {
       cout << m_helpText << endl;
       continue;
+    } else {
+      std::stringstream ss(line);
+      std::string command, arg;
+      ss >> command >> arg;
+      if (command == "run") {
+        runChaiFile(arg);
+        continue;
+      }
     }
 
-    try {
-      m_chai.eval(line);
-    } catch (const chaiscript::exception::eval_error &e) {
-      cerr << e.what() << endl;
-    }
+    runChaiLine(line);
+
   } while (m_running);
 
   cout << "**** EXIT COMMAND MODE *****" << endl;
+}
+
+void OSPRayScriptHandler::runChaiLine(const std::string &line)
+{
+  try {
+    m_chai.eval(line);
+  } catch (const chaiscript::exception::eval_error &e) {
+    cerr << e.what() << endl;
+  }
+}
+
+void OSPRayScriptHandler::runChaiFile(const std::__1::string &file)
+{
+  try {
+    m_chai.eval_file(file);
+  } catch (const chaiscript::exception::eval_error &e) {
+    cerr << e.what() << endl;
+  }
 }
 
 void OSPRayScriptHandler::start()
