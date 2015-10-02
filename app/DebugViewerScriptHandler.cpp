@@ -18,7 +18,7 @@ DebugViewerScriptHandler::DebugViewerScriptHandler(OSPModel    model,
 
   std::stringstream ss;
 
-  ss << "Viewer functions available" << endl << endl;
+  ss << "Viewer functions available:" << endl << endl;
   ss << "setRenderer(renderer) --> set the renderer in the viewer" << endl;
   ss << "refresh()             --> reset the accumulation buffer" << endl;
   ss << "toggleFullScreen()    --> toggle fullscreen mode" << endl;

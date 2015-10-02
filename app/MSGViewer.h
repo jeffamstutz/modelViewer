@@ -55,7 +55,7 @@ private:
   void keypress(char key, const vec2f where) override;
   void mouseButton(int32 whichButton, bool released, const vec2i &pos) override;
 
-  void display();
+  void display() override;
 
   void switchRenderers();
 
