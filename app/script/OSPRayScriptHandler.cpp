@@ -16,6 +16,66 @@ using std::stringstream;
 
 #include <functional>
 
+#ifdef USE_SYSTEM_READLINE
+#  include <readline/readline.h>
+#  include <readline/history.h>
+#else
+
+static char *mystrdup (const char *s) {
+  size_t len = strlen(s); // Space for length plus nul
+  char *d = static_cast<char*>(malloc (len+1));
+  if (d == nullptr) return nullptr;          // No memory
+#if 0//MSVC
+  strcpy_s(d, len+1, s);                        // Copy the characters
+#else
+  strncpy(d,s,len);                        // Copy the characters
+#endif
+  d[len] = '\0';
+  return d;                            // Return the new string
+}
+
+static char* readline(const char* p)
+{
+  string retval;
+  cout << p ;
+  getline(std::cin, retval);
+  return cin.eof() ? nullptr : mystrdup(retval.c_str());
+}
+
+
+static void add_history(const char*){}
+static void using_history(){}
+#endif
+
+// Static helper functions ////////////////////////////////////////////////////
+
+static std::string get_next_command() {
+  std::string retval("quit");
+  if ( ! std::cin.eof() ) {
+    char *input_raw = readline("% ");
+    if ( input_raw ) {
+      add_history(input_raw);
+
+      std::string val(input_raw);
+      size_t pos = val.find_first_not_of("\t \n");
+      if (pos != std::string::npos)
+      {
+        val.erase(0, pos);
+      }
+      pos = val.find_last_not_of("\t \n");
+      if (pos != std::string::npos)
+      {
+        val.erase(pos+1, std::string::npos);
+      }
+
+      retval = val;
+
+      ::free(input_raw);
+    }
+  }
+  return retval;
+}
+
 // Scripting callback functions ///////////////////////////////////////////////
 
 namespace chaiospray {
@@ -97,6 +157,7 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
   ss << "Commands available:" << endl << endl;
   ss << "exit       --> exit command mode" << endl;
   ss << "done       --> synonomous with 'exit'" << endl;
+  ss << "quit       --> synonomous with 'exit'" << endl;
   ss << "run [file] --> execute a script file" << endl << endl;
 
   ss << "OSPRay viewer objects available:" << endl << endl;
@@ -147,24 +208,18 @@ void OSPRayScriptHandler::consoleLoop()
 {
   registerScriptObjects();
 
-  string line;
+  using_history();
 
   do {
-    cout << "% ";
+    std::string input = get_next_command();
 
-    getline(cin, line);
-
-    while(line[0] == ' ') {
-      line.erase(line.begin(), line.begin()++);
-    }
-
-    if (line == "done" || line == "exit") {
+    if (input == "done" || input == "exit" || input == "quit") {
       break;
-    } else if (line == "help") {
+    } else if (input == "help") {
       cout << m_helpText << endl;
       continue;
     } else {
-      stringstream ss(line);
+      stringstream ss(input);
       string command, arg;
       ss >> command >> arg;
       if (command == "run") {
@@ -173,7 +228,7 @@ void OSPRayScriptHandler::consoleLoop()
       }
     }
 
-    runChaiLine(line);
+    runChaiLine(input);
 
   } while (m_running);
 

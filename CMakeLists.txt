@@ -26,6 +26,8 @@ IF(COMMAND cmake_policy)
   ENDIF(${CMAKE_MAJOR_VERSION} EQUAL 3)
 ENDIF(COMMAND cmake_policy)
 
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+
 ##############################################################
 # Compiler configuration
 ##############################################################

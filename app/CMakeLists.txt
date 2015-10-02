@@ -18,9 +18,16 @@ SET(APP_NAME ospDebugViewer)
 
 ADD_SUBDIRECTORY(miniSG)
 
+FIND_PACKAGE(Readline)
+
+IF(READLINE_FOUND)
+  ADD_DEFINITIONS(-DUSE_SYSTEM_READLINE)
+ENDIF()
+
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/script
+  ${Readline_INCLUDE_DIR}
 )
 
 # --------------------------------------------
@@ -46,6 +53,7 @@ TARGET_LINK_LIBRARIES(${APP_NAME}
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}
+  ${Readline_LIBRARY}
 )
 # ------------------------------------------------------------
 
