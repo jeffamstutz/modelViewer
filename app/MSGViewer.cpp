@@ -107,6 +107,14 @@ void MSGViewer::printViewport()
   fflush(stdout);
 }
 
+void MSGViewer::saveScreenshot(const std::string &basename)
+{
+  const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
+  writePPM(basename + ".ppm", m_windowSize.x, m_windowSize.y, p);
+  cout << "#ospDebugViewer: saved current frame to '" << basename << ".ppm'"
+       << endl;
+}
+
 void MSGViewer::reshape(const vec2i &newSize)
 {
   Glut3DWidget::reshape(newSize);
@@ -144,12 +152,9 @@ void MSGViewer::keypress(char key, const vec2f where)
     ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
     forceRedraw();
     break;
-  case '!': {
-    const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
-    writePPM("ospdebugviewer.ppm", m_windowSize.x, m_windowSize.y, p);
-    cout << "#ospDebugViewer: saved current frame to 'ospdebugviewer.ppm'"
-         << endl;
-  } break;
+  case '!':
+    saveScreenshot("ospdebugviewer");
+    break;
   case 'X':
     if (viewPort.up == vec3f(1,0,0) || viewPort.up == vec3f(-1.f,0,0)) {
       viewPort.up = - viewPort.up;

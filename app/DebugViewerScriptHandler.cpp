@@ -57,11 +57,17 @@ void DebugViewerScriptHandler::registerScriptFunctions()
     m_viewer->printViewport();
   };
 
+  // screenshot()
+  auto screenshot = [&](const std::string &name) {
+    m_viewer->saveScreenshot(name);
+  };
+
   chai.add(chaiscript::fun(setRenderer),      "setRenderer"     );
   chai.add(chaiscript::fun(refresh),          "refresh"         );
   chai.add(chaiscript::fun(toggleFullscreen), "toggleFullscreen");
   chai.add(chaiscript::fun(resetView),        "resetView"       );
   chai.add(chaiscript::fun(printViewport),    "printViewport"   );
+  chai.add(chaiscript::fun(screenshot),       "screenshot"      );
 }
 
 }// namespace ospray

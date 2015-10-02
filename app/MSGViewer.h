@@ -47,6 +47,7 @@ public:
   void toggleFullscreen();
   void resetView();
   void printViewport();
+  void saveScreenshot(const std::string &basename);
 
 private:
 
