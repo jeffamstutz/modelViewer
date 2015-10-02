@@ -12,6 +12,7 @@ using std::endl;
 
 #include <string>
 using std::string;
+using std::stringstream;
 
 #include <functional>
 
@@ -93,7 +94,10 @@ OSPRayScriptHandler::OSPRayScriptHandler(OSPModel    model,
   registerScriptFunctions();
 
   std::stringstream ss;
-  ss << "Type 'exit' or 'done' to exit command mode." << endl << endl;
+  ss << "Commands available:" << endl << endl;
+  ss << "exit       --> exit command mode" << endl;
+  ss << "done       --> synonomous with 'exit'" << endl;
+  ss << "run [file] --> execute a script file" << endl << endl;
 
   ss << "OSPRay viewer objects available:" << endl << endl;
   ss << "c --> Camera"   << endl;
@@ -160,8 +164,8 @@ void OSPRayScriptHandler::consoleLoop()
       cout << m_helpText << endl;
       continue;
     } else {
-      std::stringstream ss(line);
-      std::string command, arg;
+      stringstream ss(line);
+      string command, arg;
       ss >> command >> arg;
       if (command == "run") {
         runChaiFile(arg);
@@ -185,11 +189,11 @@ void OSPRayScriptHandler::runChaiLine(const std::string &line)
   }
 }
 
-void OSPRayScriptHandler::runChaiFile(const std::__1::string &file)
+void OSPRayScriptHandler::runChaiFile(const std::string &file)
 {
   try {
     m_chai.eval_file(file);
-  } catch (const chaiscript::exception::eval_error &e) {
+  } catch (const std::runtime_error &e) {
     cerr << e.what() << endl;
   }
 }
