@@ -1,5 +1,7 @@
 #include "CommandLineSceneBuilder.h"
 
+#include <random>
+
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -95,7 +97,13 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     reportParsedData();
   }
 
+  createRenderer();
+
+#if 0
   createScene();
+#else
+  createSpheres();
+#endif
 
   m_camera = ospNewCamera(m_cameraType.c_str());
   Assert(m_camera != NULL && "could not create camera");
@@ -228,13 +236,8 @@ void CommandLineSceneBuilder::reportParsedData()
     error("no (valid) input files specified - model contains no triangles");
 }
 
-void CommandLineSceneBuilder::createScene()
+void CommandLineSceneBuilder::createRenderer()
 {
-  // -------------------------------------------------------
-  // create ospray model
-  // -------------------------------------------------------
-  m_model = ospNewModel();
-
   m_renderer = ospNewRenderer(m_rendererType.c_str());
   if (!m_renderer) {
     throw std::runtime_error("could not create m_renderer '" +
@@ -242,6 +245,14 @@ void CommandLineSceneBuilder::createScene()
   }
   Assert(m_renderer != NULL && "could not create m_renderer");
   ospCommit(m_renderer);
+}
+
+void CommandLineSceneBuilder::createScene()
+{
+  // -------------------------------------------------------
+  // create ospray model
+  // -------------------------------------------------------
+  m_model = ospNewModel();
 
   // code does not yet do instancing ... check that the model doesn't
   // contain instances
@@ -469,6 +480,56 @@ void CommandLineSceneBuilder::createScene()
   ospSetData(m_renderer, "lights", lightArray);
   //end light test
   ospCommit(m_renderer);
+}
+
+void CommandLineSceneBuilder::createSpheres()
+{
+  m_model = ospNewModel();
+
+  auto geometry = ospNewGeometry("spheres");
+
+  std::vector<float> vertices;
+  std::vector<float> colors;
+
+#define NUM_SPHERES 100
+
+  vertices.resize(3*NUM_SPHERES);
+  colors.resize(4*NUM_SPHERES);
+
+  std::default_random_engine rng;
+  std::uniform_real_distribution<float> vdist(-1000.0f, 1000.0f);
+  std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
+
+  for (int i = 0; i < NUM_SPHERES; i += 3) {
+    vertices[i+0] = vdist(rng);
+    vertices[i+1] = vdist(rng);
+    vertices[i+2] = vdist(rng);
+  }
+
+  for (int i = 0; i < NUM_SPHERES; i += 4) {
+    colors[i+0] = 1.0f;//cdist(rng);
+    colors[i+1] = 0.0f;//cdist(rng);
+    colors[i+2] = 0.0f;//cdist(rng);
+    colors[i+3] = 1.0f;
+  }
+
+  auto sphereData = ospNewData(NUM_SPHERES, OSP_FLOAT3, vertices.data());
+  auto colorData  = ospNewData(NUM_SPHERES, OSP_FLOAT4, colors.data());
+
+  ospCommit(sphereData);
+  ospCommit(colorData);
+
+  ospSetData(geometry, "spheres", sphereData);
+  ospSetData(geometry, "color",   colorData);
+  ospSet1f(geometry, "radius", 100.f);
+  ospSet1i(geometry, "bytes_per_sphere", 3*sizeof(float));
+
+  ospCommit(sphereData);
+  ospCommit(colorData);
+
+  ospCommit(geometry);
+  ospAddGeometry(m_model, geometry);
+  ospCommit(m_model);
 }
 
 OSPMaterial
