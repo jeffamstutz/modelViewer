@@ -98,12 +98,12 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   }
 
   createRenderer();
-
 #if 0
   createScene();
 #else
   createSpheres();
 #endif
+  createSunLight();
 
   m_camera = ospNewCamera(m_cameraType.c_str());
   Assert(m_camera != NULL && "could not create camera");
@@ -458,27 +458,6 @@ void CommandLineSceneBuilder::createScene()
   if (m_config.verboseOutput) {
     cout << "#m_modelViewer: done creating ospray model." << endl;
   }
-
-  //TODO: Need to figure out where we're going to read lighting data from
-  //begin light test
-  std::vector<OSPLight> lights;
-  if (m_defaultDirLight_direction != vec3f(0.f)) {
-    if (m_config.verboseOutput) {
-      cout << "#m_modelViewer: Adding a hard coded directional "
-           << "light as the sun." << endl;
-    }
-    OSPLight ospLight = ospNewLight(m_renderer, "DirectionalLight");
-    ospSetString(ospLight, "name", "sun" );
-    ospSet3f(ospLight, "color", 1, 1, 1);
-    ospSet3fv(ospLight, "direction", &m_defaultDirLight_direction.x);
-    ospSet1f(ospLight, "angularDiameter", 0.53f);
-    ospCommit(ospLight);
-    lights.push_back(ospLight);
-  }
-
-  OSPData lightArray = ospNewData(lights.size(), OSP_OBJECT, &lights[0], 0);
-  ospSetData(m_renderer, "lights", lightArray);
-  //end light test
 }
 
 void CommandLineSceneBuilder::createSpheres()
@@ -524,6 +503,30 @@ void CommandLineSceneBuilder::createSpheres()
   m_model = ospNewModel();
   ospAddGeometry(m_model, geometry);
   ospCommit(m_model);
+}
+
+void CommandLineSceneBuilder::createSunLight()
+{
+  //TODO: Need to figure out where we're going to read lighting data from
+  //begin light test
+  std::vector<OSPLight> lights;
+  if (m_defaultDirLight_direction != vec3f(0.f)) {
+    if (m_config.verboseOutput) {
+      cout << "#m_modelViewer: Adding a hard coded directional "
+           << "light as the sun." << endl;
+    }
+    OSPLight ospLight = ospNewLight(m_renderer, "DirectionalLight");
+    ospSetString(ospLight, "name", "sun" );
+    ospSet3f(ospLight, "color", 1, 1, 1);
+    ospSet3fv(ospLight, "direction", &m_defaultDirLight_direction.x);
+    ospSet1f(ospLight, "angularDiameter", 0.53f);
+    ospCommit(ospLight);
+    lights.push_back(ospLight);
+  }
+
+  OSPData lightArray = ospNewData(lights.size(), OSP_OBJECT, &lights[0], 0);
+  ospSetData(m_renderer, "lights", lightArray);
+  //end light test
 }
 
 OSPMaterial

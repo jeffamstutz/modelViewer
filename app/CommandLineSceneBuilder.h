@@ -48,6 +48,7 @@ private:
   void createRenderer();
   void createScene();
   void createSpheres();
+  void createSunLight();
 
   OSPMaterial createDefaultMaterial(OSPRenderer renderer);
   OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
