@@ -462,33 +462,41 @@ void CommandLineSceneBuilder::createScene()
 
 void CommandLineSceneBuilder::createSpheres()
 {
-  std::vector<vec3f> vertices;
-  std::vector<vec4f> colors;
+  struct Sphere {
+    vec3f center;
+    uint  colorID;
+  };
 
-#define NUM_SPHERES 100
+  std::vector<Sphere> spheres;
+  std::vector<vec4f>  colors;
 
-  vertices.resize(NUM_SPHERES);
+#define NUM_SPHERES 100000
+#define NUM_COLORS 10
+
+  spheres.resize(NUM_SPHERES);
   colors.resize(NUM_SPHERES);
 
   std::default_random_engine rng;
   std::uniform_real_distribution<float> vdist(-1000.0f, 1000.0f);
   std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
+  std::uniform_int_distribution<uint>   ciddist(0, NUM_COLORS-1);
 
   for (int i = 0; i < NUM_SPHERES; i++) {
-    vertices[i].x = vdist(rng);
-    vertices[i].y = vdist(rng);
-    vertices[i].z = vdist(rng);
+    spheres[i].center.x = vdist(rng);
+    spheres[i].center.y = vdist(rng);
+    spheres[i].center.z = vdist(rng);
+    spheres[i].colorID  = ciddist(rng);
   }
 
-  for (int i = 0; i < NUM_SPHERES; i++) {
+  for (int i = 0; i < NUM_COLORS; i++) {
     colors[i].x = cdist(rng);
     colors[i].y = cdist(rng);
     colors[i].z = cdist(rng);
     colors[i].w = 1.0f;
   }
 
-  auto sphereData = ospNewData(NUM_SPHERES, OSP_FLOAT3, vertices.data());
-  auto colorData  = ospNewData(NUM_SPHERES, OSP_FLOAT4, colors.data());
+  auto sphereData = ospNewData(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR, spheres.data());
+  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
 
   ospCommit(sphereData);
   ospCommit(colorData);
@@ -496,8 +504,9 @@ void CommandLineSceneBuilder::createSpheres()
   auto geometry = ospNewGeometry("spheres");
   ospSetData(geometry, "spheres", sphereData);
   ospSetData(geometry, "color",   colorData);
-  ospSet1f(geometry, "radius", 100.f);
-  ospSet1i(geometry, "bytes_per_sphere", sizeof(vec3f));
+  ospSet1f(geometry, "radius", 10.f);
+  ospSet1i(geometry, "bytes_per_sphere", sizeof(Sphere));
+  ospSet1i(geometry, "offset_colorID", sizeof(vec3f));
   ospCommit(geometry);
 
   m_model = ospNewModel();
