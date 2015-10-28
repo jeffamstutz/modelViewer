@@ -45,7 +45,10 @@ private:
 
   void parseCommandLine(int ac, const char **&av);
   void reportParsedData();
+  void createRenderer();
   void createScene();
+  void createSpheres();
+  void createSunLight();
 
   OSPMaterial createDefaultMaterial(OSPRenderer renderer);
   OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);

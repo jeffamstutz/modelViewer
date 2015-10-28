@@ -1,5 +1,7 @@
 #include "CommandLineSceneBuilder.h"
 
+#include <random>
+
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -95,7 +97,13 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
     reportParsedData();
   }
 
+  createRenderer();
+#if 1
   createScene();
+#else
+  createSpheres();
+#endif
+  createSunLight();
 
   m_camera = ospNewCamera(m_cameraType.c_str());
   Assert(m_camera != NULL && "could not create camera");
@@ -228,13 +236,8 @@ void CommandLineSceneBuilder::reportParsedData()
     error("no (valid) input files specified - model contains no triangles");
 }
 
-void CommandLineSceneBuilder::createScene()
+void CommandLineSceneBuilder::createRenderer()
 {
-  // -------------------------------------------------------
-  // create ospray model
-  // -------------------------------------------------------
-  m_model = ospNewModel();
-
   m_renderer = ospNewRenderer(m_rendererType.c_str());
   if (!m_renderer) {
     throw std::runtime_error("could not create m_renderer '" +
@@ -242,6 +245,14 @@ void CommandLineSceneBuilder::createScene()
   }
   Assert(m_renderer != NULL && "could not create m_renderer");
   ospCommit(m_renderer);
+}
+
+void CommandLineSceneBuilder::createScene()
+{
+  // -------------------------------------------------------
+  // create ospray model
+  // -------------------------------------------------------
+  m_model = ospNewModel();
 
   // code does not yet do instancing ... check that the model doesn't
   // contain instances
@@ -447,7 +458,64 @@ void CommandLineSceneBuilder::createScene()
   if (m_config.verboseOutput) {
     cout << "#m_modelViewer: done creating ospray model." << endl;
   }
+}
 
+void CommandLineSceneBuilder::createSpheres()
+{
+  struct Sphere {
+    vec3f center;
+    uint  colorID;
+  };
+
+  std::vector<Sphere> spheres;
+  std::vector<vec4f>  colors;
+
+#define NUM_SPHERES 100000
+#define NUM_COLORS 10
+
+  spheres.resize(NUM_SPHERES);
+  colors.resize(NUM_SPHERES);
+
+  std::default_random_engine rng;
+  std::uniform_real_distribution<float> vdist(-1000.0f, 1000.0f);
+  std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
+  std::uniform_int_distribution<uint>   ciddist(0, NUM_COLORS-1);
+
+  for (int i = 0; i < NUM_SPHERES; i++) {
+    spheres[i].center.x = vdist(rng);
+    spheres[i].center.y = vdist(rng);
+    spheres[i].center.z = vdist(rng);
+    spheres[i].colorID  = ciddist(rng);
+  }
+
+  for (int i = 0; i < NUM_COLORS; i++) {
+    colors[i].x = cdist(rng);
+    colors[i].y = cdist(rng);
+    colors[i].z = cdist(rng);
+    colors[i].w = 1.0f;
+  }
+
+  auto sphereData = ospNewData(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR, spheres.data());
+  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+
+  ospCommit(sphereData);
+  ospCommit(colorData);
+
+  auto geometry = ospNewGeometry("spheres");
+  ospSetData(geometry, "spheres", sphereData);
+  ospSetData(geometry, "color",   colorData);
+  ospSet1f(geometry, "radius", 10.f);
+  ospSet1i(geometry, "bytes_per_sphere", sizeof(Sphere));
+  ospSet1i(geometry, "offset_colorID", sizeof(vec3f));
+  ospCommit(geometry);
+
+  m_model = ospNewModel();
+  ospAddGeometry(m_model, geometry);
+  ospCommit(m_model);
+}
+
+void CommandLineSceneBuilder::createSunLight()
+{
   //TODO: Need to figure out where we're going to read lighting data from
   //begin light test
   std::vector<OSPLight> lights;
@@ -468,7 +536,6 @@ void CommandLineSceneBuilder::createScene()
   OSPData lightArray = ospNewData(lights.size(), OSP_OBJECT, &lights[0], 0);
   ospSetData(m_renderer, "lights", lightArray);
   //end light test
-  ospCommit(m_renderer);
 }
 
 OSPMaterial
