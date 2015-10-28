@@ -98,7 +98,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   }
 
   createRenderer();
-#if 0
+#if 1
   createScene();
 #else
   createSpheres();
