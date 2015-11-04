@@ -100,8 +100,10 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   createRenderer();
 #if 1
   createScene();
-#else
+#elif 0
   createSpheres();
+#else
+  createCylinders();
 #endif
   createSunLight();
 
@@ -507,6 +509,65 @@ void CommandLineSceneBuilder::createSpheres()
   ospSet1f(geometry, "radius", 10.f);
   ospSet1i(geometry, "bytes_per_sphere", sizeof(Sphere));
   ospSet1i(geometry, "offset_colorID", sizeof(vec3f));
+  ospCommit(geometry);
+
+  m_model = ospNewModel();
+  ospAddGeometry(m_model, geometry);
+  ospCommit(m_model);
+}
+
+void CommandLineSceneBuilder::createCylinders()
+{
+  struct Cylinder {
+    vec3f v0;
+    vec3f v1;
+    uint  colorID;
+  };
+
+  std::vector<Cylinder> cylinders;
+  std::vector<vec4f>  colors;
+
+#define NUM_CYLINDERS 100
+#define NUM_COLORS 10
+
+  cylinders.resize(NUM_CYLINDERS);
+  colors.resize(NUM_CYLINDERS);
+
+  std::default_random_engine rng;
+  std::uniform_real_distribution<float> vdist(-1000.0f, 1000.0f);
+  std::uniform_real_distribution<float> cdist(0.0f, 1.0f);
+  std::uniform_int_distribution<uint>   ciddist(0, NUM_COLORS-1);
+
+  for (int i = 0; i < NUM_CYLINDERS; i++) {
+    cylinders[i].v0.x = vdist(rng);
+    cylinders[i].v0.y = vdist(rng);
+    cylinders[i].v0.z = vdist(rng);
+    cylinders[i].v1.x = vdist(rng);
+    cylinders[i].v1.y = vdist(rng);
+    cylinders[i].v1.z = vdist(rng);
+    cylinders[i].colorID  = ciddist(rng);
+  }
+
+  for (int i = 0; i < NUM_COLORS; i++) {
+    colors[i].x = cdist(rng);
+    colors[i].y = cdist(rng);
+    colors[i].z = cdist(rng);
+    colors[i].w = 1.0f;
+  }
+
+  auto cylinderData = ospNewData(sizeof(Cylinder)*NUM_CYLINDERS, OSP_CHAR,
+                                 cylinders.data());
+  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+
+  ospCommit(cylinderData);
+  ospCommit(colorData);
+
+  auto geometry = ospNewGeometry("cylinders");
+  ospSetData(geometry, "cylinders", cylinderData);
+  ospSetData(geometry, "color",   colorData);
+  ospSet1f(geometry, "radius", 10.f);
+  ospSet1i(geometry, "bytes_per_cylinder", sizeof(Cylinder));
+  ospSet1i(geometry, "offset_colorID", 2*sizeof(vec3f));
   ospCommit(geometry);
 
   m_model = ospNewModel();
