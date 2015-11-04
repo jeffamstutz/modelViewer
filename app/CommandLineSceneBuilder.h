@@ -48,6 +48,7 @@ private:
   void createRenderer();
   void createScene();
   void createSpheres();
+  void createCylinders();
   void createSunLight();
 
   OSPMaterial createDefaultMaterial(OSPRenderer renderer);
