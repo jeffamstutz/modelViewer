@@ -72,3 +72,6 @@ ADD_SUBDIRECTORY(common/widgets)
 ADD_SUBDIRECTORY(common/xml)
 
 ADD_SUBDIRECTORY(app)
+
+# benchmarks
+ADD_SUBDIRECTORY(bench)
