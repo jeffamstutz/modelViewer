@@ -59,18 +59,17 @@ find_package(ospray)
 INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}
   ${OSPRAY_INCLUDE_DIRS}
+  common/script/chaiscript
 )
 
 ##############################################################
 # Build app
 ##############################################################
 
-# common utility classes for 3D viewer widget
-ADD_SUBDIRECTORY(common/widgets)
+# common utility classes
+ADD_SUBDIRECTORY(common)
 
-# common xml utility classes
-ADD_SUBDIRECTORY(common/xml)
-
+# debug app
 ADD_SUBDIRECTORY(app)
 
 # benchmarks

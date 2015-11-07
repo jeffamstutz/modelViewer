@@ -22,7 +22,7 @@
 // viewer widget
 #include "common/widgets/glut3D.h"
 // mini scene graph for loading the model
-#include "miniSG/miniSG.h"
+#include "common/miniSG/miniSG.h"
 // ospray, for rendering
 #include "ospray/ospray.h"
 

@@ -14,48 +14,15 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-SET(APP_NAME ospDebugViewer)
+SET(LIBRARY_NAME ospray_script)
 
-FIND_PACKAGE(Readline)
-
-IF(READLINE_FOUND)
-  ADD_DEFINITIONS(-DUSE_SYSTEM_READLINE)
-  SET(Readline_INC ${Readline_INCLUDE_DIR})
-  SET(Readline_LIB ${Readline_LIBRARY})
-ELSE()
-  MESSAGE(STATUS "Readline NOT found, command history feature NOT enabled.")
-ENDIF()
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_LIST_DIR}
-  ${CMAKE_CURRENT_LIST_DIR}/script
-  ${Readline_INC}
+ADD_LIBRARY(ospray_script
+  OSPRayScriptHandler.cpp
+  OSPRayScriptHandler.h
 )
 
-# --------------------------------------------
-# main executable
-# --------------------------------------------
-ADD_EXECUTABLE(${APP_NAME}
-  DebugViewerScriptHandler.cpp
-  DebugViewerScriptHandler.h
-  CommandLineSceneBuilder.cpp
-  CommandLineSceneBuilder.h
-  MSGViewer.cpp
-  MSGViewer.h
-  ViewerConfig.h
-  modelViewer.cpp
-  ospray_cpp.h
-)
-
-TARGET_LINK_LIBRARIES(${APP_NAME}
-  ospray_glut3d
-  ospray_minisg
-  ospray_script
-  ${OPENGL_LIBRARIES}
-  ${GLUT_LIBRARIES}
+TARGET_LINK_LIBRARIES(ospray_script
   ${OSPRAY_LIBRARIES}
-  ${Readline_LIB}
 )
-# ------------------------------------------------------------
 
-INSTALL(TARGETS ${APP_NAME} DESTINATION bin)
+INSTALL(TARGETS ospray_script DESTINATION lib)
