@@ -1,25 +1,10 @@
-
-#include <random>
-#include <vector>
-
 #include <hayai/hayai.hpp>
 
-#define NUM_INTS 10000
+#include "OSPRayFixture.h"
 
-BENCHMARK(TestGroup, Test1, 10, 100)
+BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 {
-  std::vector<int> numbers;
-
-  numbers.reserve(NUM_INTS);
-
-  std::default_random_engine rng;
-  std::uniform_int_distribution<int> dist(0, 2*NUM_INTS);
-
-  for (int i = 0; i < NUM_INTS; ++i) {
-    numbers.push_back(dist(rng));
-  }
-
-  std::sort(numbers.begin(), numbers.end());
+  ospRenderFrame(fb, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
 
 int main()
