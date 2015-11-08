@@ -28,8 +28,8 @@ INCLUDE_DIRECTORIES(
 # --------------------------------------------
 ADD_EXECUTABLE(${APP_NAME}
   bench.cpp
-  OSPrayFixture.cpp
-  OSPrayFixture.h
+  OSPRayFixture.cpp
+  OSPRayFixture.h
 )
 
 TARGET_LINK_LIBRARIES(${APP_NAME}

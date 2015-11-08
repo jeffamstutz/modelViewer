@@ -6,7 +6,7 @@ using std::endl;
 using std::string;
 #include <vector>
 
-#include "OSPrayFixture.h"
+#include "OSPRayFixture.h"
 
 using ospray::box3f;
 using ospray::vec2i;
