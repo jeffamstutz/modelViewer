@@ -333,7 +333,8 @@ static void createOSPCamera(OSPRayFixture *f)
 
 static void createOSPRenderer(OSPRayFixture *f)
 {
-  f->renderer = ospNewRenderer("primID");
+  f->renderer = ospNewRenderer("ao1");
+  ospSetVec3f(f->renderer, "bgcolor", vec3f(1.f, 1.f, 1.f));
 }
 
 static void createFramebuffer(OSPRayFixture *f)
@@ -342,6 +343,7 @@ static void createFramebuffer(OSPRayFixture *f)
                             OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
   ospSet1f(f->fb, "gamma", 2.2f);
   ospCommit(f->fb);
+  ospFrameBufferClear(f->fb, OSP_FB_ACCUM);
 }
 
 void OSPRayFixture::SetUp()
@@ -365,8 +367,25 @@ void OSPRayFixture::SetUp()
 
 #if 1
   ospRenderFrame(fb, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
-  auto *lfb = (uint32*)ospMapFrameBuffer(fb);
+  auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
+# if 0
   writePPM("test.ppm", 1024, 1024, lfb);
+# else
+  bool hasColor = false;
+  for (int i = 0; i < 1024*1024; ++i) {
+    if ((lfb[i] & 0xFFFFFF00) > 0) {
+      hasColor = true;
+      std::cerr << "got color: " << lfb[i] << std::endl;
+      break;
+    }
+  }
+
+  if (hasColor) {
+    std::cerr << "IMAGE HAS COLOR!!!" << std::endl;
+  } else {
+    std::cerr << "IMAGE HAS NO COLOR..." << std::endl;
+  }
+# endif
   ospUnmapFrameBuffer(lfb, fb);
 #endif
 }
