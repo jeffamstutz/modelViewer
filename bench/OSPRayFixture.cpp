@@ -12,6 +12,8 @@ using ospray::box3f;
 using ospray::vec2i;
 using ospray::vec3f;
 
+using ospray::uint32;
+
 #ifndef BENCH_MODEL
 # define BENCH_MODEL "/Users/jdamstut/data/city/city.obj"
 #endif
@@ -322,9 +324,9 @@ static void createOSPCamera(OSPRayFixture *f)
   ospSetVec3f(f->camera, "up",  up);
 #else
   // city model view
-  ospSetVec3f(f->camera, "pos", vec3f(33398.523438, 20320.738281, -35626.101562));
-  ospSetVec3f(f->camera, "dir", vec3f(14588.197266, 4275.844727, -10825.982422));
-  ospSetVec3f(f->camera, "up",  vec3f(0, 1, 0));
+  ospSet3f(f->camera, "pos", 33398.523438, 20320.738281, -35626.101562);
+  ospSet3f(f->camera, "dir", 14588.197266, 4275.844727, -10825.982422);
+  ospSet3f(f->camera, "up",  0, 1, 0);
 #endif
 
   ospSetf(f->camera, "aspect", 1.333f);
@@ -334,12 +336,12 @@ static void createOSPCamera(OSPRayFixture *f)
 static void createOSPRenderer(OSPRayFixture *f)
 {
   f->renderer = ospNewRenderer("ao1");
-  ospSetVec3f(f->renderer, "bgcolor", vec3f(1.f, 1.f, 1.f));
+  ospSet3f(f->renderer, "bgcolor", 1.f, 1.f, 1.f);
 }
 
 static void createFramebuffer(OSPRayFixture *f)
 {
-  f->fb = ospNewFrameBuffer(vec2i(1024, 1024), OSP_RGBA_I8,
+  f->fb = ospNewFrameBuffer(osp::vec2i{1024, 1024}, OSP_RGBA_I8,
                             OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
   ospSet1f(f->fb, "gamma", 2.2f);
   ospCommit(f->fb);

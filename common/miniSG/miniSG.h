@@ -16,12 +16,12 @@
 
 #pragma once
 
-// ospray 
+// ospray
 #include "ospray/common/OSPCommon.h"
 #include "ospray/common/Managed.h"
-// embree 
+// embree
 #include "common/sys/filename.h"
-// stl 
+// stl
 #include <vector>
 #include <map>
 
@@ -41,7 +41,7 @@ namespace ospray {
       int height;   //Pixels per column
       void *data;   //Pointer to binary texture data
     };
-    
+
     Texture2D *loadTexture(const std::string &path, const std::string &fileName);
 
     struct Material : public RefCount {
@@ -80,7 +80,7 @@ namespace ospray {
           };
         }
 
-        void set(const char *v) { 
+        void set(const char *v) {
           clear();
           s = strdup(v);
           type = STRING;
@@ -197,8 +197,8 @@ namespace ospray {
           component of the triangle, but right now ospray/embree do
           not yet allow this ... */
       std::vector<uint32> triangleMaterialId;
-      
-      
+
+
       box3f bounds; /*!< bounding box of all vertices */
 
       int size() const { return triangle.size(); }
@@ -210,7 +210,7 @@ namespace ospray {
     struct Instance : public RefCount {
       affine3f xfm;
       int meshID;
-      
+
       Instance(int meshID=0, affine3f xfm=embree::one) : meshID(meshID), xfm(xfm) {};
     };
     bool operator==(const Instance &a, const Instance &b);
@@ -218,11 +218,11 @@ namespace ospray {
 
     struct Model : public RefCount {
       /*! list of meshes that the scene is composed of */
-      std::vector<Ref<Mesh> >     mesh;
+      std::vector<Ref<Mesh>>     mesh;
       /*! \brief list of instances (if available). */
-      std::vector<Instance>       instance;
+      std::vector<Instance>      instance;
       /*! \brief list of camera defined in the model (usually empty) */
-      std::vector<Ref<Camera> >   camera;
+      std::vector<Ref<Camera>>   camera;
 
       //! return number of meshes in this model
       inline size_t numMeshes() const { return mesh.size(); }

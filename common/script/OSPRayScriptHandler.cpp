@@ -100,7 +100,7 @@ void ospSet1f(OSPObject _object, const string &id, float x)
   ::ospSet1f(_object, id.c_str(), x);
 }
 
-void ospSet1i(OSPObject _object, const string &id, int32 x)
+void ospSet1i(OSPObject _object, const string &id, int x)
 {
   ::ospSet1i(_object, id.c_str(), x);
 }

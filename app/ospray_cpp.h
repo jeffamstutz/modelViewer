@@ -18,6 +18,8 @@
 
 #include <ospray/ospray.h>
 
+#include <string>
+
 namespace osp {
 namespace cpp {
 
