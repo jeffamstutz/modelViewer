@@ -14,17 +14,15 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(COMMON_CXX_FLAGS "/EHsc /MP /GR ")
+set(LIBRARY_NAME ospray_script)
 
-set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} ${COMMON_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE}        ${COMMON_CXX_FLAGS} /Ox /fp:fast /Oi /Gy ")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${COMMON_CXX_FLAGS} /Ox /fp:fast /Oi /Gy ")
+add_library(${LIBRARY_NAME}
+  OSPRayScriptHandler.cpp
+  OSPRayScriptHandler.h
+)
 
-# optionally use static runtime library
-option(USE_STATIC_RUNTIME "Use the static version of the C/C++ runtime library." ON)
-if (USE_STATIC_RUNTIME)
-  string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-endif()
+target_link_libraries(${LIBRARY_NAME}
+  ${OSPRAY_LIBRARIES}
+)
 
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

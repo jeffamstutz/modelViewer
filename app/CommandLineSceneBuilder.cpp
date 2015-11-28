@@ -446,7 +446,7 @@ void CommandLineSceneBuilder::createScene()
     for (int i=0;i<m_msgModel->instance.size();i++) {
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
-          m_msgModel->instance[i].xfm);
+          reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));
       ospAddGeometry(m_model,inst);
     }
   }

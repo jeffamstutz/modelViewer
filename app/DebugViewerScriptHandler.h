@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "OSPRayScriptHandler.h"
+#include "common/script/OSPRayScriptHandler.h"
 
 namespace ospray {
 

@@ -8,6 +8,8 @@ using std::string;
 using std::lock_guard;
 using std::mutex;
 
+using ospray::uint32;
+
 // Static local helper functions //////////////////////////////////////////////
 
 // helper function to write the rendered image as PPM file
@@ -120,7 +122,7 @@ void MSGViewer::reshape(const vec2i &newSize)
   Glut3DWidget::reshape(newSize);
   m_windowSize = newSize;
   if (m_fb) ospFreeFrameBuffer(m_fb);
-  m_fb = ospNewFrameBuffer(newSize, OSP_RGBA_I8,
+  m_fb = ospNewFrameBuffer(osp::vec2i{newSize.x, newSize.y}, OSP_RGBA_I8,
                            OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
   ospSet1f(m_fb, "gamma", 2.2f);
   ospCommit(m_fb);
@@ -205,9 +207,9 @@ void MSGViewer::mouseButton(int32 whichButton, bool released, const vec2i &pos)
     vec2f normpos = vec2f(pos.x / (float)windowSize.x,
                           1.0f - pos.y / (float)windowSize.y);
     OSPPickResult pick;
-    ospPick(&pick, m_renderer, normpos);
+    ospPick(&pick, m_renderer, reinterpret_cast<osp::vec2f&>(normpos));
     if(pick.hit) {
-      viewPort.at = pick.position;
+      viewPort.at = reinterpret_cast<ospray::vec3f&>(pick.position);
       viewPort.modified = true;
       computeFrame();
       forceRedraw();
@@ -250,9 +252,10 @@ void MSGViewer::display()
       once = false;
     }
     Assert2(m_camera,"ospray camera is null");
-    ospSetVec3f(m_camera,"pos",viewPort.from);
-    ospSetVec3f(m_camera,"dir",viewPort.at-viewPort.from);
-    ospSetVec3f(m_camera,"up",viewPort.up);
+    ospSetVec3f(m_camera,"pos",reinterpret_cast<osp::vec3f&>(viewPort.from));
+    auto dir = viewPort.at - viewPort.from;
+    ospSetVec3f(m_camera,"dir",reinterpret_cast<osp::vec3f&>(dir));
+    ospSetVec3f(m_camera,"up",reinterpret_cast<osp::vec3f&>(viewPort.up));
     ospSetf(m_camera,"aspect",viewPort.aspect);
     ospCommit(m_camera);
     viewPort.modified = false;

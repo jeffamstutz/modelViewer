@@ -19,7 +19,7 @@
 // viewer widget
 #include "common/widgets/glut3D.h"
 
-#include "miniSG/miniSG.h"
+#include "common/miniSG/miniSG.h"
 
 #include "ospray/ospray.h"
 

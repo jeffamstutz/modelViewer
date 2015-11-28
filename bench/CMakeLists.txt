@@ -1,4 +1,4 @@
-## ======================================================================== ##
+# ======================================================================== ##
 ## Copyright 2009-2015 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
@@ -14,17 +14,28 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(COMMON_CXX_FLAGS "/EHsc /MP /GR ")
+set(APP_NAME ospBenchmark)
 
-set(CMAKE_CXX_FLAGS_DEBUG          "${CMAKE_CXX_FLAGS_DEBUG} ${COMMON_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE        "${CMAKE_CXX_FLAGS_RELEASE}        ${COMMON_CXX_FLAGS} /Ox /fp:fast /Oi /Gy ")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} ${COMMON_CXX_FLAGS} /Ox /fp:fast /Oi /Gy ")
+find_package(hayai)
 
-# optionally use static runtime library
-option(USE_STATIC_RUNTIME "Use the static version of the C/C++ runtime library." ON)
-if (USE_STATIC_RUNTIME)
-  string(REPLACE "/MDd" "/MTd" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-endif()
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${HAYAI_INCLUDE_DIRS}
+)
 
+# --------------------------------------------
+# main executable
+# --------------------------------------------
+add_executable(${APP_NAME}
+  bench.cpp
+  OSPRayFixture.cpp
+  OSPRayFixture.h
+)
+
+target_link_libraries(${APP_NAME}
+  ospray_minisg
+)
+
+# ------------------------------------------------------------
+
+install(TARGETS ${APP_NAME} DESTINATION bin)

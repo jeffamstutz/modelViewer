@@ -14,21 +14,19 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-SET(APP_NAME ospDebugViewer)
+set(APP_NAME ospDebugViewer)
 
-ADD_SUBDIRECTORY(miniSG)
+find_package(Readline)
 
-FIND_PACKAGE(Readline)
+if(READLINE_FOUND)
+  add_definitions(-DUSE_SYSTEM_READLINE)
+  set(Readline_INC ${Readline_INCLUDE_DIR})
+  set(Readline_LIB ${Readline_LIBRARY})
+else()
+  message(STATUS "Readline NOT found, command history feature NOT enabled.")
+endif()
 
-IF(READLINE_FOUND)
-  ADD_DEFINITIONS(-DUSE_SYSTEM_READLINE)
-  SET(Readline_INC ${Readline_INCLUDE_DIR})
-  SET(Readline_LIB ${Readline_LIBRARY})
-ELSE()
-  MESSAGE(STATUS "Readline NOT found, command history feature NOT enabled.")
-ENDIF()
-
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_LIST_DIR}/script
   ${Readline_INC}
@@ -37,9 +35,7 @@ INCLUDE_DIRECTORIES(
 # --------------------------------------------
 # main executable
 # --------------------------------------------
-ADD_EXECUTABLE(${APP_NAME}
-  script/OSPRayScriptHandler.cpp
-  script/OSPRayScriptHandler.h
+add_executable(${APP_NAME}
   DebugViewerScriptHandler.cpp
   DebugViewerScriptHandler.h
   CommandLineSceneBuilder.cpp
@@ -51,9 +47,10 @@ ADD_EXECUTABLE(${APP_NAME}
   ospray_cpp.h
 )
 
-TARGET_LINK_LIBRARIES(${APP_NAME}
-  ospray_minisg
+target_link_libraries(${APP_NAME}
   ospray_glut3d
+  ospray_minisg
+  ospray_script
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}
@@ -61,4 +58,4 @@ TARGET_LINK_LIBRARIES(${APP_NAME}
 )
 # ------------------------------------------------------------
 
-INSTALL(TARGETS ${APP_NAME} DESTINATION bin)
+install(TARGETS ${APP_NAME} DESTINATION bin)
