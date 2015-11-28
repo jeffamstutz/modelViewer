@@ -30,7 +30,7 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
     for (int x = 0; x < sizeX; x++) {
       out[3*x + 0] = in[4*x + 0];
       out[3*x + 1] = in[4*x + 1];
-      out[3*x + 2] = in[4*x +2 ];
+      out[3*x + 2] = in[4*x + 2];
     }
     fwrite(out, 3*sizeX, sizeof(char), file);
   }
@@ -314,22 +314,15 @@ static void createOSPCamera(OSPRayFixture *f)
   vec3f center = embree::center(worldBounds);
   vec3f diag   = worldBounds.size();
   diag         = max(diag,vec3f(0.3f*length(diag)));
-  vec3f from   = center - .75f*vec3f(-.6*diag.x,-1.2*diag.y,.8*diag.z);
+  vec3f from   = center - 0.95f*vec3f(-.6*diag.x,-1.2*diag.y,.8*diag.z);
   vec3f dir    = center - from;
   vec3f up     = vec3f(0.f, 1.f, 0.f);
 
-#if 0
-  ospSetVec3f(f->camera, "pos", from);
-  ospSetVec3f(f->camera, "dir", dir);
-  ospSetVec3f(f->camera, "up",  up);
-#else
-  // city model view
-  ospSet3f(f->camera, "pos", 33398.523438, 20320.738281, -35626.101562);
-  ospSet3f(f->camera, "dir", 14588.197266, 4275.844727, -10825.982422);
-  ospSet3f(f->camera, "up",  0, 1, 0);
-#endif
+  ospSetVec3f(f->camera, "pos", reinterpret_cast<osp::vec3f&>(from));
+  ospSetVec3f(f->camera, "dir", reinterpret_cast<osp::vec3f&>(dir));
+  ospSetVec3f(f->camera, "up",  reinterpret_cast<osp::vec3f&>(up));
 
-  ospSetf(f->camera, "aspect", 1.333f);
+  ospSetf(f->camera, "aspect", 1.f);
   ospCommit(f->camera);
 }
 
@@ -342,10 +335,10 @@ static void createOSPRenderer(OSPRayFixture *f)
 static void createFramebuffer(OSPRayFixture *f)
 {
   f->fb = ospNewFrameBuffer(osp::vec2i{1024, 1024}, OSP_RGBA_I8,
-                            OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
+                            OSP_FB_COLOR|OSP_FB_ACCUM);
   ospSet1f(f->fb, "gamma", 2.2f);
   ospCommit(f->fb);
-  ospFrameBufferClear(f->fb, OSP_FB_ACCUM);
+  ospFrameBufferClear(f->fb, OSP_FB_ACCUM | OSP_FB_COLOR);
 }
 
 void OSPRayFixture::SetUp()
@@ -366,33 +359,12 @@ void OSPRayFixture::SetUp()
   ospSet1i(renderer, "spp", 1);
 
   ospCommit(renderer);
-
-#if 1
-  ospRenderFrame(fb, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
-  auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
-# if 0
-  writePPM("test.ppm", 1024, 1024, lfb);
-# else
-  bool hasColor = false;
-  for (int i = 0; i < 1024*1024; ++i) {
-    if ((lfb[i] & 0xFFFFFF00) > 0) {
-      hasColor = true;
-      std::cerr << "got color: " << lfb[i] << std::endl;
-      break;
-    }
-  }
-
-  if (hasColor) {
-    std::cerr << "IMAGE HAS COLOR!!!" << std::endl;
-  } else {
-    std::cerr << "IMAGE HAS NO COLOR..." << std::endl;
-  }
-# endif
-  ospUnmapFrameBuffer(lfb, fb);
-#endif
 }
 
 void OSPRayFixture::TearDown()
 {
+  auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
+  writePPM("test.ppm", 1024, 1024, lfb);
+  ospUnmapFrameBuffer(lfb, fb);
   ospFreeFrameBuffer(fb);
 }
