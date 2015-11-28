@@ -14,4 +14,6 @@ struct OSPRayFixture : public hayai::Fixture
   OSPCamera      camera;
   OSPModel       model;
   OSPFrameBuffer fb;
+
+  static std::string benchmarkModelFile;
 };

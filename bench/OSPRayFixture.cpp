@@ -14,9 +14,7 @@ using ospray::vec3f;
 
 using ospray::uint32;
 
-#ifndef BENCH_MODEL
-# define BENCH_MODEL "/Users/jdamstut/data/city/city.obj"
-#endif
+string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
 
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
@@ -112,15 +110,16 @@ static OSPMaterial createMaterial(OSPRenderer renderer,
     return createDefaultMaterial(renderer);
   }
 
-  static std::map<ospray::miniSG::Material*, OSPMaterial> alreadyCreatedMaterials;
+  static std::map<ospray::miniSG::Material*, OSPMaterial> createdMaterials;
 
-  if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end())
-    return alreadyCreatedMaterials[mat];
+  if (createdMaterials.find(mat) != createdMaterials.end()) {
+    return createdMaterials[mat];
+  }
 
-  const char *type = mat->getParam("type","OBJMaterial");
+  const char *type = mat->getParam("type", "OBJMaterial");
   assert(type);
-  OSPMaterial ospMat = alreadyCreatedMaterials[mat]
-      = ospNewMaterial(renderer,type);
+  OSPMaterial ospMat = createdMaterials[mat]
+      = ospNewMaterial(renderer, type);
   if (!ospMat) {
     return createDefaultMaterial(renderer);
   }
@@ -145,7 +144,7 @@ static OSPMaterial createMaterial(OSPRenderer renderer,
           f < 1.f) {
         f = 1.f/(1.f - f) - 1.f;
       }
-      ospSet1f(ospMat,name,f);
+      ospSet1f(ospMat, name, f);
     } break;
     case ospray::miniSG::Material::Param::FLOAT_3:
       ospSet3fv(ospMat,name,p->f);
@@ -175,7 +174,7 @@ static OSPMaterial createMaterial(OSPRenderer renderer,
 
 static void loadModel(OSPRayFixture *f)
 {
-  embree::FileName fn = BENCH_MODEL;
+  embree::FileName fn = OSPRayFixture::benchmarkModelFile;
   ospray::miniSG::importOBJ(f->sgModel, fn);
 }
 
@@ -313,8 +312,8 @@ static void createOSPCamera(OSPRayFixture *f)
   const box3f worldBounds(f->sgModel.getBBox());
   vec3f center = embree::center(worldBounds);
   vec3f diag   = worldBounds.size();
-  diag         = max(diag,vec3f(0.3f*length(diag)));
-  vec3f from   = center - 0.95f*vec3f(-.6*diag.x,-1.2*diag.y,.8*diag.z);
+  diag         = max(diag, vec3f(0.3f*length(diag)));
+  vec3f from   = center - 0.95f*vec3f(-.6*diag.x, -1.2*diag.y, .8*diag.z);
   vec3f dir    = center - from;
   vec3f up     = vec3f(0.f, 1.f, 0.f);
 
