@@ -14,63 +14,66 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-PROJECT(ospDebugViewer)
+project(ospDebugViewer)
 
-IF(COMMAND cmake_policy)
-  CMAKE_POLICY(SET CMP0003 NEW)
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
 
-  IF(${CMAKE_MAJOR_VERSION} EQUAL 3)
-    CMAKE_POLICY(SET CMP0042 NEW)
-  ENDIF(${CMAKE_MAJOR_VERSION} EQUAL 3)
-ENDIF(COMMAND cmake_policy)
+  if(${CMAKE_MAJOR_VERSION} EQUAL 3)
+    cmake_policy(SET CMP0042 NEW)
+  endif(${CMAKE_MAJOR_VERSION} EQUAL 3)
+endif(COMMAND cmake_policy)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
 ##############################################################
 # Compiler configuration
 ##############################################################
 
 # compiler selection for the non-MIC part
-IF (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/icc.cmake)
-ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/gcc.cmake)
-ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/clang.cmake)
-ELSEIF (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-  INCLUDE(${PROJECT_SOURCE_DIR}/cmake/msvc.cmake)
-ELSE()
-  MESSAGE(FATAL_ERROR "Unsupported compiler: '${OSPRAY_COMPILER}'")
-ENDIF()
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
+  include(${PROJECT_SOURCE_DIR}/cmake/icc.cmake)
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
+  include(${PROJECT_SOURCE_DIR}/cmake/gcc.cmake)
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  include(${PROJECT_SOURCE_DIR}/cmake/clang.cmake)
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+  include(${PROJECT_SOURCE_DIR}/cmake/msvc.cmake)
+else()
+  message(FATAL_ERROR "Unsupported compiler: '${OSPRAY_COMPILER}'")
+endif()
 
 ##############################################################
 # Project configuration
 ##############################################################
 
-INCLUDE(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
 
-SET(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 find_package(ospray)
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_SOURCE_DIR}
   ${OSPRAY_INCLUDE_DIRS}
   common/script/chaiscript
 )
 
 ##############################################################
-# Build app
+# Build apps
 ##############################################################
 
 # common utility classes
-ADD_SUBDIRECTORY(common)
+add_subdirectory(common)
 
 # debug app
-ADD_SUBDIRECTORY(app)
+add_subdirectory(app)
 
 # benchmarks
-ADD_SUBDIRECTORY(bench)
+option(BUILD_BENCHMARKS "Enable/Disable building of benchmark apps" ON)
+if(BUILD_BENCHMARKS)
+  add_subdirectory(bench)
+endif()

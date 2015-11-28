@@ -14,11 +14,11 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-SET(APP_NAME ospBenchmark)
+set(APP_NAME ospBenchmark)
 
-FIND_PACKAGE(hayai)
+find_package(hayai)
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${CMAKE_CURRENT_LIST_DIR}
   ${HAYAI_INCLUDE_DIRS}
 )
@@ -26,16 +26,16 @@ INCLUDE_DIRECTORIES(
 # --------------------------------------------
 # main executable
 # --------------------------------------------
-ADD_EXECUTABLE(${APP_NAME}
+add_executable(${APP_NAME}
   bench.cpp
   OSPRayFixture.cpp
   OSPRayFixture.h
 )
 
-TARGET_LINK_LIBRARIES(${APP_NAME}
+target_link_libraries(${APP_NAME}
   ospray_minisg
 )
 
 # ------------------------------------------------------------
 
-INSTALL(TARGETS ${APP_NAME} DESTINATION bin)
+install(TARGETS ${APP_NAME} DESTINATION bin)

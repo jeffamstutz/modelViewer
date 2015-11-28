@@ -14,15 +14,15 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-SET(LIBRARY_NAME ospray_script)
+set(LIBRARY_NAME ospray_script)
 
-ADD_LIBRARY(ospray_script
+add_library(${LIBRARY_NAME}
   OSPRayScriptHandler.cpp
   OSPRayScriptHandler.h
 )
 
-TARGET_LINK_LIBRARIES(ospray_script
+target_link_libraries(${LIBRARY_NAME}
   ${OSPRAY_LIBRARIES}
 )
 
-INSTALL(TARGETS ospray_script DESTINATION lib)
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

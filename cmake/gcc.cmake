@@ -14,12 +14,12 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-SET(CMAKE_CXX_FLAGS "-fPIC --std=c++11 -msse4.1 -Wno-narrowing -fno-strict-aliasing ${CMAKE_CXX_FLAGS}")
-SET(CMAKE_CXX_FLAGS_DEBUG          "-DDEBUG  -g     -Wstrict-aliasing=1")
-SET(CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG    -O3 -Wstrict-aliasing=1 -ffast-math ")
-SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -g -O3 -Wstrict-aliasing=1 -ffast-math ")
-SET(CMAKE_EXE_LINKER_FLAGS "")
+set(CMAKE_CXX_FLAGS "-fPIC --std=c++11 -msse4.1 -Wno-narrowing -fno-strict-aliasing ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG          "-DDEBUG  -g     -Wstrict-aliasing=1")
+set(CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG    -O3 -Wstrict-aliasing=1 -ffast-math ")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -g -O3 -Wstrict-aliasing=1 -ffast-math ")
+set(CMAKE_EXE_LINKER_FLAGS "")
 
-IF (APPLE)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7")
-ENDIF (APPLE)
+if (APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mmacosx-version-min=10.7")
+endif (APPLE)

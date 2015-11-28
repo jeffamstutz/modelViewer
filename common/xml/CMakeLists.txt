@@ -14,17 +14,16 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ospray/include)
+set(LIBRARY_NAME ospray_xml)
 
-ADD_LIBRARY(ospray_xml
+add_library(${LIBRARY_NAME}
   XML.cpp
 )
 
-TARGET_LINK_LIBRARIES(ospray_xml
+target_link_libraries(${LIBRARY_NAME}
   ${OSPRAY_LIBRARIES}
 )
 
 # ------------------------------------------------------------
-INSTALL(TARGETS ospray_xml DESTINATION lib)
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
 
