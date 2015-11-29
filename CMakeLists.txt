@@ -54,7 +54,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
 set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-find_package(ospray)
+find_package(ospray REQUIRED)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}
