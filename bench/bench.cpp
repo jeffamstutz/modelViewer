@@ -9,6 +9,8 @@ BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 
 int main(int argc, char *argv[])
 {
+  ospInit(&argc, argv);
+
   if (argc > 1) {
     OSPRayFixture::benchmarkModelFile = argv[1];
   }

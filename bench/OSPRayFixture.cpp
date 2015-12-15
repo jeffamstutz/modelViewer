@@ -342,10 +342,6 @@ static void createFramebuffer(OSPRayFixture *f)
 
 void OSPRayFixture::SetUp()
 {
-  const char *av[] = {"ospBenchmark"};
-  int ac = 1;
-  ospInit(&ac, av);
-
   loadModel(this);
   createOSPRenderer(this);
   createOSPModel(this);
