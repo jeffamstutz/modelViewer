@@ -85,7 +85,6 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   m_spp(1),
   m_maxObjectsToConsider((uint32)-1),
   m_forceInstancing(false),
-  m_frameBufferMode(glut3D::Glut3DWidget::FRAMEBUFFER_UCHAR),
   m_rendererType("ao1"),
   m_cameraType("perspective")
 {

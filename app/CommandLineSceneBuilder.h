@@ -16,9 +16,6 @@
 
 #pragma once
 
-// viewer widget
-#include "common/widgets/glut3D.h"
-
 #include "common/miniSG/miniSG.h"
 
 #include "ospray/ospray.h"
@@ -82,9 +79,6 @@ private:
   // if turned on, we'll put each triangle mesh into its own instance,
   // no matter what
   bool m_forceInstancing;
-  /*! if turned on we're showing the depth buffer rather than the (accum'ed)
-   *  color buffer */
-  glut3D::Glut3DWidget::FrameBufferMode m_frameBufferMode;
 
   std::string m_rendererType;
   std::string m_cameraType;
