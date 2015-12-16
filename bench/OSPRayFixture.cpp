@@ -14,6 +14,11 @@ using ospray::vec3f;
 
 using ospray::uint32;
 
+bool OSPRayFixture::customView = false;
+ospray::vec3f OSPRayFixture::pos;
+ospray::vec3f OSPRayFixture::at;
+ospray::vec3f OSPRayFixture::up;
+
 string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
 
 // helper function to write the rendered image as PPM file
@@ -313,11 +318,20 @@ static void createOSPCamera(OSPRayFixture *f)
   vec3f center = embree::center(worldBounds);
   vec3f diag   = worldBounds.size();
   diag         = max(diag, vec3f(0.3f*length(diag)));
-  vec3f from   = center - 0.95f*vec3f(-.6*diag.x, -1.2*diag.y, .8*diag.z);
-  vec3f dir    = center - from;
-  vec3f up     = vec3f(0.f, 1.f, 0.f);
 
-  ospSetVec3f(f->camera, "pos", reinterpret_cast<osp::vec3f&>(from));
+  vec3f pos, dir, up;
+
+  if (OSPRayFixture::customView) {
+    pos = OSPRayFixture::pos;
+    up  = OSPRayFixture::up;
+    dir = OSPRayFixture::at - OSPRayFixture::pos;
+  } else {
+    pos = center - 0.95f*vec3f(-.6*diag.x, -1.2*diag.y, .8*diag.z);
+    up  = vec3f(0.f, 1.f, 0.f);
+    dir = center - pos;
+  }
+
+  ospSetVec3f(f->camera, "pos", reinterpret_cast<osp::vec3f&>(pos));
   ospSetVec3f(f->camera, "dir", reinterpret_cast<osp::vec3f&>(dir));
   ospSetVec3f(f->camera, "up",  reinterpret_cast<osp::vec3f&>(up));
 

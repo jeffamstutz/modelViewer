@@ -15,5 +15,10 @@ struct OSPRayFixture : public hayai::Fixture
   OSPModel       model;
   OSPFrameBuffer fb;
 
+  static bool customView;
+  static ospray::vec3f pos;
+  static ospray::vec3f at;
+  static ospray::vec3f up;
+
   static std::string benchmarkModelFile;
 };
