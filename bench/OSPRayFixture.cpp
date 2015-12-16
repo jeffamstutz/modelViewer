@@ -195,7 +195,8 @@ static void loadModel(OSPRayFixture *f)
   } else if (fn.ext() == "x3d") {
     ospray::miniSG::importX3D(f->sgModel,fn);
   } else {
-    throw std::runtime_error("could not open file: " + fn.name());
+    throw std::runtime_error("could not open file: " +
+                             OSPRayFixture::benchmarkModelFile);
   }
 }
 
