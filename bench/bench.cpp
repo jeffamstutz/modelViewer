@@ -2,15 +2,50 @@
 
 #include "OSPRayFixture.h"
 
+using std::cout;
+using std::endl;
+using std::string;
+
 BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 {
   ospRenderFrame(fb, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
 
+void printUsageAndExit()
+{
+  cout << "Usage: ospBenchmark [options] model_file" << endl;
+
+  cout << endl << "Args:" << endl;
+
+  cout << endl;
+  cout << "    model_file --> Scene used for benchmarking, supported types"
+            << " are:" << endl;
+  cout << "                   stl, msg, tri, xml, obj, hbp, x3d" << endl;
+
+  cout << endl;
+  cout << "Options:" << endl;
+
+  cout << endl;
+  cout << "    -v | --view --> Specify the camera view as: ex ey ez ux uy uz"
+       << " dx dy dz." << endl;
+  cout << "                    Ex: -v 1.0 0 0 0 1.0 0 -1.0 0 0" << endl;
+
+  cout << endl;
+  cout << "    -r | --renderer --> Specify the renderer to be benchmarked."
+       << endl;
+  cout << "                        Ex: -r pathtracer" << endl;
+
+  exit(0);
+}
+
 void parseCommandLine(int argc, const char *argv[])
 {
+  if (argc <= 1) {
+    printUsageAndExit();
+  }
+
   for (int i = 1; i < argc; ++i) {
-    std::string arg = argv[i];
+    string arg = argv[i];
     if (arg == "-v" || arg == "--view") {
       assert(i+9 <= argc);
 
