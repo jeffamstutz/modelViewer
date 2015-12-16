@@ -180,7 +180,23 @@ static OSPMaterial createMaterial(OSPRenderer renderer,
 static void loadModel(OSPRayFixture *f)
 {
   embree::FileName fn = OSPRayFixture::benchmarkModelFile;
-  ospray::miniSG::importOBJ(f->sgModel, fn);
+  if (fn.ext() == "stl") {
+    ospray::miniSG::importSTL(f->sgModel,fn);
+  } else if (fn.ext() == "msg") {
+    ospray::miniSG::importMSG(f->sgModel,fn);
+  } else if (fn.ext() == "tri") {
+    ospray::miniSG::importTRI(f->sgModel,fn);
+  } else if (fn.ext() == "xml") {
+    ospray::miniSG::importRIVL(f->sgModel,fn);
+  } else if (fn.ext() == "obj") {
+    ospray::miniSG::importOBJ(f->sgModel,fn);
+  } else if (fn.ext() == "hbp") {
+    ospray::miniSG::importHBP(f->sgModel,fn);
+  } else if (fn.ext() == "x3d") {
+    ospray::miniSG::importX3D(f->sgModel,fn);
+  } else {
+    throw std::runtime_error("could not open file: " + fn.name());
+  }
 }
 
 static void createOSPModel(OSPRayFixture *f)
