@@ -11,7 +11,7 @@ void parseCommandLine(int argc, const char *argv[])
 {
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
-    if (arg == "-view" || arg == "--view") {
+    if (arg == "-v" || arg == "--view") {
       assert(i+9 <= argc);
 
       auto &pos = OSPRayFixture::pos;
@@ -30,6 +30,9 @@ void parseCommandLine(int argc, const char *argv[])
       at.z = atof(argv[++i]);
 
       OSPRayFixture::customView = true;
+    }
+    else if (arg == "-r" || arg == "--renderer") {
+      OSPRayFixture::renderer_type = argv[++i];
     }
     else {
       OSPRayFixture::benchmarkModelFile = arg;

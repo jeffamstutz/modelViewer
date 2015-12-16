@@ -19,6 +19,8 @@ ospray::vec3f OSPRayFixture::pos;
 ospray::vec3f OSPRayFixture::at;
 ospray::vec3f OSPRayFixture::up;
 
+string OSPRayFixture::renderer_type;
+
 string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
 
 // helper function to write the rendered image as PPM file
@@ -358,7 +360,8 @@ static void createOSPCamera(OSPRayFixture *f)
 
 static void createOSPRenderer(OSPRayFixture *f)
 {
-  f->renderer = ospNewRenderer("ao1");
+  auto &r = f->renderer_type;
+  f->renderer = ospNewRenderer(r.empty() ? "ao1" : r.c_str());
   ospSet3f(f->renderer, "bgcolor", 1.f, 1.f, 1.f);
 }
 
