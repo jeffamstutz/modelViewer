@@ -26,14 +26,21 @@ void printUsageAndExit()
   cout << "Options:" << endl;
 
   cout << endl;
-  cout << "    -v | --view --> Specify the camera view as: ex ey ez ux uy uz"
-       << " dx dy dz." << endl;
-  cout << "                    Ex: -v 1.0 0 0 0 1.0 0 -1.0 0 0" << endl;
+  cout << "    -i | --image --> Specify the base filename to write the"
+       << " framebuffer to a file." << endl;
+  cout << "                     If ommitted, no file will be written." << endl;
+  cout << "                     NOTE: this option adds '.ppm' to the end of the"
+       << " filename" << endl;
 
   cout << endl;
   cout << "    -r | --renderer --> Specify the renderer to be benchmarked."
        << endl;
   cout << "                        Ex: -r pathtracer" << endl;
+
+  cout << endl;
+  cout << "    -v | --view --> Specify the camera view as: ex ey ez ux uy uz"
+       << " dx dy dz." << endl;
+  cout << "                    Ex: -v 1.0 0 0 0 1.0 0 -1.0 0 0" << endl;
 
   exit(0);
 }
@@ -68,6 +75,9 @@ void parseCommandLine(int argc, const char *argv[])
     }
     else if (arg == "-r" || arg == "--renderer") {
       OSPRayFixture::renderer_type = argv[++i];
+    }
+    else if (arg == "-i" || arg == "--image") {
+      OSPRayFixture::imageOutputFile = argv[++i];
     }
     else {
       OSPRayFixture::benchmarkModelFile = arg;

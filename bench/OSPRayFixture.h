@@ -21,6 +21,6 @@ struct OSPRayFixture : public hayai::Fixture
   static ospray::vec3f up;
 
   static std::string renderer_type;
-
   static std::string benchmarkModelFile;
+  static std::string imageOutputFile;
 };

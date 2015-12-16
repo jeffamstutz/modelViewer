@@ -23,6 +23,8 @@ string OSPRayFixture::renderer_type;
 
 string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
 
+string OSPRayFixture::imageOutputFile;
+
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
@@ -392,8 +394,11 @@ void OSPRayFixture::SetUp()
 
 void OSPRayFixture::TearDown()
 {
-  auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
-  writePPM("test.ppm", 1024, 1024, lfb);
-  ospUnmapFrameBuffer(lfb, fb);
+  if (!imageOutputFile.empty()) {
+    auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
+    writePPM(imageOutputFile + ".ppm", 1024, 1024, lfb);
+    ospUnmapFrameBuffer(lfb, fb);
+  }
+
   ospFreeFrameBuffer(fb);
 }
