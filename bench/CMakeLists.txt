@@ -16,11 +16,8 @@
 
 set(APP_NAME ospBenchmark)
 
-find_package(hayai)
-
 include_directories(
   ${CMAKE_CURRENT_LIST_DIR}
-  ${HAYAI_INCLUDE_DIRS}
 )
 
 # --------------------------------------------
