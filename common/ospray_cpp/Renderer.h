@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include <ManagedObject.h>
-#include <Material.h>
-#include <Light.h>
+#include <ospray_cpp/Light.h>
+#include <ospray_cpp/ManagedObject.h>
+#include <ospray_cpp/Material.h>
 
 namespace ospray {
 namespace cpp    {
