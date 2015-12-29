@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <ospray_cpp/FrameBuffer.h>
 #include <ospray_cpp/Light.h>
 #include <ospray_cpp/ManagedObject.h>
 #include <ospray_cpp/Material.h>
@@ -33,6 +34,8 @@ public:
 
   Material newMaterial(const std::string &type);
   Light    newLight(const std::string &type);
+
+  void renderFrame(const FrameBuffer &fb, uint32_t channels);
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
@@ -65,6 +68,11 @@ inline Material Renderer::newMaterial(const std::string &type)
 inline Light Renderer::newLight(const std::string &type)
 {
   return Light(ospNewLight((OSPRenderer)handle(), type.c_str()));
+}
+
+inline void Renderer::renderFrame(const FrameBuffer &fb, uint32_t channels)
+{
+  ospRenderFrame((OSPFrameBuffer)fb.handle(), (OSPRenderer)handle(), channels);
 }
 
 

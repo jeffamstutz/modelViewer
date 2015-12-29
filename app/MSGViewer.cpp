@@ -36,20 +36,23 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
 
 namespace ospray {
 
-MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
-                     OSPRenderer renderer, OSPCamera camera,
+MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
+                     cpp::Renderer renderer, cpp::Camera camera,
                      ViewerConfig config)
   : Glut3DWidget(Glut3DWidget::FRAMEBUFFER_NONE),
     m_sgmodel(sgmodel),
     m_model(model),
-    m_fb(NULL),
+    m_fb(nullptr),
     m_renderer(renderer),
     m_camera(camera),
-    m_queuedRenderer(NULL),
+    m_queuedRenderer(nullptr),
     m_config(config),
     m_accumID(-1),
     m_fullScreen(false),
-    m_scriptHandler(model, renderer, camera, this)
+    m_scriptHandler((OSPModel)model.handle(),
+                    (OSPRenderer)renderer.handle(),
+                    (OSPCamera)camera.handle(),
+                    this)
 {
   const box3f worldBounds(m_sgmodel->getBBox());
   setWorldBounds(worldBounds);
@@ -61,8 +64,8 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, OSPModel model,
 
   if (m_sgmodel->camera.size() > 0) {
     setViewPort(m_sgmodel->camera[0]->from,
-        m_sgmodel->camera[0]->at,
-        m_sgmodel->camera[0]->up);
+                m_sgmodel->camera[0]->at,
+                m_sgmodel->camera[0]->up);
   }
 
   if (!m_config.scriptFileName.empty()) {
@@ -103,15 +106,15 @@ void MSGViewer::resetView()
 void MSGViewer::printViewport()
 {
   printf("-vp %f %f %f -vu %f %f %f -vi %f %f %f\n",
-         viewPort.from.x, viewPort.from.y, viewPort.from.z, viewPort.up.x,
-         viewPort.up.y, viewPort.up.z, viewPort.at.x, viewPort.at.y,
-         viewPort.at.z);
+         viewPort.from.x, viewPort.from.y, viewPort.from.z,
+         viewPort.up.x,   viewPort.up.y,   viewPort.up.z,
+         viewPort.at.x,   viewPort.at.y,   viewPort.at.z);
   fflush(stdout);
 }
 
 void MSGViewer::saveScreenshot(const std::string &basename)
 {
-  const uint32 * p = (uint32*)ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
+  const uint32 *p = (uint32*)m_fb.map(OSP_FB_COLOR);
   writePPM(basename + ".ppm", m_windowSize.x, m_windowSize.y, p);
   cout << "#ospDebugViewer: saved current frame to '" << basename << ".ppm'"
        << endl;
@@ -121,14 +124,14 @@ void MSGViewer::reshape(const vec2i &newSize)
 {
   Glut3DWidget::reshape(newSize);
   m_windowSize = newSize;
-  if (m_fb) ospFreeFrameBuffer(m_fb);
-  m_fb = ospNewFrameBuffer(osp::vec2i{newSize.x, newSize.y}, OSP_RGBA_I8,
-                           OSP_FB_COLOR|OSP_FB_DEPTH|OSP_FB_ACCUM);
-  ospSet1f(m_fb, "gamma", 2.2f);
-  ospCommit(m_fb);
-  ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
-  ospSetf(m_camera,"aspect",viewPort.aspect);
-  ospCommit(m_camera);
+  m_fb = cpp::FrameBuffer(osp::vec2i{newSize.x, newSize.y}, OSP_RGBA_I8,
+                          OSP_FB_COLOR | OSP_FB_DEPTH | OSP_FB_ACCUM);
+
+  m_fb.set("gamma", 2.2f);
+  m_fb.commit();
+  m_fb.clear(OSP_FB_ACCUM);
+  m_camera.set("aspect", viewPort.aspect);
+  m_camera.commit();
   viewPort.modified = true;
   forceRedraw();
 }
@@ -148,10 +151,10 @@ void MSGViewer::keypress(char key, const vec2f where)
   case 'S':
     m_config.doShadows = !m_config.doShadows;
     cout << "Switching shadows " << (m_config.doShadows?"ON":"OFF") << endl;
-    ospSet1i(m_renderer,"shadowsEnabled", m_config.doShadows);
-    ospCommit(m_renderer);
-    m_accumID=0;
-    ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
+    m_renderer.set("shadowsEnabled", m_config.doShadows);
+    m_renderer.commit();
+    m_accumID = 0;
+    m_fb.clear(OSP_FB_ACCUM);
     forceRedraw();
     break;
   case '!':
@@ -207,7 +210,8 @@ void MSGViewer::mouseButton(int32 whichButton, bool released, const vec2i &pos)
     vec2f normpos = vec2f(pos.x / (float)windowSize.x,
                           1.0f - pos.y / (float)windowSize.y);
     OSPPickResult pick;
-    ospPick(&pick, m_renderer, reinterpret_cast<osp::vec2f&>(normpos));
+    ospPick(&pick, (OSPRenderer)m_renderer.handle(),
+            reinterpret_cast<osp::vec2f&>(normpos));
     if(pick.hit) {
       viewPort.at = reinterpret_cast<ospray::vec3f&>(pick.position);
       viewPort.modified = true;
@@ -219,7 +223,7 @@ void MSGViewer::mouseButton(int32 whichButton, bool released, const vec2i &pos)
 
 void MSGViewer::display()
 {
-  if (!m_fb || !m_renderer) return;
+  if (!m_fb.handle() || !m_renderer.handle()) return;
 
   static int frameID = 0;
 
@@ -236,7 +240,7 @@ void MSGViewer::display()
   switchRenderers();
 
   if (m_resetAccum) {
-    ospFrameBufferClear(m_fb, OSP_FB_ACCUM);
+    m_fb.clear(OSP_FB_ACCUM);
     m_resetAccum = false;
   }
 
@@ -252,28 +256,30 @@ void MSGViewer::display()
       once = false;
     }
     Assert2(m_camera,"ospray camera is null");
-    ospSetVec3f(m_camera,"pos",reinterpret_cast<osp::vec3f&>(viewPort.from));
+    m_camera.set("pos", viewPort.from);
     auto dir = viewPort.at - viewPort.from;
-    ospSetVec3f(m_camera,"dir",reinterpret_cast<osp::vec3f&>(dir));
-    ospSetVec3f(m_camera,"up",reinterpret_cast<osp::vec3f&>(viewPort.up));
-    ospSetf(m_camera,"aspect",viewPort.aspect);
-    ospCommit(m_camera);
+    m_camera.set("dir", dir);
+    m_camera.set("up", viewPort.up);
+    m_camera.set("aspect", viewPort.aspect);
+    m_camera.commit();
     viewPort.modified = false;
     m_accumID=0;
-    ospFrameBufferClear(m_fb,OSP_FB_ACCUM);
+    m_fb.clear(OSP_FB_ACCUM);
   }
 
-  ospRenderFrame(m_fb, m_renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
+  m_renderer.renderFrame(m_fb, OSP_FB_COLOR | OSP_FB_ACCUM);
   ++m_accumID;
 
   // set the glut3d widget's frame buffer to the opsray frame buffer,
   // then display
-  ucharFB = (uint32 *) ospMapFrameBuffer(m_fb, OSP_FB_COLOR);
+  ucharFB = (uint32 *)m_fb.map(OSP_FB_COLOR);
   frameBufferMode = Glut3DWidget::FRAMEBUFFER_UCHAR;
   Glut3DWidget::display();
 
+  m_fb.unmap(ucharFB);
+
   // that pointer is no longer valid, so set it to null
-  ucharFB = NULL;
+  ucharFB = nullptr;
 
   std::string title("OSPRay Debug Viewer");
 
@@ -291,10 +297,10 @@ void MSGViewer::switchRenderers()
   lock_guard<mutex> lock{m_rendererMutex};
   (void)lock;// NOTE(jda) - squash "unused variable" warning...
 
-  if (m_queuedRenderer) {
+  if (m_queuedRenderer.handle()) {
     m_renderer = m_queuedRenderer;
-    m_queuedRenderer = NULL;
-    ospFrameBufferClear(m_fb, OSP_FB_ACCUM);
+    m_queuedRenderer = nullptr;
+    m_fb.clear(OSP_FB_ACCUM);
   }
 }
 
