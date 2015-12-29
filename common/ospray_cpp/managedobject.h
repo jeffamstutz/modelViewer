@@ -19,6 +19,7 @@
 #include <string>
 
 #include <ospray.h>
+#include <ospray/common/OSPCommon.h>
 
 namespace ospray {
 namespace cpp    {
@@ -53,6 +54,17 @@ public:
   void set(const std::string &name, double v1, double v2);
   void set(const std::string &name, double v1, double v2, double v3);
 
+  // vec2
+  void set(const std::string &name, const ospray::vec2i &v);
+  void set(const std::string &name, const ospray::vec2f &v);
+
+  // vec3
+  void set(const std::string &name, const ospray::vec3i &v);
+  void set(const std::string &name, const ospray::vec3f &v);
+
+  // vec4
+  void set(const std::string &name, const ospray::vec4f &v);
+
   // void*
   void set(const std::string &name, void *v);
 
@@ -61,8 +73,6 @@ public:
 
   // osp::cpp::ManagedObject
   void set(const std::string &name, const ManagedObject &v);
-
-  //! \todo add get functions
 
   //! Commit to ospray
   void commit() const;
@@ -141,6 +151,31 @@ inline void ManagedObject::set(const std::string &name,
                                double v1, double v2, double v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
+}
+
+inline void ManagedObject::set(const std::string &name, const vec2i &v)
+{
+  ospSetVec2i(m_object, name.c_str(), (const osp::vec2i&)v);
+}
+
+inline void ManagedObject::set(const std::string &name, const vec2f &v)
+{
+  ospSetVec2f(m_object, name.c_str(), (const osp::vec2f&)v);
+}
+
+inline void ManagedObject::set(const std::string &name, const vec3i &v)
+{
+  ospSetVec3i(m_object, name.c_str(), (const osp::vec3i&)v);
+}
+
+inline void ManagedObject::set(const std::string &name, const vec3f &v)
+{
+  ospSetVec3f(m_object, name.c_str(), (const osp::vec3f&)v);
+}
+
+inline void ManagedObject::set(const std::string &name, const vec4f &v)
+{
+  ospSetVec4f(m_object, name.c_str(), (const osp::vec4f&)v);
 }
 
 inline void ManagedObject::set(const std::string &name, void *v)
