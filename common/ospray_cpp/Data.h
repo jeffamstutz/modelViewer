@@ -25,11 +25,19 @@ class Data : public ManagedObject
 {
 public:
 
+  Data(size_t numItems, OSPDataType format,
+       const void *init = nullptr, int flags = 0);
   Data(const Data &copy);
   Data(OSPData existing);
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
+
+inline Data::Data(size_t numItems, OSPDataType format,
+                  const void *init, int flags)
+{
+  ospNewData(numItems, format, init, flags);
+}
 
 inline Data::Data(const Data &copy) :
   ManagedObject(copy.handle())

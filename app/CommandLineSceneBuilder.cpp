@@ -1,5 +1,7 @@
 #include "CommandLineSceneBuilder.h"
 
+#include <ospray_cpp/Data.h>
+
 #include <random>
 
 using std::cerr;
@@ -106,18 +108,17 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
 #endif
   createSunLight();
 
-  m_camera = ospNewCamera(m_cameraType.c_str());
-  Assert(m_camera != NULL && "could not create camera");
-  ospSet3f(m_camera, "pos", -1,  1, -1);
-  ospSet3f(m_camera, "dir",  1, -1,  1);
-  ospCommit(m_camera);
+  m_camera = cpp::Camera(m_cameraType.c_str());
+  Assert(m_camera.handel() != NULL && "could not create camera");
+  m_camera.set("pos", -1,  1, -1);
+  m_camera.set("dir",  1, -1,  1);
+  m_camera.commit();
 
-  ospSetObject(m_renderer, "world", m_model);
-  ospSetObject(m_renderer, "model", m_model);
-  ospSetObject(m_renderer, "camera",m_camera);
-  ospSet1i(m_renderer, "spp", m_spp);
-  ospCommit(m_camera);
-  ospCommit(m_renderer);
+  m_renderer.set("world", m_model);
+  m_renderer.set("model", m_model);
+  m_renderer.set("camera",m_camera);
+  m_renderer.set("spp", m_spp);
+  m_renderer.commit();
 
   if (m_config.verboseOutput) {
     cout << "#ospDebugViewer: done creating window. Press 'Q' to quit." << endl;
@@ -239,22 +240,17 @@ void CommandLineSceneBuilder::reportParsedData()
 
 void CommandLineSceneBuilder::createRenderer()
 {
-  m_renderer = ospNewRenderer(m_rendererType.c_str());
-  if (!m_renderer) {
+  m_renderer = cpp::Renderer(m_rendererType.c_str());
+  if (!m_renderer.handle()) {
     throw std::runtime_error("could not create m_renderer '" +
                              m_rendererType + "'");
   }
   Assert(m_renderer != NULL && "could not create m_renderer");
-  ospCommit(m_renderer);
+  m_renderer.commit();
 }
 
 void CommandLineSceneBuilder::createScene()
 {
-  // -------------------------------------------------------
-  // create ospray model
-  // -------------------------------------------------------
-  m_model = ospNewModel();
-
   // code does not yet do instancing ... check that the model doesn't
   // contain instances
   bool doesInstancing = 0;
@@ -372,7 +368,7 @@ void CommandLineSceneBuilder::createScene()
     // add triangle material id array to mesh
     if (msgMesh->materialList.empty()) {
       // we have a single material for this mesh...
-      OSPMaterial singleMaterial = createMaterial(m_renderer,
+      OSPMaterial singleMaterial = createMaterial((OSPRenderer)m_renderer.handle(),
                                                   msgMesh->material.ptr);
       ospSetMaterial(ospMesh,singleMaterial);
     } else {
@@ -381,9 +377,8 @@ void CommandLineSceneBuilder::createScene()
       std::vector<OSPTexture2D > alphaMaps;
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
-        materialList.push_back(
-              createMaterial(m_renderer, msgMesh->materialList[i].ptr)
-              );
+        materialList.push_back(createMaterial((OSPRenderer)m_renderer.handle(),
+                                              msgMesh->materialList[i].ptr));
 
         for (miniSG::Material::ParamMap::const_iterator it =
              msgMesh->materialList[i]->params.begin();
@@ -436,9 +431,9 @@ void CommandLineSceneBuilder::createScene()
       ospAddGeometry(model_i,ospMesh);
       ospCommit(model_i);
       instanceModels.push_back(model_i);
-    } else
-      ospAddGeometry(m_model,ospMesh);
-
+    } else {
+      m_model.addGeometry(ospMesh);
+    }
   }
 
   if (doesInstancing) {
@@ -446,7 +441,7 @@ void CommandLineSceneBuilder::createScene()
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
           reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));
-      ospAddGeometry(m_model,inst);
+      m_model.addGeometry(inst);
     }
   }
 
@@ -454,7 +449,7 @@ void CommandLineSceneBuilder::createScene()
     cout << "#m_modelViewer: committing model" << endl;
   }
 
-  ospCommit(m_model);
+  m_model.commit();
 
   if (m_config.verboseOutput) {
     cout << "#m_modelViewer: done creating ospray model." << endl;
@@ -496,23 +491,23 @@ void CommandLineSceneBuilder::createSpheres()
     colors[i].w = 1.0f;
   }
 
-  auto sphereData = ospNewData(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR, spheres.data());
-  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+  auto sphereData = cpp::Data(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR,
+                              spheres.data());
+  auto colorData  = cpp::Data(NUM_COLORS, OSP_FLOAT4, colors.data());
 
-  ospCommit(sphereData);
-  ospCommit(colorData);
+  sphereData.commit();
+  colorData.commit();
 
-  auto geometry = ospNewGeometry("spheres");
-  ospSetData(geometry, "spheres", sphereData);
-  ospSetData(geometry, "color",   colorData);
-  ospSet1f(geometry, "radius", 10.f);
-  ospSet1i(geometry, "bytes_per_sphere", sizeof(Sphere));
-  ospSet1i(geometry, "offset_colorID", sizeof(vec3f));
-  ospCommit(geometry);
+  auto geometry = cpp::Geometry("spheres");
+  geometry.set("spheres", sphereData);
+  geometry.set("color",   colorData);
+  geometry.set("radius", 10.f);
+  geometry.set("bytes_per_sphere", int(sizeof(Sphere)));
+  geometry.set("offset_colorID", int(sizeof(vec3f)));
+  geometry.commit();
 
-  m_model = ospNewModel();
-  ospAddGeometry(m_model, geometry);
-  ospCommit(m_model);
+  m_model.addGeometry(geometry);
+  m_model.commit();
 }
 
 void CommandLineSceneBuilder::createCylinders()
@@ -554,48 +549,45 @@ void CommandLineSceneBuilder::createCylinders()
     colors[i].w = 1.0f;
   }
 
-  auto cylinderData = ospNewData(sizeof(Cylinder)*NUM_CYLINDERS, OSP_CHAR,
-                                 cylinders.data());
-  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+  auto cylinderData = cpp::Data(sizeof(Cylinder)*NUM_CYLINDERS, OSP_CHAR,
+                                cylinders.data());
+  auto colorData  = cpp::Data(NUM_COLORS, OSP_FLOAT4, colors.data());
 
-  ospCommit(cylinderData);
-  ospCommit(colorData);
+  cylinderData.commit();
+  colorData.commit();
 
-  auto geometry = ospNewGeometry("cylinders");
-  ospSetData(geometry, "cylinders", cylinderData);
-  ospSetData(geometry, "color",   colorData);
-  ospSet1f(geometry, "radius", 10.f);
-  ospSet1i(geometry, "bytes_per_cylinder", sizeof(Cylinder));
-  ospSet1i(geometry, "offset_colorID", 2*sizeof(vec3f));
-  ospCommit(geometry);
+  auto geometry = cpp::Geometry("cylinders");
+  geometry.set("cylinders", cylinderData);
+  geometry.set("color",   colorData);
+  geometry.set("radius", 10.f);
+  geometry.set("bytes_per_cylinder", int(sizeof(Cylinder)));
+  geometry.set("offset_colorID", int(2*sizeof(vec3f)));
+  geometry.commit();
 
-  m_model = ospNewModel();
-  ospAddGeometry(m_model, geometry);
-  ospCommit(m_model);
+  m_model.addGeometry(geometry);
+  m_model.commit();
 }
 
 void CommandLineSceneBuilder::createSunLight()
 {
   //TODO: Need to figure out where we're going to read lighting data from
-  //begin light test
-  std::vector<OSPLight> lights;
+  std::vector<cpp::Light> lights;
   if (m_defaultDirLight_direction != vec3f(0.f)) {
     if (m_config.verboseOutput) {
       cout << "#m_modelViewer: Adding a hard coded directional "
            << "light as the sun." << endl;
     }
-    OSPLight ospLight = ospNewLight(m_renderer, "DirectionalLight");
-    ospSetString(ospLight, "name", "sun" );
-    ospSet3f(ospLight, "color", 1, 1, 1);
-    ospSet3fv(ospLight, "direction", &m_defaultDirLight_direction.x);
-    ospSet1f(ospLight, "angularDiameter", 0.53f);
-    ospCommit(ospLight);
+    auto ospLight = m_renderer.newLight("directionalLight");
+    ospLight.set("name", "sun" );
+    ospLight.set("color", 1, 1, 1);
+    ospLight.set("direction", &m_defaultDirLight_direction.x);
+    ospLight.set("angularDiameter", 0.53f);
+    ospLight.commit();
     lights.push_back(ospLight);
   }
 
-  OSPData lightArray = ospNewData(lights.size(), OSP_OBJECT, &lights[0], 0);
-  ospSetData(m_renderer, "lights", lightArray);
-  //end light test
+  auto lightArray = cpp::Data(lights.size(), OSP_OBJECT, &lights[0], 0);
+  m_renderer.set("lights", lightArray);
 }
 
 OSPMaterial
