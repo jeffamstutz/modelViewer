@@ -18,7 +18,18 @@
 
 #include <thread>
 
-#include "app/ospray_cpp.h"
+#include <ospray_cpp/Camera.h>
+#include <ospray_cpp/Data.h>
+#include <ospray_cpp/FrameBuffer.h>
+#include <ospray_cpp/Geometry.h>
+#include <ospray_cpp/Light.h>
+#include <ospray_cpp/Material.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/PixelOp.h>
+#include <ospray_cpp/Renderer.h>
+#include <ospray_cpp/Texture2D.h>
+#include <ospray_cpp/TransferFunction.h>
+#include <ospray_cpp/Volume.h>
 
 // ChaiScript
 #include "chaiscript/chaiscript.hpp"
@@ -65,9 +76,9 @@ private:
 
   // Data //
 
-  osp::cpp::Model    m_model;
-  osp::cpp::Renderer m_renderer;
-  osp::cpp::Camera   m_camera;
+  cpp::Model    m_model;
+  cpp::Renderer m_renderer;
+  cpp::Camera   m_camera;
 
   chaiscript::ChaiScript m_chai;
 

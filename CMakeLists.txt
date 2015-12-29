@@ -62,6 +62,8 @@ FIND_PACKAGE(Threads REQUIRED)
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${OSPRAY_INCLUDE_DIRS}
+  common
+  common/ospray_cpp
   common/script/chaiscript
 )
 

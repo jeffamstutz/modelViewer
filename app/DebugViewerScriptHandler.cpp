@@ -34,7 +34,7 @@ void DebugViewerScriptHandler::registerScriptFunctions()
   auto &chai = this->scriptEngine();
 
   // setRenderer()
-  auto setRenderer = [&](osp::cpp::Renderer &r) {
+  auto setRenderer = [&](ospray::cpp::Renderer &r) {
     m_viewer->setRenderer((OSPRenderer)r.handle());
   };
 
