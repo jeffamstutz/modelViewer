@@ -62,7 +62,13 @@ inline Renderer::Renderer(OSPRenderer existing) :
 
 inline Material Renderer::newMaterial(const std::string &type)
 {
-  return Material(ospNewMaterial((OSPRenderer)handle(), type.c_str()));
+  auto mat = Material(ospNewMaterial((OSPRenderer)handle(), type.c_str()));
+
+  if (!mat.handle()) {
+    throw std::runtime_error("Failed to create OSPMaterial!");
+  }
+
+  return mat;
 }
 
 inline Light Renderer::newLight(const std::string &type)

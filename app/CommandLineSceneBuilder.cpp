@@ -360,8 +360,7 @@ void CommandLineSceneBuilder::createScene()
     // add triangle material id array to mesh
     if (msgMesh->materialList.empty()) {
       // we have a single material for this mesh...
-      OSPMaterial singleMaterial = createMaterial((OSPRenderer)m_renderer.handle(),
-                                                  msgMesh->material.ptr);
+      auto singleMaterial = createMaterial(m_renderer, msgMesh->material.ptr);
       ospMesh.setMaterial(singleMaterial);
     } else {
       // we have an entire material list, assign that list
@@ -369,8 +368,9 @@ void CommandLineSceneBuilder::createScene()
       std::vector<OSPTexture2D> alphaMaps;
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
-        materialList.push_back(createMaterial((OSPRenderer)m_renderer.handle(),
-                                              msgMesh->materialList[i].ptr));
+        auto m = (OSPMaterial)createMaterial(m_renderer,
+                                        msgMesh->materialList[i].ptr).handle();
+        materialList.push_back(m);
 
         for (miniSG::Material::ParamMap::const_iterator it =
              msgMesh->materialList[i]->params.begin();
@@ -586,30 +586,24 @@ void CommandLineSceneBuilder::createSunLight()
   m_renderer.set("lights", lightArray);
 }
 
-OSPMaterial
-ospray::CommandLineSceneBuilder::createDefaultMaterial(OSPRenderer renderer)
+cpp::Material
+CommandLineSceneBuilder::createDefaultMaterial(cpp::Renderer renderer)
 {
   if(!m_createDefaultMaterial) return nullptr;
 
-  static OSPMaterial ospMat = nullptr;
+  static auto ospMat = cpp::Material(nullptr);
 
-  if (ospMat) return ospMat;
+  if (ospMat.handle()) return ospMat;
 
-  ospMat = ospNewMaterial(renderer, "OBJMaterial");
+  ospMat = renderer.newMaterial("OBJMaterial");
 
-  if (!ospMat)
-  {
-    std::string msg = "could not create default material 'OBJMaterial'";
-    throw std::runtime_error(msg);
-  }
-
-  ospSet3f(ospMat, "Kd", .8f, 0.f, 0.f);
-  ospCommit(ospMat);
+  ospMat.set("Kd", .8f, 0.f, 0.f);
+  ospMat.commit();
   return ospMat;
 }
 
-OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
-                                                    miniSG::Material *mat)
+cpp::Material CommandLineSceneBuilder::createMaterial(cpp::Renderer renderer,
+                                                      miniSG::Material *mat)
 {
   if (mat == nullptr)
   {
@@ -621,32 +615,32 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
     }
     return createDefaultMaterial(renderer);
   }
-  static std::map<miniSG::Material *,OSPMaterial> alreadyCreatedMaterials;
+  static std::map<miniSG::Material *, cpp::Material> alreadyCreatedMaterials;
 
-  if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end())
+  if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end()) {
     return alreadyCreatedMaterials[mat];
+  }
 
-  const char *type = mat->getParam("type","OBJMaterial");
+  const char *type = mat->getParam("type", "OBJMaterial");
   assert(type);
-  OSPMaterial ospMat = alreadyCreatedMaterials[mat]
-      = ospNewMaterial(renderer,type);
-  if (!ospMat)
-  {
+
+  cpp::Material ospMat;
+  try {
+    ospMat = alreadyCreatedMaterials[mat] = renderer.newMaterial(type);
+  } catch (const std::runtime_error &/*e*/) {
     warnMaterial(type);
     return createDefaultMaterial(renderer);
   }
 
   const bool isOBJMaterial = !strcmp(type, "OBJMaterial");
 
-  for (miniSG::Material::ParamMap::const_iterator it =  mat->params.begin();
-       it !=  mat->params.end(); ++it)
-  {
+  for (auto it =  mat->params.begin(); it !=  mat->params.end(); ++it) {
     const char *name = it->first.c_str();
     const miniSG::Material::Param *p = it->second.ptr;
 
     switch(p->type) {
     case miniSG::Material::Param::INT:
-      ospSet1i(ospMat,name,p->i[0]);
+      ospMat.set(name, p->i[0]);
       break;
     case miniSG::Material::Param::FLOAT: {
       float f = p->f[0];
@@ -658,13 +652,13 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
           f < 1.f) {
         f = 1.f/(1.f - f) - 1.f;
       }
-      ospSet1f(ospMat,name,f);
+      ospMat.set(name, f);
     } break;
     case miniSG::Material::Param::FLOAT_3:
-      ospSet3fv(ospMat,name,p->f);
+     ospMat.set(name, p->f[0], p->f[1], p->f[2]);
       break;
     case miniSG::Material::Param::STRING:
-      ospSetString(ospMat,name,p->s);
+      ospMat.set(name, p->s);
       break;
     case miniSG::Material::Param::TEXTURE:
     {
@@ -673,7 +667,7 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
         OSPTexture2D ospTex = createTexture2D(tex);
         assert(ospTex);
         ospCommit(ospTex);
-        ospSetObject(ospMat, name, ospTex);
+        ospMat.set(name, ospTex);
       }
       break;
     }
@@ -682,7 +676,7 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
     };
   }
 
-  ospCommit(ospMat);
+  ospMat.commit();
   return ospMat;
 }
 

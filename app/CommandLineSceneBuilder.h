@@ -52,8 +52,8 @@ private:
   void createCylinders();
   void createSunLight();
 
-  OSPMaterial createDefaultMaterial(OSPRenderer renderer);
-  OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
+  cpp::Material createDefaultMaterial(cpp::Renderer renderer);
+  cpp::Material createMaterial(cpp::Renderer renderer, miniSG::Material *mat);
 
   // Data //
 

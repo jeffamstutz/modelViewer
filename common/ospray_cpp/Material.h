@@ -25,6 +25,7 @@ class Material : public ManagedObject
 {
 public:
 
+  Material() = default;
   Material(const Material &copy);
   Material(OSPMaterial existing);
 };
