@@ -23,8 +23,10 @@
 #include "common/widgets/glut3D.h"
 // mini scene graph for loading the model
 #include "common/miniSG/miniSG.h"
-// ospray, for rendering
-#include "ospray/ospray.h"
+
+#include <ospray_cpp/Camera.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
 
 #include "ViewerConfig.h"
 
@@ -39,8 +41,8 @@ class MSGViewer : public ospray::glut3D::Glut3DWidget
 {
 public:
 
-  MSGViewer(miniSG::Model *sgmodel, OSPModel model, OSPRenderer renderer,
-            OSPCamera camera, ViewerConfig config = ViewerConfig());
+  MSGViewer(miniSG::Model *sgmodel, cpp::Model model, cpp::Renderer renderer,
+            cpp::Camera camera, ViewerConfig config = ViewerConfig());
 
   void setRenderer(OSPRenderer renderer);
   void resetAccumulation();
@@ -62,14 +64,14 @@ private:
   // Data //
 
   miniSG::Model *m_sgmodel;
-  OSPModel       m_model;
-  OSPFrameBuffer m_fb;
-  OSPRenderer    m_renderer;
-  OSPCamera      m_camera;
+  cpp::Model       m_model;
+  cpp::FrameBuffer m_fb;
+  cpp::Renderer    m_renderer;
+  cpp::Camera      m_camera;
   ospray::glut3D::FPSCounter m_fps;
 
   std::mutex m_rendererMutex;
-  OSPRenderer m_queuedRenderer;
+  cpp::Renderer m_queuedRenderer;
 
   ViewerConfig m_config;
 

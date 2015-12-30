@@ -30,8 +30,7 @@ class ManagedObject
 {
 public:
 
-  ManagedObject();
-  ManagedObject(OSPObject object);
+  ManagedObject(OSPObject object = nullptr);
   virtual ~ManagedObject();
 
   // Parameter 'set' functions //
@@ -86,11 +85,6 @@ protected:
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
-
-inline ManagedObject::ManagedObject() :
-  m_object(NULL)
-{
-}
 
 inline ManagedObject::ManagedObject(OSPObject object) :
   m_object(object)

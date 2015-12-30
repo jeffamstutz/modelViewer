@@ -1,5 +1,7 @@
 #include "CommandLineSceneBuilder.h"
 
+#include <ospray_cpp/Data.h>
+
 #include <random>
 
 using std::cerr;
@@ -31,7 +33,7 @@ static void warnMaterial(const std::string &type)
 
 static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 {
-  if(msgTex == NULL)
+  if(msgTex == nullptr)
   {
     static int numWarnings = 0;
     if (++numWarnings < 10)
@@ -39,7 +41,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
       cerr << "WARNING: material does not have Textures"
            << " (only warning for the first 10 times)!" << endl;
     }
-    return NULL;
+    return nullptr;
   }
 
   static std::map<ospray::miniSG::Texture2D*,
@@ -75,10 +77,8 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 namespace ospray {
 
 CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
-  m_model(NULL),
-  m_renderer(NULL),
-  m_camera(NULL),
-  m_msgModel(NULL),
+  m_renderer(nullptr),
+  m_camera(nullptr),
   m_defaultDirLight_direction(.3, -1, -.2),
   m_alpha(false),
   m_createDefaultMaterial(true),
@@ -106,18 +106,17 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
 #endif
   createSunLight();
 
-  m_camera = ospNewCamera(m_cameraType.c_str());
-  Assert(m_camera != NULL && "could not create camera");
-  ospSet3f(m_camera, "pos", -1,  1, -1);
-  ospSet3f(m_camera, "dir",  1, -1,  1);
-  ospCommit(m_camera);
+  m_camera = cpp::Camera(m_cameraType.c_str());
+  Assert(m_camera.handel() != nullptr && "could not create camera");
+  m_camera.set("pos", -1,  1, -1);
+  m_camera.set("dir",  1, -1,  1);
+  m_camera.commit();
 
-  ospSetObject(m_renderer, "world", m_model);
-  ospSetObject(m_renderer, "model", m_model);
-  ospSetObject(m_renderer, "camera",m_camera);
-  ospSet1i(m_renderer, "spp", m_spp);
-  ospCommit(m_camera);
-  ospCommit(m_renderer);
+  m_renderer.set("world",  m_model);
+  m_renderer.set("model",  m_model);
+  m_renderer.set("camera", m_camera);
+  m_renderer.set("spp", m_spp);
+  m_renderer.commit();
 
   if (m_config.verboseOutput) {
     cout << "#ospDebugViewer: done creating window. Press 'Q' to quit." << endl;
@@ -239,22 +238,12 @@ void CommandLineSceneBuilder::reportParsedData()
 
 void CommandLineSceneBuilder::createRenderer()
 {
-  m_renderer = ospNewRenderer(m_rendererType.c_str());
-  if (!m_renderer) {
-    throw std::runtime_error("could not create m_renderer '" +
-                             m_rendererType + "'");
-  }
-  Assert(m_renderer != NULL && "could not create m_renderer");
-  ospCommit(m_renderer);
+  m_renderer = cpp::Renderer(m_rendererType.c_str());
+  m_renderer.commit();
 }
 
 void CommandLineSceneBuilder::createScene()
 {
-  // -------------------------------------------------------
-  // create ospray model
-  // -------------------------------------------------------
-  m_model = ospNewModel();
-
   // code does not yet do instancing ... check that the model doesn't
   // contain instances
   bool doesInstancing = 0;
@@ -300,9 +289,8 @@ void CommandLineSceneBuilder::createScene()
     Ref<miniSG::Mesh> msgMesh = m_msgModel->mesh[i];
 
     // create ospray mesh
-    OSPGeometry ospMesh = m_alpha ?
-          ospNewGeometry("alpha_aware_triangle_mesh") :
-          ospNewGeometry("trianglemesh");
+    auto ospMesh = m_alpha ? cpp::Geometry("alpha_aware_triangle_mesh") :
+                             cpp::Geometry("triangles");
 
     // check if we have to transform the vertices:
     if (doesInstancing == false &&
@@ -318,7 +306,7 @@ void CommandLineSceneBuilder::createScene()
                                   OSP_FLOAT3A,
                                   &msgMesh->position[0],
         OSP_DATA_SHARED_BUFFER);
-    ospSetData(ospMesh,"position",position);
+    ospMesh.set("position", position);
 
     // add triangle index array to mesh
     if (!msgMesh->triangleMaterialId.empty()) {
@@ -326,7 +314,7 @@ void CommandLineSceneBuilder::createScene()
                                      OSP_INT,
                                      &msgMesh->triangleMaterialId[0],
           OSP_DATA_SHARED_BUFFER);
-      ospSetData(ospMesh,"prim.materialID",primMatID);
+      ospMesh.set("prim.materialID", primMatID);
     }
 
     // add triangle index array to mesh
@@ -335,7 +323,7 @@ void CommandLineSceneBuilder::createScene()
                                &msgMesh->triangle[0],
         OSP_DATA_SHARED_BUFFER);
     assert(msgMesh->triangle.size() > 0);
-    ospSetData(ospMesh,"index",index);
+    ospMesh.set("index", index);
 
     // add normal array to mesh
     if (!msgMesh->normal.empty()) {
@@ -344,7 +332,7 @@ void CommandLineSceneBuilder::createScene()
                                   &msgMesh->normal[0],
           OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->normal.size() > 0);
-      ospSetData(ospMesh,"vertex.normal",normal);
+      ospMesh.set("vertex.normal", normal);
     }
 
     // add color array to mesh
@@ -354,7 +342,7 @@ void CommandLineSceneBuilder::createScene()
                                  &msgMesh->color[0],
           OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->color.size() > 0);
-      ospSetData(ospMesh,"vertex.color",color);
+      ospMesh.set("vertex.color", color);
     }
     // add texcoord array to mesh
     if (!msgMesh->texcoord.empty()) {
@@ -363,27 +351,26 @@ void CommandLineSceneBuilder::createScene()
                                     &msgMesh->texcoord[0],
           OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->texcoord.size() > 0);
-      ospSetData(ospMesh,"vertex.texcoord",texcoord);
+      ospMesh.set("vertex.texcoord", texcoord);
     }
 
-    ospSet1i(ospMesh, "alpha_type", 0);
-    ospSet1i(ospMesh, "alpha_component", 4);
+    ospMesh.set("alpha_type", 0);
+    ospMesh.set("alpha_component", 4);
 
     // add triangle material id array to mesh
     if (msgMesh->materialList.empty()) {
       // we have a single material for this mesh...
-      OSPMaterial singleMaterial = createMaterial(m_renderer,
-                                                  msgMesh->material.ptr);
-      ospSetMaterial(ospMesh,singleMaterial);
+      auto singleMaterial = createMaterial(m_renderer, msgMesh->material.ptr);
+      ospMesh.setMaterial(singleMaterial);
     } else {
       // we have an entire material list, assign that list
-      std::vector<OSPMaterial > materialList;
-      std::vector<OSPTexture2D > alphaMaps;
+      std::vector<OSPMaterial> materialList;
+      std::vector<OSPTexture2D> alphaMaps;
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
-        materialList.push_back(
-              createMaterial(m_renderer, msgMesh->materialList[i].ptr)
-              );
+        auto m = (OSPMaterial)createMaterial(m_renderer,
+                                        msgMesh->materialList[i].ptr).handle();
+        materialList.push_back(m);
 
         for (miniSG::Material::ParamMap::const_iterator it =
              msgMesh->materialList[i]->params.begin();
@@ -403,42 +390,42 @@ void CommandLineSceneBuilder::createScene()
         }
 
         while(materialList.size() > alphaMaps.size()) {
-          alphaMaps.push_back(NULL);
+          alphaMaps.push_back(nullptr);
         }
         while(materialList.size() > alphas.size()) {
           alphas.push_back(0.f);
         }
       }
-      OSPData ospMaterialList = ospNewData(materialList.size(),
-                                           OSP_OBJECT,
-                                           &materialList[0]);
-      ospSetData(ospMesh,"materialList",ospMaterialList);
+      auto ospMaterialList = cpp::Data(materialList.size(),
+                                       OSP_OBJECT,
+                                       &materialList[0]);
+      ospMesh.set("materialList", ospMaterialList);
 
       // only set these if alpha aware mode enabled
       // this currently doesn't work on the MICs!
       if(m_alpha) {
-        OSPData ospAlphaMapList = ospNewData(alphaMaps.size(),
-                                             OSP_OBJECT,
-                                             &alphaMaps[0]);
-        ospSetData(ospMesh, "alpha_maps", ospAlphaMapList);
+        auto ospAlphaMapList = cpp::Data(alphaMaps.size(),
+                                         OSP_OBJECT,
+                                         &alphaMaps[0]);
+        ospMesh.set("alpha_maps", ospAlphaMapList);
 
-        OSPData ospAlphaList = ospNewData(alphas.size(),
-                                          OSP_OBJECT,
-                                          &alphas[0]);
-        ospSetData(ospMesh, "alphas", ospAlphaList);
+        auto ospAlphaList = cpp::Data(alphas.size(),
+                                      OSP_OBJECT,
+                                      &alphas[0]);
+        ospMesh.set("alphas", ospAlphaList);
       }
     }
 
-    ospCommit(ospMesh);
+    ospMesh.commit();
 
     if (doesInstancing) {
-      OSPModel model_i = ospNewModel();
-      ospAddGeometry(model_i,ospMesh);
-      ospCommit(model_i);
-      instanceModels.push_back(model_i);
-    } else
-      ospAddGeometry(m_model,ospMesh);
-
+      cpp::Model model_i;
+      model_i.addGeometry(ospMesh);
+      model_i.commit();
+      instanceModels.push_back((OSPModel)model_i.handle());
+    } else {
+      m_model.addGeometry(ospMesh);
+    }
   }
 
   if (doesInstancing) {
@@ -446,7 +433,7 @@ void CommandLineSceneBuilder::createScene()
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
           reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));
-      ospAddGeometry(m_model,inst);
+      m_model.addGeometry(inst);
     }
   }
 
@@ -454,7 +441,7 @@ void CommandLineSceneBuilder::createScene()
     cout << "#m_modelViewer: committing model" << endl;
   }
 
-  ospCommit(m_model);
+  m_model.commit();
 
   if (m_config.verboseOutput) {
     cout << "#m_modelViewer: done creating ospray model." << endl;
@@ -496,23 +483,23 @@ void CommandLineSceneBuilder::createSpheres()
     colors[i].w = 1.0f;
   }
 
-  auto sphereData = ospNewData(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR, spheres.data());
-  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+  auto sphereData = cpp::Data(sizeof(Sphere)*NUM_SPHERES, OSP_CHAR,
+                              spheres.data());
+  auto colorData  = cpp::Data(NUM_COLORS, OSP_FLOAT4, colors.data());
 
-  ospCommit(sphereData);
-  ospCommit(colorData);
+  sphereData.commit();
+  colorData.commit();
 
-  auto geometry = ospNewGeometry("spheres");
-  ospSetData(geometry, "spheres", sphereData);
-  ospSetData(geometry, "color",   colorData);
-  ospSet1f(geometry, "radius", 10.f);
-  ospSet1i(geometry, "bytes_per_sphere", sizeof(Sphere));
-  ospSet1i(geometry, "offset_colorID", sizeof(vec3f));
-  ospCommit(geometry);
+  auto geometry = cpp::Geometry("spheres");
+  geometry.set("spheres", sphereData);
+  geometry.set("color",   colorData);
+  geometry.set("radius", 10.f);
+  geometry.set("bytes_per_sphere", int(sizeof(Sphere)));
+  geometry.set("offset_colorID", int(sizeof(vec3f)));
+  geometry.commit();
 
-  m_model = ospNewModel();
-  ospAddGeometry(m_model, geometry);
-  ospCommit(m_model);
+  m_model.addGeometry(geometry);
+  m_model.commit();
 }
 
 void CommandLineSceneBuilder::createCylinders()
@@ -554,76 +541,71 @@ void CommandLineSceneBuilder::createCylinders()
     colors[i].w = 1.0f;
   }
 
-  auto cylinderData = ospNewData(sizeof(Cylinder)*NUM_CYLINDERS, OSP_CHAR,
-                                 cylinders.data());
-  auto colorData  = ospNewData(NUM_COLORS,  OSP_FLOAT4, colors.data());
+  auto cylinderData = cpp::Data(sizeof(Cylinder)*NUM_CYLINDERS, OSP_CHAR,
+                                cylinders.data());
+  auto colorData  = cpp::Data(NUM_COLORS, OSP_FLOAT4, colors.data());
 
-  ospCommit(cylinderData);
-  ospCommit(colorData);
+  cylinderData.commit();
+  colorData.commit();
 
-  auto geometry = ospNewGeometry("cylinders");
-  ospSetData(geometry, "cylinders", cylinderData);
-  ospSetData(geometry, "color",   colorData);
-  ospSet1f(geometry, "radius", 10.f);
-  ospSet1i(geometry, "bytes_per_cylinder", sizeof(Cylinder));
-  ospSet1i(geometry, "offset_colorID", 2*sizeof(vec3f));
-  ospCommit(geometry);
+  auto geometry = cpp::Geometry("cylinders");
+  geometry.set("cylinders", cylinderData);
+  geometry.set("color",   colorData);
+  geometry.set("radius", 10.f);
+  geometry.set("bytes_per_cylinder", int(sizeof(Cylinder)));
+  geometry.set("offset_colorID", int(2*sizeof(vec3f)));
+  geometry.commit();
 
-  m_model = ospNewModel();
-  ospAddGeometry(m_model, geometry);
-  ospCommit(m_model);
+  m_model.addGeometry(geometry);
+  m_model.commit();
 }
 
 void CommandLineSceneBuilder::createSunLight()
 {
   //TODO: Need to figure out where we're going to read lighting data from
-  //begin light test
   std::vector<OSPLight> lights;
   if (m_defaultDirLight_direction != vec3f(0.f)) {
     if (m_config.verboseOutput) {
       cout << "#m_modelViewer: Adding a hard coded directional "
            << "light as the sun." << endl;
     }
-    OSPLight ospLight = ospNewLight(m_renderer, "DirectionalLight");
-    ospSetString(ospLight, "name", "sun" );
-    ospSet3f(ospLight, "color", 1, 1, 1);
-    ospSet3fv(ospLight, "direction", &m_defaultDirLight_direction.x);
-    ospSet1f(ospLight, "angularDiameter", 0.53f);
-    ospCommit(ospLight);
-    lights.push_back(ospLight);
+    auto ospLight = m_renderer.newLight("DirectionalLight");
+    if (ospLight.handle() == nullptr) {
+      throw std::runtime_error("Failed to create a 'DirectionalLight'!");
+    }
+    ospLight.set("name", "sun");
+    ospLight.set("color", 1.f, 1.f, 1.f);
+    ospLight.set("direction", m_defaultDirLight_direction);
+    ospLight.set("angularDiameter", 0.53f);
+    ospLight.commit();
+    lights.push_back((OSPLight)ospLight.handle());
   }
 
-  OSPData lightArray = ospNewData(lights.size(), OSP_OBJECT, &lights[0], 0);
-  ospSetData(m_renderer, "lights", lightArray);
-  //end light test
+  auto lightArray = cpp::Data(lights.size(), OSP_OBJECT, lights.data());
+  //lightArray.commit();
+  m_renderer.set("lights", lightArray);
 }
 
-OSPMaterial
-ospray::CommandLineSceneBuilder::createDefaultMaterial(OSPRenderer renderer)
+cpp::Material
+CommandLineSceneBuilder::createDefaultMaterial(cpp::Renderer renderer)
 {
-  if(!m_createDefaultMaterial) return NULL;
+  if(!m_createDefaultMaterial) return nullptr;
 
-  static OSPMaterial ospMat = NULL;
+  static auto ospMat = cpp::Material(nullptr);
 
-  if (ospMat) return ospMat;
+  if (ospMat.handle()) return ospMat;
 
-  ospMat = ospNewMaterial(renderer, "OBJMaterial");
+  ospMat = renderer.newMaterial("OBJMaterial");
 
-  if (!ospMat)
-  {
-    std::string msg = "could not create default material 'OBJMaterial'";
-    throw std::runtime_error(msg);
-  }
-
-  ospSet3f(ospMat, "Kd", .8f, 0.f, 0.f);
-  ospCommit(ospMat);
+  ospMat.set("Kd", .8f, 0.f, 0.f);
+  ospMat.commit();
   return ospMat;
 }
 
-OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
-                                                    miniSG::Material *mat)
+cpp::Material CommandLineSceneBuilder::createMaterial(cpp::Renderer renderer,
+                                                      miniSG::Material *mat)
 {
-  if (mat == NULL)
+  if (mat == nullptr)
   {
     static int numWarnings = 0;
     if (++numWarnings < 10)
@@ -633,32 +615,32 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
     }
     return createDefaultMaterial(renderer);
   }
-  static std::map<miniSG::Material *,OSPMaterial> alreadyCreatedMaterials;
+  static std::map<miniSG::Material *, cpp::Material> alreadyCreatedMaterials;
 
-  if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end())
+  if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end()) {
     return alreadyCreatedMaterials[mat];
+  }
 
-  const char *type = mat->getParam("type","OBJMaterial");
+  const char *type = mat->getParam("type", "OBJMaterial");
   assert(type);
-  OSPMaterial ospMat = alreadyCreatedMaterials[mat]
-      = ospNewMaterial(renderer,type);
-  if (!ospMat)
-  {
+
+  cpp::Material ospMat;
+  try {
+    ospMat = alreadyCreatedMaterials[mat] = renderer.newMaterial(type);
+  } catch (const std::runtime_error &/*e*/) {
     warnMaterial(type);
     return createDefaultMaterial(renderer);
   }
 
   const bool isOBJMaterial = !strcmp(type, "OBJMaterial");
 
-  for (miniSG::Material::ParamMap::const_iterator it =  mat->params.begin();
-       it !=  mat->params.end(); ++it)
-  {
+  for (auto it =  mat->params.begin(); it !=  mat->params.end(); ++it) {
     const char *name = it->first.c_str();
     const miniSG::Material::Param *p = it->second.ptr;
 
     switch(p->type) {
     case miniSG::Material::Param::INT:
-      ospSet1i(ospMat,name,p->i[0]);
+      ospMat.set(name, p->i[0]);
       break;
     case miniSG::Material::Param::FLOAT: {
       float f = p->f[0];
@@ -670,13 +652,13 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
           f < 1.f) {
         f = 1.f/(1.f - f) - 1.f;
       }
-      ospSet1f(ospMat,name,f);
+      ospMat.set(name, f);
     } break;
     case miniSG::Material::Param::FLOAT_3:
-      ospSet3fv(ospMat,name,p->f);
+     ospMat.set(name, p->f[0], p->f[1], p->f[2]);
       break;
     case miniSG::Material::Param::STRING:
-      ospSetString(ospMat,name,p->s);
+      ospMat.set(name, p->s);
       break;
     case miniSG::Material::Param::TEXTURE:
     {
@@ -685,7 +667,7 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
         OSPTexture2D ospTex = createTexture2D(tex);
         assert(ospTex);
         ospCommit(ospTex);
-        ospSetObject(ospMat, name, ospTex);
+        ospMat.set(name, ospTex);
       }
       break;
     }
@@ -694,7 +676,7 @@ OSPMaterial CommandLineSceneBuilder::createMaterial(OSPRenderer renderer,
     };
   }
 
-  ospCommit(ospMat);
+  ospMat.commit();
   return ospMat;
 }
 

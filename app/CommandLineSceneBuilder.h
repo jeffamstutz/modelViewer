@@ -20,6 +20,10 @@
 
 #include "ospray/ospray.h"
 
+#include "ospray_cpp/Camera.h"
+#include "ospray_cpp/Model.h"
+#include "ospray_cpp/Renderer.h"
+
 #include "ViewerConfig.h"
 
 namespace ospray {
@@ -31,9 +35,9 @@ public:
   CommandLineSceneBuilder(int ac, const char **&av);
 
   miniSG::Model* sgmodel();
-  OSPModel       model();
-  OSPRenderer    renderer();
-  OSPCamera      camera();
+  cpp::Model     model();
+  cpp::Renderer  renderer();
+  cpp::Camera    camera();
   ViewerConfig   viewerConfig();
 
 private:
@@ -48,14 +52,14 @@ private:
   void createCylinders();
   void createSunLight();
 
-  OSPMaterial createDefaultMaterial(OSPRenderer renderer);
-  OSPMaterial createMaterial(OSPRenderer renderer, miniSG::Material *mat);
+  cpp::Material createDefaultMaterial(cpp::Renderer renderer);
+  cpp::Material createMaterial(cpp::Renderer renderer, miniSG::Material *mat);
 
   // Data //
 
-  OSPModel    m_model;
-  OSPRenderer m_renderer;
-  OSPCamera   m_camera;
+  ospray::cpp::Model    m_model;
+  ospray::cpp::Renderer m_renderer;
+  ospray::cpp::Camera   m_camera;
 
   ViewerConfig m_config;
 
@@ -91,17 +95,17 @@ inline miniSG::Model *CommandLineSceneBuilder::sgmodel()
   return m_msgModel.ptr;
 }
 
-inline OSPModel CommandLineSceneBuilder::model()
+inline cpp::Model CommandLineSceneBuilder::model()
 {
   return m_model;
 }
 
-inline OSPRenderer CommandLineSceneBuilder::renderer()
+inline cpp::Renderer CommandLineSceneBuilder::renderer()
 {
   return m_renderer;
 }
 
-inline OSPCamera CommandLineSceneBuilder::camera()
+inline cpp::Camera CommandLineSceneBuilder::camera()
 {
   return m_camera;
 }

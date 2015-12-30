@@ -26,23 +26,78 @@ class FrameBuffer : public ManagedObject
 {
 public:
 
+  FrameBuffer() = default;//NOTE(jda) - this does *not* create the underlying
+                          //            OSP object
+  FrameBuffer(const osp::vec2i &size,
+              OSPFrameBufferFormat format = OSP_RGBA_I8,
+              int channels = OSP_FB_COLOR);
   FrameBuffer(const FrameBuffer &copy);
+  FrameBuffer(FrameBuffer &&move);
   FrameBuffer(OSPFrameBuffer existing);
+
+  FrameBuffer& operator=(const FrameBuffer &copy);
+  FrameBuffer& operator=(      FrameBuffer &&move);
+
+  ~FrameBuffer();
 
   void setPixelOp(PixelOp &p);
   void setPixelOp(OSPPixelOp p);
+
+  const void *map(OSPFrameBufferChannel channel);
+  void unmap(void *ptr);
+  void clear(uint32_t channel);
+
+private:
+
+  void free();
+
+  bool m_owner = true;
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
 
-inline FrameBuffer::FrameBuffer(const FrameBuffer &copy) :
-  ManagedObject(copy.handle())
+inline FrameBuffer::FrameBuffer(const osp::vec2i &size,
+                                OSPFrameBufferFormat format,
+                                int channels)
 {
+  m_object = ospNewFrameBuffer(size, format, channels);
+}
+
+inline FrameBuffer::FrameBuffer(const FrameBuffer &copy) :
+  ManagedObject(copy.handle()),
+  m_owner(false)
+{
+}
+
+inline FrameBuffer::FrameBuffer(FrameBuffer &&move) :
+  ManagedObject(move.handle())
+{
+  move.m_object = nullptr;
 }
 
 inline FrameBuffer::FrameBuffer(OSPFrameBuffer existing) :
   ManagedObject(existing)
 {
+}
+
+inline FrameBuffer& FrameBuffer::operator=(const FrameBuffer &copy)
+{
+  free();
+  m_object = copy.m_object;
+  return *this;
+}
+
+inline FrameBuffer& FrameBuffer::operator=(FrameBuffer &&move)
+{
+  free();
+  m_object = move.m_object;
+  move.m_object = nullptr;
+  return *this;
+}
+
+inline FrameBuffer::~FrameBuffer()
+{
+  free();
 }
 
 inline void FrameBuffer::setPixelOp(PixelOp &p)
@@ -53,6 +108,28 @@ inline void FrameBuffer::setPixelOp(PixelOp &p)
 inline void FrameBuffer::setPixelOp(OSPPixelOp p)
 {
   ospSetPixelOp((OSPFrameBuffer)handle(), p);
+}
+
+inline const void *FrameBuffer::map(OSPFrameBufferChannel channel)
+{
+  return ospMapFrameBuffer((OSPFrameBuffer)handle(), channel);
+}
+
+inline void FrameBuffer::unmap(void *ptr)
+{
+  ospUnmapFrameBuffer(ptr, (OSPFrameBuffer)handle());
+}
+
+inline void FrameBuffer::clear(uint32_t channel)
+{
+  ospFrameBufferClear((OSPFrameBuffer)handle(), channel);
+}
+
+inline void FrameBuffer::free()
+{
+  if (m_owner && handle()) {
+    ospFreeFrameBuffer((OSPFrameBuffer)handle());
+  }
 }
 
 }// namespace cpp
