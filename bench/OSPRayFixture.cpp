@@ -359,7 +359,7 @@ static void createOSPCamera(OSPRayFixture *f)
   ospSetVec3f(f->camera, "dir", reinterpret_cast<osp::vec3f&>(dir));
   ospSetVec3f(f->camera, "up",  reinterpret_cast<osp::vec3f&>(up));
 
-  ospSetf(f->camera, "aspect", 1.f);
+  ospSetf(f->camera, "aspect", f->width/float(f->height));
   ospCommit(f->camera);
 }
 
