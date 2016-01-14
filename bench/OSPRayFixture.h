@@ -23,4 +23,7 @@ struct OSPRayFixture : public hayai::Fixture
   static std::string renderer_type;
   static std::string benchmarkModelFile;
   static std::string imageOutputFile;
+
+  static int width;
+  static int height;
 };

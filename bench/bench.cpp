@@ -33,6 +33,16 @@ void printUsageAndExit()
        << " filename" << endl;
 
   cout << endl;
+  cout << "    -w | --width --> Specify the width of the benchmark frame"
+       << endl;
+  cout << "                     default: 1024" << endl;
+
+  cout << endl;
+  cout << "    -h | --height --> Specify the height of the benchmark frame"
+       << endl;
+  cout << "                      default: 1024" << endl;
+
+  cout << endl;
   cout << "    -r | --renderer --> Specify the renderer to be benchmarked."
        << endl;
   cout << "                        Ex: -r pathtracer" << endl;
@@ -78,6 +88,10 @@ void parseCommandLine(int argc, const char *argv[])
     }
     else if (arg == "-i" || arg == "--image") {
       OSPRayFixture::imageOutputFile = argv[++i];
+    } else if (arg == "-w" || arg == "--width") {
+      OSPRayFixture::width = atoi(argv[++i]);
+    } else if (arg == "-h" || arg == "--height") {
+      OSPRayFixture::height = atoi(argv[++i]);
     }
     else {
       OSPRayFixture::benchmarkModelFile = arg;
