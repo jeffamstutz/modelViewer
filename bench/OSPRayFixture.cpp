@@ -25,6 +25,9 @@ string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
 
 string OSPRayFixture::imageOutputFile;
 
+int OSPRayFixture::width  = 1024;
+int OSPRayFixture::height = 1024;
+
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
@@ -356,7 +359,7 @@ static void createOSPCamera(OSPRayFixture *f)
   ospSetVec3f(f->camera, "dir", reinterpret_cast<osp::vec3f&>(dir));
   ospSetVec3f(f->camera, "up",  reinterpret_cast<osp::vec3f&>(up));
 
-  ospSetf(f->camera, "aspect", 1.f);
+  ospSetf(f->camera, "aspect", f->width/float(f->height));
   ospCommit(f->camera);
 }
 
@@ -369,7 +372,7 @@ static void createOSPRenderer(OSPRayFixture *f)
 
 static void createFramebuffer(OSPRayFixture *f)
 {
-  f->fb = ospNewFrameBuffer(osp::vec2i{1024, 1024}, OSP_RGBA_I8,
+  f->fb = ospNewFrameBuffer(osp::vec2i{f->width, f->height}, OSP_RGBA_I8,
                             OSP_FB_COLOR|OSP_FB_ACCUM);
   ospSet1f(f->fb, "gamma", 2.2f);
   ospCommit(f->fb);
@@ -396,7 +399,7 @@ void OSPRayFixture::TearDown()
 {
   if (!imageOutputFile.empty()) {
     auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
-    writePPM(imageOutputFile + ".ppm", 1024, 1024, lfb);
+    writePPM(imageOutputFile + ".ppm", width, height, lfb);
     ospUnmapFrameBuffer(lfb, fb);
   }
 
