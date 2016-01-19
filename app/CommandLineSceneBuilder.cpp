@@ -107,7 +107,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   createSunLight();
 
   m_camera = cpp::Camera(m_cameraType.c_str());
-  Assert(m_camera.handel() != nullptr && "could not create camera");
+  Assert(m_camera.handle() != nullptr && "could not create camera");
   m_camera.set("pos", -1,  1, -1);
   m_camera.set("dir",  1, -1,  1);
   m_camera.commit();

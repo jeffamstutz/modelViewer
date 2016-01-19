@@ -28,6 +28,23 @@ endif(COMMAND cmake_policy)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
+# force 'Release' build type on initial configuration (otherwise is empty)
+set(CONFIGURATION_TYPES "Debug" "Release" "RelWithDebInfo")
+if (WIN32)
+  if (NOT DEFAULT_CMAKE_CONFIGURATION_TYPES_SET)
+    set(CMAKE_CONFIGURATION_TYPES "${CONFIGURATION_TYPES}" CACHE STRING "List of generated configurations." FORCE)
+    set(DEFAULT_CMAKE_CONFIGURATION_TYPES_SET ON CACHE INTERNAL "Default CMake configuration types set.")
+  endif()
+else()
+  if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS ${CONFIGURATION_TYPES})
+  endif()
+endif()
+
+# unhide compiler to make it easier for users to see what they are using
+mark_as_advanced(CLEAR CMAKE_CXX_COMPILER)
+
 ##############################################################
 # Compiler configuration
 ##############################################################

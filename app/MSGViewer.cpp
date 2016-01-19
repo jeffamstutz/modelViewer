@@ -255,7 +255,7 @@ void MSGViewer::display()
       m_viewPort = viewPort;
       once = false;
     }
-    Assert2(m_camera,"ospray camera is null");
+    Assert2(m_camera.handle(),"ospray camera is null");
     m_camera.set("pos", viewPort.from);
     auto dir = viewPort.at - viewPort.from;
     m_camera.set("dir", dir);
