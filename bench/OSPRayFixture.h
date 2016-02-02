@@ -17,6 +17,8 @@ struct OSPRayFixture : public hayai::Fixture
 
   OSPTransferFunction tf;
 
+  float samplingRate = 0.125f;
+
   static bool customView;
   static ospray::vec3f pos;
   static ospray::vec3f at;

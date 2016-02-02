@@ -216,6 +216,7 @@ static void importObjectsFromFile(const std::string &filename,
 
       // For now we set the same transfer function on all volumes.
       ospSetObject(volume, "transferFunction", f->tf);
+      ospSet1f(volume, "samplingRate", f->samplingRate);
       ospCommit(volume);
 
       // Add the loaded volume(s) to the model.
@@ -225,8 +226,7 @@ static void importObjectsFromFile(const std::string &filename,
 
       // Set the minimum and maximum values in the domain for both color and
       // opacity components of the transfer function.
-      //ospSet2f(f->tf, "valueRange", voxelRange.x, voxelRange.y);
-      ospSet2f(f->tf, "valueRange", 0.f, 25.f);
+      ospSet2f(f->tf, "valueRange", voxelRange.x, voxelRange.y);
 
       ospCommit(f->tf);
     }
