@@ -104,7 +104,7 @@ void parseCommandLine(int argc, const char *argv[])
     } else if (arg == "-h" || arg == "--height") {
       OSPRayFixture::height = atoi(argv[++i]);
     } else if (arg == "-s" || arg == "--sampling-rate") {
-      OSPRayFixture::height = atoi(argv[++i]);
+      OSPRayFixture::samplingRate = atof(argv[++i]);
     } else {
       OSPRayFixture::benchmarkModelFile = arg;
     }

@@ -29,6 +29,8 @@ string OSPRayFixture::imageOutputFile;
 int OSPRayFixture::width  = 1024;
 int OSPRayFixture::height = 1024;
 
+float OSPRayFixture::samplingRate = 0.125f;
+
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
