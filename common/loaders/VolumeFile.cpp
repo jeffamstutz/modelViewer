@@ -87,9 +87,6 @@ std::string VolumeFile::getFullFilePath(const std::string &filename)
 #endif
 }
 
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
 std::map<OSPVolume, ospray::vec2f> VolumeFile::voxelRangeOf;
-#endif
-
 
 VolumeFile::~VolumeFile() {}

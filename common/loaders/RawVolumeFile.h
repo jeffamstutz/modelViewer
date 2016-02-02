@@ -24,7 +24,8 @@
 //!  voxel data stored in a file on disk as a single monolithic brick,
 //!  where the volume specification is defined elsewhere.
 //!
-class RawVolumeFile : public VolumeFile {
+class RawVolumeFile : public VolumeFile
+{
 public:
 
   //! Constructor.

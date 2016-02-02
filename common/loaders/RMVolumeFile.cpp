@@ -69,9 +69,7 @@ struct RMLoaderThreads {
     void *result = NULL;
     for (int i=0;i<numThreads;i++)
       pthread_join(thread[i],&result);
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
     VolumeFile::voxelRangeOf[volume] = voxelRange;
-#endif
   };
 
   void loadBlock(Block &block, 
@@ -136,10 +134,8 @@ struct RMLoaderThreads {
       loadBlock(*block,inFilesDir,blockID);
  
       mutex.lock();
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
       for (int i=0;i<5;i++)
         printf("[%i]",block->voxel[i]);
-#endif
       ospray::vec3i region_lo(I*256,J*256,K*128);
       ospray::vec3i region_sz(256,256,128);
       ospSetRegion(volume,block->voxel,(osp::vec3i&)region_lo,(osp::vec3i&)region_sz);
@@ -148,19 +144,18 @@ struct RMLoaderThreads {
       ospray::vec2f blockRange(block->voxel[0]);
       extendVoxelRange(blockRange,&block->voxel[0],256*256*128);
       
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
       mutex.lock();
       this->voxelRange.x = std::min(this->voxelRange.x,blockRange.x);
       this->voxelRange.y = std::max(this->voxelRange.y,blockRange.y);
       mutex.unlock();
-#endif
     }
     delete block;
   }
 
   static void *threadFunc(void *arg)
   { ((RMLoaderThreads *)arg)->run(); return NULL; }
-  ~RMLoaderThreads() { delete[] thread; };
+
+  ~RMLoaderThreads() { delete [] thread; };
 };
 
 OSPVolume RMVolumeFile::importVolume(OSPVolume volume)

@@ -7,6 +7,7 @@ using std::string;
 #include <vector>
 
 #include "common/loaders/ObjectFile.h"
+#include "common/loaders/VolumeFile.h"
 
 #include "OSPRayFixture.h"
 
@@ -22,9 +23,7 @@ ospray::vec3f OSPRayFixture::at;
 ospray::vec3f OSPRayFixture::up;
 
 string OSPRayFixture::renderer_type;
-
-string OSPRayFixture::benchmarkModelFile = "/Users/jdamstut/data/city/city.obj";
-
+string OSPRayFixture::benchmarkModelFile;
 string OSPRayFixture::imageOutputFile;
 
 int OSPRayFixture::width  = 1024;
@@ -199,19 +198,37 @@ static void importObjectsFromFile(const std::string &filename,
     OSPDataType type;
     ospGetType(objects[i], NULL, &type);
 
+    auto object = objects[i];
+
     if (type == OSP_GEOMETRY) {
+
+      auto geometry = (OSPGeometry)object;
+
       // Commit the geometry.
-      ospCommit(objects[i]);
+      ospCommit(geometry);
 
       // Add the loaded geometry to the model.
-      ospAddGeometry(model, (OSPGeometry) objects[i]);
+      ospAddGeometry(model, geometry);
+
     } else if (type == OSP_VOLUME) {
+
+      auto volume = (OSPVolume)object;
+
       // For now we set the same transfer function on all volumes.
-      ospSetObject(objects[i], "transferFunction", f->tf);
-      ospCommit(objects[i]);
+      ospSetObject(volume, "transferFunction", f->tf);
+      ospCommit(volume);
 
       // Add the loaded volume(s) to the model.
-      ospAddVolume(model, (OSPVolume)objects[i]);
+      ospAddVolume(model, volume);
+
+      auto voxelRange = VolumeFile::voxelRangeOf[volume];
+
+      // Set the minimum and maximum values in the domain for both color and
+      // opacity components of the transfer function.
+      //ospSet2f(f->tf, "valueRange", voxelRange.x, voxelRange.y);
+      ospSet2f(f->tf, "valueRange", 0.f, 25.f);
+
+      ospCommit(f->tf);
     }
   }
 
@@ -407,12 +424,19 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
   ospSetData(f->tf, "colors", colorsData);
 
   // Add opacities
-  std::vector<float> opacityValues = {0.f, 1.f};
+  std::vector<float> opacityValues;
+
+  const int N_OPACITIES = 64;//NOTE(jda) - This affects image quality and
+                             //            performance!
+  for (int i = 0; i < N_OPACITIES; ++i) {
+    opacityValues.push_back(float(i)/N_OPACITIES);
+  }
   auto opacityValuesData = ospNewData(opacityValues.size(),
                                       OSP_FLOAT,
                                       opacityValues.data());
   ospSetData(f->tf, "opacities", opacityValuesData);
 
+  // Commit transfer function
   ospCommit(f->tf);
 }
 

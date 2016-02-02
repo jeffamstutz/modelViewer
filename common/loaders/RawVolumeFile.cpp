@@ -117,10 +117,8 @@ OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
     ospSetVec3i(volume, "dimensions", (osp::vec3i&)importVolumeDimensions);
   }
 
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
 ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
                            -std::numeric_limits<float>::infinity());
-#endif
 
   if (!useSubvolume) {
 
@@ -149,7 +147,6 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
       exitOnCondition(voxelsRead != slicesToRead*voxelCount,
                       "end of volume file reached before read completed");
 
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
       if (strcmp(voxelType, "uchar") == 0) {
         extendVoxelRange(voxelRange,
                          (unsigned char *)voxelData,
@@ -168,7 +165,6 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
       else {
         exitOnCondition(true, "unsupported voxel type");
       }
-#endif
 
 
       ospray::vec3i region_lo(0, 0, z);
@@ -191,10 +187,8 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
 
   } else {
 
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
     throw std::runtime_error("computation of voxel range not yet "
                              "implemented for subvolumes");
-#endif
 
     // Allocate memory for a single row of voxel data.
     unsigned char *rowData = new unsigned char[volumeDimensions.x * voxelSize];
@@ -258,9 +252,7 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
     fclose(file);
   // Return the volume.
   
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
   VolumeFile::voxelRangeOf[volume] = voxelRange;
-#endif
   
   return(volume);
 }

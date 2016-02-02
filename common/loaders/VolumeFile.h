@@ -74,9 +74,7 @@ public:
   //! A string description of this class.
   virtual std::string toString() const;
 
-#ifdef OSPRAY_VOLUME_VOXELRANGE_IN_APP
   static std::map<OSPVolume, ospray::vec2f> voxelRangeOf;
-#endif
 
   //! Print an error message.
   void emitMessage(const std::string &kind, const std::string &message) const;
