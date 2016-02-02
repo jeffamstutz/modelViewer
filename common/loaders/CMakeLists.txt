@@ -1,4 +1,4 @@
-# ======================================================================== ##
+## ======================================================================== ##
 ## Copyright 2009-2016 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
@@ -14,26 +14,20 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(APP_NAME ospBenchmark)
+set(LIBRARY_NAME ospray_loaders)
 
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}
+add_library(${LIBRARY_NAME} SHARED
+  ObjectFile.cpp
+  OSPObjectFile.cpp
+  PLYTriangleMeshFile.cpp
+  RawVolumeFile.cpp
+  RMVolumeFile.cpp
+  SymbolRegistry.cpp
+  TinyXML2.cpp
+  TriangleMeshFile.cpp
+  VolumeFile.cpp
 )
 
-# --------------------------------------------
-# main executable
-# --------------------------------------------
-add_executable(${APP_NAME}
-  bench.cpp
-  OSPRayFixture.cpp
-  OSPRayFixture.h
-)
+target_link_libraries(${LIBRARY_NAME} ${OSPRAY_LIBRARIES})
 
-target_link_libraries(${APP_NAME}
-  ospray_loaders
-  ospray_minisg
-)
-
-# ------------------------------------------------------------
-
-install(TARGETS ${APP_NAME} DESTINATION bin)
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

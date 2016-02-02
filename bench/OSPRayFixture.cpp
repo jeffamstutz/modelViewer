@@ -6,6 +6,8 @@ using std::endl;
 using std::string;
 #include <vector>
 
+#include "common/loaders/ObjectFile.h"
+
 #include "OSPRayFixture.h"
 
 using ospray::box3f;
@@ -184,7 +186,39 @@ static OSPMaterial createMaterial(OSPRenderer renderer,
   return ospMat;
 }
 
-static void loadModel(OSPRayFixture *f)
+static void importObjectsFromFile(const std::string &filename,
+                                  OSPRayFixture *f)
+{
+  auto &model = f->model;
+
+  // Load OSPRay objects from a file.
+  OSPObject *objects = ObjectFile::importObjects(filename.c_str());
+
+  // Iterate over the objects contained in the object list.
+  for (size_t i = 0; objects[i]; i++) {
+    OSPDataType type;
+    ospGetType(objects[i], NULL, &type);
+
+    if (type == OSP_GEOMETRY) {
+      // Commit the geometry.
+      ospCommit(objects[i]);
+
+      // Add the loaded geometry to the model.
+      ospAddGeometry(model, (OSPGeometry) objects[i]);
+    } else if (type == OSP_VOLUME) {
+      // For now we set the same transfer function on all volumes.
+      ospSetObject(objects[i], "transferFunction", f->tf);
+      ospCommit(objects[i]);
+
+      // Add the loaded volume(s) to the model.
+      ospAddVolume(model, (OSPVolume)objects[i]);
+    }
+  }
+
+  ospCommit(model);
+}
+
+static void loadModelFromFile(OSPRayFixture *f)
 {
   embree::FileName fn = OSPRayFixture::benchmarkModelFile;
   if (fn.ext() == "stl") {
@@ -201,16 +235,16 @@ static void loadModel(OSPRayFixture *f)
     ospray::miniSG::importHBP(f->sgModel,fn);
   } else if (fn.ext() == "x3d") {
     ospray::miniSG::importX3D(f->sgModel,fn);
+  } else if (fn.ext() == "osp") {
+    importObjectsFromFile(fn, f);
   } else {
     throw std::runtime_error("could not open file: " +
                              OSPRayFixture::benchmarkModelFile);
   }
 }
 
-static void createOSPModel(OSPRayFixture *f)
+static void addMeshToModel(OSPRayFixture *f)
 {
-  f->model = ospNewModel();
-
   for (size_t i = 0; i < f->sgModel.mesh.size(); i++) {
     ospray::Ref<ospray::miniSG::Mesh> msgMesh = f->sgModel.mesh[i];
 
@@ -363,6 +397,25 @@ static void createOSPCamera(OSPRayFixture *f)
   ospCommit(f->camera);
 }
 
+static void createDefaultTransferFunction(OSPRayFixture *f)
+{
+  f->tf = ospNewTransferFunction("piecewise_linear");
+
+  // Add colors
+  std::vector<ospray::vec3f> colors = {ospray::vec3f(0.f), ospray::vec3f(1.f)};
+  auto colorsData = ospNewData(colors.size(), OSP_FLOAT3, colors.data());
+  ospSetData(f->tf, "colors", colorsData);
+
+  // Add opacities
+  std::vector<float> opacityValues = {0.f, 1.f};
+  auto opacityValuesData = ospNewData(opacityValues.size(),
+                                      OSP_FLOAT,
+                                      opacityValues.data());
+  ospSetData(f->tf, "opacities", opacityValuesData);
+
+  ospCommit(f->tf);
+}
+
 static void createOSPRenderer(OSPRayFixture *f)
 {
   auto &r = f->renderer_type;
@@ -381,9 +434,12 @@ static void createFramebuffer(OSPRayFixture *f)
 
 void OSPRayFixture::SetUp()
 {
-  loadModel(this);
+  this->model = ospNewModel();
+  createDefaultTransferFunction(this);
+
+  loadModelFromFile(this);
   createOSPRenderer(this);
-  createOSPModel(this);
+  addMeshToModel(this);
   createOSPCamera(this);
   createFramebuffer(this);
 
