@@ -1,11 +1,17 @@
 
 #include "hayai/hayai.hpp"
 
-#include "ospray/ospray.h"
+#include <ospray_cpp/Camera.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
+#include <ospray_cpp/TransferFunction.h>
+
 #include "common/miniSG/miniSG.h"
 
 struct OSPRayFixture : public hayai::Fixture
 {
+  OSPRayFixture();
+
   // Fixture hayai interface //
 
   void SetUp() override;
@@ -14,11 +20,11 @@ struct OSPRayFixture : public hayai::Fixture
   // Fixture data //
 
   ospray::miniSG::Model sgModel;
-  OSPRenderer    renderer;
-  OSPCamera      camera;
-  OSPModel       model;
-  OSPFrameBuffer fb;
-  OSPTransferFunction tf;
+  ospray::cpp::Renderer    renderer;
+  ospray::cpp::Camera      camera;
+  ospray::cpp::Model       model;
+  ospray::cpp::FrameBuffer fb;
+  ospray::cpp::TransferFunction tf;
 
   // Command-line configuration data //
 

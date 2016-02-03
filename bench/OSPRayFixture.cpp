@@ -9,6 +9,8 @@ using std::string;
 #include "common/loaders/ObjectFile.h"
 #include "common/loaders/VolumeFile.h"
 
+#include <ospray_cpp/Data.h>
+
 #include "OSPRayFixture.h"
 
 using ospray::box3f;
@@ -208,40 +210,44 @@ static void importObjectsFromFile(const std::string &filename,
 
     if (type == OSP_GEOMETRY) {
 
-      auto geometry = (OSPGeometry)object;
+      auto geometry = ospray::cpp::Geometry((OSPGeometry)object);
 
       // Commit the geometry.
-      ospCommit(geometry);
+      geometry.commit();
 
       // Add the loaded geometry to the model.
-      ospAddGeometry(model, geometry);
+      model.addGeometry(geometry);
 
     } else if (type == OSP_VOLUME) {
 
-      auto volume = (OSPVolume)object;
+      auto volume = ospray::cpp::Volume((OSPVolume)object);
 
       // For now we set the same transfer function on all volumes.
-      ospSetObject(volume, "transferFunction", f->tf);
-      ospSet1f(volume, "samplingRate", f->samplingRate);
-      ospCommit(volume);
+      volume.set("transferFunction", f->tf);
+      volume.set("samplingRate", f->samplingRate);
+      volume.commit();
 
       // Add the loaded volume(s) to the model.
-      ospAddVolume(model, volume);
+      model.addVolume(volume);
 
-      auto voxelRange = VolumeFile::voxelRangeOf[volume];
+      auto voxelRange = VolumeFile::voxelRangeOf[(OSPVolume)volume.handle()];
 
       // Set the minimum and maximum values in the domain for both color and
       // opacity components of the transfer function.
-      ospSet2f(f->tf, "valueRange", voxelRange.x, voxelRange.y);
+      f->tf.set("valueRange", voxelRange.x, voxelRange.y);
 
-      ospCommit(f->tf);
+      f->tf.commit();
 
       // Get the volume's bounding box for a decent default view
       // NOTE(jda) - This uses depricated API functions...need to calculate
       //             within the loaders.
       ospray::box3f boundingBox;
-      ospGetVec3f(volume, "boundingBoxMin", (osp::vec3f*)&boundingBox.lower);
-      ospGetVec3f(volume, "boundingBoxMax", (osp::vec3f*)&boundingBox.upper);
+      ospGetVec3f(volume.handle(),
+                  "boundingBoxMin",
+                  (osp::vec3f*)&boundingBox.lower);
+      ospGetVec3f(volume.handle(),
+                  "boundingBoxMax",
+                  (osp::vec3f*)&boundingBox.upper);
 
       auto volumeMesh = new ospray::miniSG::Mesh;
       volumeMesh->bounds = boundingBox;
@@ -249,7 +255,7 @@ static void importObjectsFromFile(const std::string &filename,
     }
   }
 
-  ospCommit(model);
+  model.commit();
 }
 
 static void loadModelFromFile(OSPRayFixture *f)
@@ -287,7 +293,7 @@ static void addMeshToModel(OSPRayFixture *f)
     }
 
     // create ospray mesh
-    OSPGeometry ospMesh = ospNewGeometry("trianglemesh");
+    auto ospMesh = ospray::cpp::Geometry("trianglemesh");
 
     // check if we have to transform the vertices:
     if (f->sgModel.instance[i] != ospray::miniSG::Instance(i)) {
@@ -298,68 +304,68 @@ static void addMeshToModel(OSPRayFixture *f)
     }
 
     // add position array to mesh
-    OSPData position = ospNewData(msgMesh->position.size(),
-                                  OSP_FLOAT3A,
-                                  &msgMesh->position[0],
-                                  OSP_DATA_SHARED_BUFFER);
-    ospSetData(ospMesh,"position",position);
+    auto position = ospray::cpp::Data(msgMesh->position.size(),
+                                      OSP_FLOAT3A,
+                                      &msgMesh->position[0],
+                                      OSP_DATA_SHARED_BUFFER);
+    ospMesh.set("position", position);
 
     // add triangle index array to mesh
     if (!msgMesh->triangleMaterialId.empty()) {
-      OSPData primMatID = ospNewData(msgMesh->triangleMaterialId.size(),
-                                     OSP_INT,
-                                     &msgMesh->triangleMaterialId[0],
-                                     OSP_DATA_SHARED_BUFFER);
-      ospSetData(ospMesh, "prim.materialID", primMatID);
+      auto primMatID = ospray::cpp::Data(msgMesh->triangleMaterialId.size(),
+                                         OSP_INT,
+                                         &msgMesh->triangleMaterialId[0],
+                                         OSP_DATA_SHARED_BUFFER);
+      ospMesh.set("prim.materialID", primMatID);
     }
 
     // add triangle index array to mesh
-    OSPData index = ospNewData(msgMesh->triangle.size(),
-                               OSP_INT3,
-                               &msgMesh->triangle[0],
-                               OSP_DATA_SHARED_BUFFER);
+    auto index = ospray::cpp::Data(msgMesh->triangle.size(),
+                                   OSP_INT3,
+                                   &msgMesh->triangle[0],
+                                   OSP_DATA_SHARED_BUFFER);
     assert(msgMesh->triangle.size() > 0);
-    ospSetData(ospMesh,"index",index);
+    ospMesh.set("index", index);
 
     // add normal array to mesh
     if (!msgMesh->normal.empty()) {
-      OSPData normal = ospNewData(msgMesh->normal.size(),
-                                  OSP_FLOAT3A,
-                                  &msgMesh->normal[0],
-                                  OSP_DATA_SHARED_BUFFER);
+      auto normal = ospray::cpp::Data(msgMesh->normal.size(),
+                                      OSP_FLOAT3A,
+                                      &msgMesh->normal[0],
+                                      OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->normal.size() > 0);
-      ospSetData(ospMesh,"vertex.normal",normal);
+      ospMesh.set("vertex.normal", normal);
     }
 
     // add color array to mesh
     if (!msgMesh->color.empty()) {
-      OSPData color = ospNewData(msgMesh->color.size(),
-                                 OSP_FLOAT3A,
-                                 &msgMesh->color[0],
-                                 OSP_DATA_SHARED_BUFFER);
+      auto color = ospray::cpp::Data(msgMesh->color.size(),
+                                     OSP_FLOAT3A,
+                                     &msgMesh->color[0],
+                                     OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->color.size() > 0);
-      ospSetData(ospMesh,"vertex.color",color);
+      ospMesh.set("vertex.color", color);
     }
 
     // add texcoord array to mesh
     if (!msgMesh->texcoord.empty()) {
-      OSPData texcoord = ospNewData(msgMesh->texcoord.size(),
-                                    OSP_FLOAT2,
-                                    &msgMesh->texcoord[0],
-                                    OSP_DATA_SHARED_BUFFER);
+      auto texcoord = ospray::cpp::Data(msgMesh->texcoord.size(),
+                                        OSP_FLOAT2,
+                                        &msgMesh->texcoord[0],
+                                        OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->texcoord.size() > 0);
-      ospSetData(ospMesh,"vertex.texcoord",texcoord);
+      ospMesh.set("vertex.texcoord", texcoord);
     }
 
-    ospSet1i(ospMesh, "alpha_type", 0);
-    ospSet1i(ospMesh, "alpha_component", 4);
+    ospMesh.set("alpha_type", 0);
+    ospMesh.set("alpha_component", 4);
 
     // add triangle material id array to mesh
     if (msgMesh->materialList.empty()) {
       // we have a single material for this mesh...
-      OSPMaterial singleMaterial = createMaterial(f->renderer,
+      OSPMaterial singleMaterial = createMaterial((OSPRenderer)f->renderer.handle(),
                                                   msgMesh->material.ptr);
-      ospSetMaterial(ospMesh,singleMaterial);
+      ospMesh.setMaterial(singleMaterial);
     } else {
       // we have an entire material list, assign that list
       std::vector<OSPMaterial > materialList;
@@ -367,7 +373,7 @@ static void addMeshToModel(OSPRayFixture *f)
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
         materialList.push_back(
-              createMaterial(f->renderer, msgMesh->materialList[i].ptr)
+              createMaterial((OSPRenderer)f->renderer.handle(), msgMesh->materialList[i].ptr)
               );
 
         for (auto it = msgMesh->materialList[i]->params.begin();
@@ -393,23 +399,21 @@ static void addMeshToModel(OSPRayFixture *f)
           alphas.push_back(0.f);
         }
       }
-      OSPData ospMaterialList = ospNewData(materialList.size(),
-                                           OSP_OBJECT,
-                                           &materialList[0]);
-      ospSetData(ospMesh,"materialList",ospMaterialList);
+      auto ospMaterialList = ospray::cpp::Data(materialList.size(),
+                                               OSP_OBJECT,
+                                               &materialList[0]);
+      ospMesh.set("materialList",ospMaterialList.handle());
     }
 
-    ospCommit(ospMesh);
-    ospAddGeometry(f->model,ospMesh);
+    ospMesh.commit();
+    f->model.addGeometry(ospMesh);
   }
 
-  ospCommit(f->model);
+  f->model.commit();
 }
 
 static void createOSPCamera(OSPRayFixture *f)
 {
-  f->camera = ospNewCamera("perspective");
-
   const box3f worldBounds(f->sgModel.getBBox());
   vec3f center = embree::center(worldBounds);
   vec3f diag   = worldBounds.size();
@@ -427,18 +431,16 @@ static void createOSPCamera(OSPRayFixture *f)
     dir = center - pos;
   }
 
-  ospSetVec3f(f->camera, "pos", reinterpret_cast<osp::vec3f&>(pos));
-  ospSetVec3f(f->camera, "dir", reinterpret_cast<osp::vec3f&>(dir));
-  ospSetVec3f(f->camera, "up",  reinterpret_cast<osp::vec3f&>(up));
+  f->camera.set("pos", pos);
+  f->camera.set("dir", dir);
+  f->camera.set("up",  up );
 
-  ospSetf(f->camera, "aspect", f->width/float(f->height));
-  ospCommit(f->camera);
+  f->camera.set("aspect", f->width/float(f->height));
+  f->camera.commit();
 }
 
 static void createDefaultTransferFunction(OSPRayFixture *f)
 {
-  f->tf = ospNewTransferFunction("piecewise_linear");
-
   // Add colors
   std::vector<ospray::vec3f> colors;
   if (f->tf_colors.empty()) {
@@ -447,8 +449,8 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
   } else {
     colors = f->tf_colors;
   }
-  auto colorsData = ospNewData(colors.size(), OSP_FLOAT3, colors.data());
-  ospSetData(f->tf, "colors", colorsData);
+  auto colorsData = ospray::cpp::Data(colors.size(), OSP_FLOAT3, colors.data());
+  f->tf.set("colors", colorsData);
 
   // Add opacities
   std::vector<float> opacityValues;
@@ -458,34 +460,42 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
   for (int i = 0; i < N_OPACITIES; ++i) {
     opacityValues.push_back(float(i)/N_OPACITIES);
   }
-  auto opacityValuesData = ospNewData(opacityValues.size(),
-                                      OSP_FLOAT,
-                                      opacityValues.data());
-  ospSetData(f->tf, "opacities", opacityValuesData);
+  auto opacityValuesData = ospray::cpp::Data(opacityValues.size(),
+                                             OSP_FLOAT,
+                                             opacityValues.data());
+  f->tf.set("opacities", opacityValuesData);
 
   // Commit transfer function
-  ospCommit(f->tf);
+  f->tf.commit();
 }
 
 static void createOSPRenderer(OSPRayFixture *f)
 {
   auto &r = f->renderer_type;
-  f->renderer = ospNewRenderer(r.empty() ? "ao1" : r.c_str());
-  ospSet3f(f->renderer, "bgColor", f->bg_color.x, f->bg_color.y, f->bg_color.z);
+  if (!r.empty()) {
+    f->renderer = ospray::cpp::Renderer(r);
+  }
+  f->renderer.set("bgColor", f->bg_color.x, f->bg_color.y, f->bg_color.z);
 }
 
 static void createFramebuffer(OSPRayFixture *f)
 {
-  f->fb = ospNewFrameBuffer(osp::vec2i{f->width, f->height}, OSP_RGBA_I8,
-                            OSP_FB_COLOR|OSP_FB_ACCUM);
-  ospSet1f(f->fb, "gamma", 2.2f);
-  ospCommit(f->fb);
-  ospFrameBufferClear(f->fb, OSP_FB_ACCUM | OSP_FB_COLOR);
+  f->fb = ospray::cpp::FrameBuffer(osp::vec2i{f->width, f->height}, OSP_RGBA_I8,
+                                   OSP_FB_COLOR|OSP_FB_ACCUM);
+  f->fb.set("gamma", 2.2f);
+  f->fb.commit();
+  f->fb.clear(OSP_FB_ACCUM | OSP_FB_COLOR);
+}
+
+OSPRayFixture::OSPRayFixture() :
+  renderer("ao1"),
+  camera("perspective"),
+  tf("piecewise_linear")
+{
 }
 
 void OSPRayFixture::SetUp()
 {
-  this->model = ospNewModel();
   createDefaultTransferFunction(this);
 
   loadModelFromFile(this);
@@ -494,21 +504,19 @@ void OSPRayFixture::SetUp()
   createOSPCamera(this);
   createFramebuffer(this);
 
-  ospSetObject(renderer, "world",  model);
-  ospSetObject(renderer, "model",  model);
-  ospSetObject(renderer, "camera", camera);
-  ospSet1i(renderer, "spp", 1);
+  renderer.set("world",  model);
+  renderer.set("model",  model);
+  renderer.set("camera", camera);
+  renderer.set("spp", 1);
 
-  ospCommit(renderer);
+  renderer.commit();
 }
 
 void OSPRayFixture::TearDown()
 {
   if (!imageOutputFile.empty()) {
-    auto *lfb = (uint32*)ospMapFrameBuffer(fb, OSP_FB_COLOR);
+    auto *lfb = (uint32*)fb.map(OSP_FB_COLOR);
     writePPM(imageOutputFile + ".ppm", width, height, lfb);
-    ospUnmapFrameBuffer(lfb, fb);
+    fb.unmap(lfb);
   }
-
-  ospFreeFrameBuffer(fb);
 }

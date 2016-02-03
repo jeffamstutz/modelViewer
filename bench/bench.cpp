@@ -8,7 +8,7 @@ using std::string;
 
 BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 {
-  ospRenderFrame(fb, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
+  renderer.renderFrame(fb, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
 
 void printUsageAndExit()
