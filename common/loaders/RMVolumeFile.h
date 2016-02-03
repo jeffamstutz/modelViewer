@@ -34,10 +34,5 @@ public:
 
   //! A string description of this class.
   std::string toString() const override;
-
-private:
-
-  //! Path to the file containing the volume data.
-  std::string fileName;
 };
 

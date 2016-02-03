@@ -29,18 +29,12 @@ class RawVolumeFile : public VolumeFile
 public:
 
   //! Constructor.
-  RawVolumeFile(const std::string &filename);
+  RawVolumeFile(const std::string &fileName);
 
   //! Import the volume data.
   OSPVolume importVolume(OSPVolume volume) override;
 
   //! A string description of this class.
   std::string toString() const override;
-
-private:
-
-  //! Path to the file containing the volume data.
-  std::string filename;
-
 };
 

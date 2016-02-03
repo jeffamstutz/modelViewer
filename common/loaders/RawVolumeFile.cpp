@@ -20,24 +20,29 @@
 #include "RawVolumeFile.h"
 #include "common/sys/filename.h"
 
+RawVolumeFile::RawVolumeFile(const std::string &fileName) :
+  VolumeFile(fileName)
+{
+}
+
 OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
 {
   // Look for the volume data file at the given path.
   FILE *file = NULL;
-  embree::FileName fn = filename;
+  embree::FileName fn = fileName;
   bool gzipped = fn.ext() == "gz";
   if (gzipped) {
-    std::string cmd = "/usr/bin/gunzip -c "+filename;
+    std::string cmd = "/usr/bin/gunzip -c "+fileName;
     file = popen(cmd.c_str(),"r");
   } else {
-    file = fopen(filename.c_str(),"rb");
+    file = fopen(fileName.c_str(),"rb");
   }
-  //FILE *file = fopen(filename.c_str(), "rb");
-  exitOnCondition(!file, "unable to open file '" + filename + "'");
+  //FILE *file = fopen(fileName.c_str(), "rb");
+  exitOnCondition(!file, "unable to open file '" + fileName + "'");
 
   // Offset into the volume data file if any.
   int offset = 0;  
-  ospGeti(volume, "filename offset", &offset);  fseek(file, offset, SEEK_SET);
+  ospGeti(volume, "fileName offset", &offset);  fseek(file, offset, SEEK_SET);
 
   // Volume dimensions.
   ospray::vec3i volumeDimensions;  
@@ -260,9 +265,4 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
 std::string RawVolumeFile::toString() const
 {
   return("ospray_module_loaders::RawVolumeFile");
-}
-
-RawVolumeFile::RawVolumeFile(const std::string &filename) :
-  filename(filename)
-{
 }

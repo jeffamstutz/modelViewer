@@ -158,6 +158,11 @@ struct RMLoaderThreads {
   ~RMLoaderThreads() { delete [] thread; };
 };
 
+RMVolumeFile::RMVolumeFile(const std::string &fileName) :
+  VolumeFile(fileName)
+{
+}
+
 OSPVolume RMVolumeFile::importVolume(OSPVolume volume)
 {
   // Update the provided dimensions of the volume for the subvolume specified.
@@ -186,5 +191,3 @@ std::string RMVolumeFile::toString() const
 {
   return("ospray_module_loaders::RawVolumeFile");
 }
-
-RMVolumeFile::RMVolumeFile(const std::string &fileName) : fileName(fileName) {}

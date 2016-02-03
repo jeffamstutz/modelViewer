@@ -61,7 +61,8 @@ class VolumeFile
 {
 public:
 
-  //! Destructor.
+  VolumeFile(const std::string &fileName);
+
   virtual ~VolumeFile();
 
   //! Create a VolumeFile object of the subtype given by the file extension and
@@ -88,5 +89,9 @@ public:
   //! Get the absolute file path.
   static std::string getFullFilePath(const std::string &filename);
 
+protected:
+
+  //! Path to the file containing the volume data.
+  std::string fileName;
 };
 
