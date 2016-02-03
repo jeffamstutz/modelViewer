@@ -231,6 +231,17 @@ static void importObjectsFromFile(const std::string &filename,
       ospSet2f(f->tf, "valueRange", voxelRange.x, voxelRange.y);
 
       ospCommit(f->tf);
+
+      // Get the volume's bounding box for a decent default view
+      // NOTE(jda) - This uses depricated API functions...need to calculate
+      //             within the loaders.
+      ospray::box3f boundingBox;
+      ospGetVec3f(volume, "boundingBoxMin", (osp::vec3f*)&boundingBox.lower);
+      ospGetVec3f(volume, "boundingBoxMax", (osp::vec3f*)&boundingBox.upper);
+
+      auto volumeMesh = new ospray::miniSG::Mesh;
+      volumeMesh->bounds = boundingBox;
+      f->sgModel.mesh.push_back(volumeMesh);
     }
   }
 
@@ -266,6 +277,10 @@ static void addMeshToModel(OSPRayFixture *f)
 {
   for (size_t i = 0; i < f->sgModel.mesh.size(); i++) {
     ospray::Ref<ospray::miniSG::Mesh> msgMesh = f->sgModel.mesh[i];
+
+    if (msgMesh->triangle.empty()) {
+      continue;
+    }
 
     // create ospray mesh
     OSPGeometry ospMesh = ospNewGeometry("trianglemesh");

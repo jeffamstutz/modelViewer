@@ -1,4 +1,4 @@
-#include <hayai/hayai.hpp>
+#include "hayai/hayai.hpp"
 
 #include "OSPRayFixture.h"
 
