@@ -6,16 +6,21 @@
 
 struct OSPRayFixture : public hayai::Fixture
 {
+  // Fixture hayai interface //
+
   void SetUp() override;
   void TearDown() override;
+
+  // Fixture data //
 
   ospray::miniSG::Model sgModel;
   OSPRenderer    renderer;
   OSPCamera      camera;
   OSPModel       model;
   OSPFrameBuffer fb;
-
   OSPTransferFunction tf;
+
+  // Command-line configuration data //
 
   static float samplingRate;
 
@@ -32,4 +37,6 @@ struct OSPRayFixture : public hayai::Fixture
 
   static int width;
   static int height;
+
+  static ospray::vec3f bg_color;
 };

@@ -33,6 +33,8 @@ float OSPRayFixture::samplingRate = 0.125f;
 
 std::vector<ospray::vec3f> OSPRayFixture::tf_colors;
 
+ospray::vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
+
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
@@ -469,7 +471,7 @@ static void createOSPRenderer(OSPRayFixture *f)
 {
   auto &r = f->renderer_type;
   f->renderer = ospNewRenderer(r.empty() ? "ao1" : r.c_str());
-  ospSet3f(f->renderer, "bgcolor", 1.f, 1.f, 1.f);
+  ospSet3f(f->renderer, "bgColor", f->bg_color.x, f->bg_color.y, f->bg_color.z);
 }
 
 static void createFramebuffer(OSPRayFixture *f)

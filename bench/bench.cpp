@@ -70,6 +70,10 @@ void printUsageAndExit()
   cout << endl;
   cout << "    -vu | --up --> Specify the camera up as: ux uy uz " << endl;
 
+  cout << endl;
+  cout << "    -bg | --background --> Specify the background color: R G B "
+       << endl;
+
   exit(0);
 }
 
@@ -86,21 +90,18 @@ void parseCommandLine(int argc, const char *argv[])
       pos.x = atof(argv[++i]);
       pos.y = atof(argv[++i]);
       pos.z = atof(argv[++i]);
-
       OSPRayFixture::customView = true;
     } else if (arg == "-vu" || arg == "--up") {
       auto &up = OSPRayFixture::up;
       up.x = atof(argv[++i]);
       up.y = atof(argv[++i]);
       up.z = atof(argv[++i]);
-
       OSPRayFixture::customView = true;
     } else if (arg == "-vi" || arg == "--gaze") {
       auto &at = OSPRayFixture::at;
       at.x = atof(argv[++i]);
       at.y = atof(argv[++i]);
       at.z = atof(argv[++i]);
-
       OSPRayFixture::customView = true;
     } else if (arg == "-r" || arg == "--renderer") {
       OSPRayFixture::renderer_type = argv[++i];
@@ -118,6 +119,11 @@ void parseCommandLine(int argc, const char *argv[])
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
       OSPRayFixture::tf_colors.push_back(color);
+    } else if (arg == "-bg" || arg == "--background") {
+      ospray::vec3f &color = OSPRayFixture::bg_color;
+      color.x = atof(argv[++i]);
+      color.y = atof(argv[++i]);
+      color.z = atof(argv[++i]);
     } else {
       OSPRayFixture::benchmarkModelFile = arg;
     }
