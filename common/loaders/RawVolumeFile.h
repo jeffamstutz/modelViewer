@@ -35,7 +35,7 @@ public:
   OSPVolume importVolume(OSPVolume volume) override;
 
   //! A string description of this class.
-  std::string toString() const;
+  std::string toString() const override;
 
 private:
 
