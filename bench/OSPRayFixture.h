@@ -1,5 +1,5 @@
 
-#include <hayai/hayai.hpp>
+#include "hayai/hayai.hpp"
 
 #include "ospray/ospray.h"
 #include "common/miniSG/miniSG.h"
@@ -27,6 +27,8 @@ struct OSPRayFixture : public hayai::Fixture
   static std::string renderer_type;
   static std::string benchmarkModelFile;
   static std::string imageOutputFile;
+
+  static std::vector<ospray::vec3f> tf_colors;
 
   static int width;
   static int height;

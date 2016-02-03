@@ -31,6 +31,8 @@ int OSPRayFixture::height = 1024;
 
 float OSPRayFixture::samplingRate = 0.125f;
 
+std::vector<ospray::vec3f> OSPRayFixture::tf_colors;
+
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
                      const uint32 *pixel)
@@ -436,7 +438,13 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
   f->tf = ospNewTransferFunction("piecewise_linear");
 
   // Add colors
-  std::vector<ospray::vec3f> colors = {ospray::vec3f(0.f), ospray::vec3f(1.f)};
+  std::vector<ospray::vec3f> colors;
+  if (f->tf_colors.empty()) {
+    colors.push_back(ospray::vec3f(0.f));
+    colors.push_back(ospray::vec3f(0.9f));
+  } else {
+    colors = f->tf_colors;
+  }
   auto colorsData = ospNewData(colors.size(), OSP_FLOAT3, colors.data());
   ospSetData(f->tf, "colors", colorsData);
 

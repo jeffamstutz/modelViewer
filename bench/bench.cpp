@@ -54,6 +54,13 @@ void printUsageAndExit()
   cout << "                             default: 0.125" << endl;
 
   cout << endl;
+  cout << "    -tc | --tf-color --> Specify the next color to in the transfer"
+       << " function for volumes. Each entry will add to the total list of"
+       << " colors in the order they are specified." << endl;
+  cout << "                              Format: R G B" << endl;
+  cout << "                         Value Range: [0,1]" << endl;
+
+  cout << endl;
   cout << "    -vp | --eye --> Specify the camera eye as: ex ey ez " << endl;
 
   cout << endl;
@@ -105,6 +112,12 @@ void parseCommandLine(int argc, const char *argv[])
       OSPRayFixture::height = atoi(argv[++i]);
     } else if (arg == "-s" || arg == "--sampling-rate") {
       OSPRayFixture::samplingRate = atof(argv[++i]);
+    } else if (arg == "-tc" || arg == "--tf-color") {
+      ospray::vec3f color;
+      color.x = atof(argv[++i]);
+      color.y = atof(argv[++i]);
+      color.z = atof(argv[++i]);
+      OSPRayFixture::tf_colors.push_back(color);
     } else {
       OSPRayFixture::benchmarkModelFile = arg;
     }
