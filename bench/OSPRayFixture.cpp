@@ -34,6 +34,7 @@ int OSPRayFixture::height = 1024;
 float OSPRayFixture::samplingRate = 0.125f;
 
 std::vector<ospray::vec3f> OSPRayFixture::tf_colors;
+std::vector<float> OSPRayFixture::isosurfaces;
 
 ospray::vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
 
@@ -252,6 +253,19 @@ static void importObjectsFromFile(const std::string &filename,
       auto volumeMesh = new ospray::miniSG::Mesh;
       volumeMesh->bounds = boundingBox;
       f->sgModel.mesh.push_back(volumeMesh);
+
+      // Create any specified isosurfaces
+      if (!f->isosurfaces.empty()) {
+        auto isoValueData = ospray::cpp::Data(f->isosurfaces.size(), OSP_FLOAT,
+                                              f->isosurfaces.data());
+        auto isoGeometry = ospray::cpp::Geometry("isosurfaces");
+
+        isoGeometry.set("isovalues", isoValueData);
+        isoGeometry.set("volume", volume);
+        isoGeometry.commit();
+
+        model.addGeometry(isoGeometry);
+      }
     }
   }
 

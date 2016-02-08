@@ -61,6 +61,9 @@ void printUsageAndExit()
   cout << "                         Value Range: [0,1]" << endl;
 
   cout << endl;
+  cout << "    -is | --surface --> Specify an isosurface at value: val " << endl;
+
+  cout << endl;
   cout << "    -vp | --eye --> Specify the camera eye as: ex ey ez " << endl;
 
   cout << endl;
@@ -119,6 +122,8 @@ void parseCommandLine(int argc, const char *argv[])
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
       OSPRayFixture::tf_colors.push_back(color);
+    } else if (arg == "-is" || arg == "--surface") {
+      OSPRayFixture::isosurfaces.push_back(atof(argv[++i]));
     } else if (arg == "-bg" || arg == "--background") {
       ospray::vec3f &color = OSPRayFixture::bg_color;
       color.x = atof(argv[++i]);

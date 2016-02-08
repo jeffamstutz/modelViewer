@@ -40,6 +40,7 @@ struct OSPRayFixture : public hayai::Fixture
   static std::string imageOutputFile;
 
   static std::vector<ospray::vec3f> tf_colors;
+  static std::vector<float> isosurfaces;
 
   static int width;
   static int height;
