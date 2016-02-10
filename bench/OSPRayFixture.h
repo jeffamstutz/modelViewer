@@ -36,8 +36,9 @@ struct OSPRayFixture : public hayai::Fixture
   static ospray::vec3f up;
 
   static std::string renderer_type;
-  static std::string benchmarkModelFile;
   static std::string imageOutputFile;
+
+  static std::vector<std::string> benchmarkModelFiles;
 
   static std::vector<ospray::vec3f> tf_colors;
   static std::vector<float> isosurfaces;

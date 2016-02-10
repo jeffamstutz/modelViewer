@@ -130,7 +130,7 @@ void parseCommandLine(int argc, const char *argv[])
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
     } else {
-      OSPRayFixture::benchmarkModelFile = arg;
+      OSPRayFixture::benchmarkModelFiles.push_back(arg);
     }
   }
 }

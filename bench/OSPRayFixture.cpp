@@ -25,8 +25,9 @@ ospray::vec3f OSPRayFixture::at;
 ospray::vec3f OSPRayFixture::up;
 
 string OSPRayFixture::renderer_type;
-string OSPRayFixture::benchmarkModelFile;
 string OSPRayFixture::imageOutputFile;
+
+std::vector<string> OSPRayFixture::benchmarkModelFiles;
 
 int OSPRayFixture::width  = 1024;
 int OSPRayFixture::height = 1024;
@@ -274,26 +275,27 @@ static void importObjectsFromFile(const std::string &filename,
 
 static void loadModelFromFile(OSPRayFixture *f)
 {
-  embree::FileName fn = OSPRayFixture::benchmarkModelFile;
-  if (fn.ext() == "stl") {
-    ospray::miniSG::importSTL(f->sgModel,fn);
-  } else if (fn.ext() == "msg") {
-    ospray::miniSG::importMSG(f->sgModel,fn);
-  } else if (fn.ext() == "tri") {
-    ospray::miniSG::importTRI(f->sgModel,fn);
-  } else if (fn.ext() == "xml") {
-    ospray::miniSG::importRIVL(f->sgModel,fn);
-  } else if (fn.ext() == "obj") {
-    ospray::miniSG::importOBJ(f->sgModel,fn);
-  } else if (fn.ext() == "hbp") {
-    ospray::miniSG::importHBP(f->sgModel,fn);
-  } else if (fn.ext() == "x3d") {
-    ospray::miniSG::importX3D(f->sgModel,fn);
-  } else if (fn.ext() == "osp") {
-    importObjectsFromFile(fn, f);
-  } else {
-    throw std::runtime_error("could not open file: " +
-                             OSPRayFixture::benchmarkModelFile);
+  for (auto &file : f->benchmarkModelFiles) {
+    embree::FileName fn = file;
+    if (fn.ext() == "stl") {
+      ospray::miniSG::importSTL(f->sgModel,fn);
+    } else if (fn.ext() == "msg") {
+      ospray::miniSG::importMSG(f->sgModel,fn);
+    } else if (fn.ext() == "tri") {
+      ospray::miniSG::importTRI(f->sgModel,fn);
+    } else if (fn.ext() == "xml") {
+      ospray::miniSG::importRIVL(f->sgModel,fn);
+    } else if (fn.ext() == "obj") {
+      ospray::miniSG::importOBJ(f->sgModel,fn);
+    } else if (fn.ext() == "hbp") {
+      ospray::miniSG::importHBP(f->sgModel,fn);
+    } else if (fn.ext() == "x3d") {
+      ospray::miniSG::importX3D(f->sgModel,fn);
+    } else if (fn.ext() == "osp") {
+      importObjectsFromFile(fn, f);
+    } else {
+      throw std::runtime_error("could not open file: " + file);
+    }
   }
 }
 
