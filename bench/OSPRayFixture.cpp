@@ -1,6 +1,7 @@
 #include <iostream>
 using std::cerr;
 using std::endl;
+#include <limits>
 #include <random>
 #include <string>
 using std::string;
@@ -34,8 +35,14 @@ int OSPRayFixture::height = 1024;
 
 float OSPRayFixture::samplingRate = 0.125f;
 
+float OSPRayFixture::tf_scale = 1.f;
 std::vector<ospray::vec3f> OSPRayFixture::tf_colors;
 std::vector<float> OSPRayFixture::isosurfaces;
+
+ospray::vec2f OSPRayFixture::volume_data_range = {
+  std::numeric_limits<float>::infinity(),
+  std::numeric_limits<float>::infinity()
+};
 
 ospray::vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
 
@@ -232,7 +239,15 @@ static void importObjectsFromFile(const std::string &filename,
       // Add the loaded volume(s) to the model.
       model.addVolume(volume);
 
-      auto voxelRange = VolumeFile::voxelRangeOf[(OSPVolume)volume.handle()];
+      ospray::vec2f voxelRange;
+      if (f->volume_data_range.x != std::numeric_limits<float>::infinity() &&
+          f->volume_data_range.y != std::numeric_limits<float>::infinity()) {
+        voxelRange = {f->volume_data_range.x, f->volume_data_range.y};
+        std::cerr << "used voxel range: " << voxelRange.x << " "
+                  << voxelRange.y << std::endl;
+      } else {
+        voxelRange = VolumeFile::voxelRangeOf[(OSPVolume)volume.handle()];
+      }
 
       // Set the minimum and maximum values in the domain for both color and
       // opacity components of the transfer function.
@@ -379,8 +394,9 @@ static void addMeshToModel(OSPRayFixture *f)
     // add triangle material id array to mesh
     if (msgMesh->materialList.empty()) {
       // we have a single material for this mesh...
-      OSPMaterial singleMaterial = createMaterial((OSPRenderer)f->renderer.handle(),
-                                                  msgMesh->material.ptr);
+      OSPMaterial singleMaterial =
+          createMaterial((OSPRenderer)f->renderer.handle(),
+                         msgMesh->material.ptr);
       ospMesh.setMaterial(singleMaterial);
     } else {
       // we have an entire material list, assign that list
@@ -389,7 +405,8 @@ static void addMeshToModel(OSPRayFixture *f)
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
         materialList.push_back(
-              createMaterial((OSPRenderer)f->renderer.handle(), msgMesh->materialList[i].ptr)
+              createMaterial((OSPRenderer)f->renderer.handle(),
+                             msgMesh->materialList[i].ptr)
               );
 
         for (auto it = msgMesh->materialList[i]->params.begin();
@@ -474,7 +491,7 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
   const int N_OPACITIES = 64;//NOTE(jda) - This affects image quality and
                              //            performance!
   for (int i = 0; i < N_OPACITIES; ++i) {
-    opacityValues.push_back(float(i)/N_OPACITIES);
+    opacityValues.push_back(f->tf_scale/N_OPACITIES);
   }
   auto opacityValuesData = ospray::cpp::Data(opacityValues.size(),
                                              OSP_FLOAT,

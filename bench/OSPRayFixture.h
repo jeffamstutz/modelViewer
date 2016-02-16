@@ -40,8 +40,11 @@ struct OSPRayFixture : public hayai::Fixture
 
   static std::vector<std::string> benchmarkModelFiles;
 
+  static float tf_scale;
   static std::vector<ospray::vec3f> tf_colors;
   static std::vector<float> isosurfaces;
+
+  static ospray::vec2f volume_data_range;
 
   static int width;
   static int height;

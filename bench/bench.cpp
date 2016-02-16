@@ -26,6 +26,9 @@ void printUsageAndExit()
   cout << "Options:" << endl;
 
   cout << endl;
+  cout << "**generic rendering options**" << endl;
+
+  cout << endl;
   cout << "    -i | --image --> Specify the base filename to write the"
        << " framebuffer to a file." << endl;
   cout << "                     If ommitted, no file will be written." << endl;
@@ -49,19 +52,11 @@ void printUsageAndExit()
   cout << "                        default: ao1" << endl;
 
   cout << endl;
-  cout << "    -s | --sampling-rate --> Specify the sampling rate for volumes."
+  cout << "    -bg | --background --> Specify the background color: R G B "
        << endl;
-  cout << "                             default: 0.125" << endl;
 
   cout << endl;
-  cout << "    -tc | --tf-color --> Specify the next color to in the transfer"
-       << " function for volumes. Each entry will add to the total list of"
-       << " colors in the order they are specified." << endl;
-  cout << "                              Format: R G B" << endl;
-  cout << "                         Value Range: [0,1]" << endl;
-
-  cout << endl;
-  cout << "    -is | --surface --> Specify an isosurface at value: val " << endl;
+  cout << "**camera rendering options**" << endl;
 
   cout << endl;
   cout << "    -vp | --eye --> Specify the camera eye as: ex ey ez " << endl;
@@ -73,9 +68,34 @@ void printUsageAndExit()
   cout << endl;
   cout << "    -vu | --up --> Specify the camera up as: ux uy uz " << endl;
 
+
   cout << endl;
-  cout << "    -bg | --background --> Specify the background color: R G B "
+  cout << "**volume rendering options**" << endl;
+
+  cout << endl;
+  cout << "    -s | --sampling-rate --> Specify the sampling rate for volumes."
        << endl;
+  cout << "                             default: 0.125" << endl;
+
+  cout << endl;
+  cout << "    -dr | --data-range --> Specify the data range for volumes."
+       << " If not specified, then the min and max data" << endl
+       << " values will be used when reading the data into memory." << endl;
+  cout << "                           Format: low high" << endl;
+
+  cout << endl;
+  cout << "    -tc | --tf-color --> Specify the next color to in the transfer"
+       << " function for volumes. Each entry will add to the total list of"
+       << " colors in the order they are specified." << endl;
+  cout << "                              Format: R G B" << endl;
+  cout << "                         Value Range: [0,1]" << endl;
+
+  cout << "    -tcs | --tf-scale --> Specify the opacity the transfer function"
+       << " will scale to: [0,x] where x is the input value." << endl;
+  cout << "                          default: 1.0" << endl;
+
+  cout << endl;
+  cout << "    -is | --surface --> Specify an isosurface at value: val " << endl;
 
   exit(0);
 }
@@ -122,6 +142,11 @@ void parseCommandLine(int argc, const char *argv[])
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
       OSPRayFixture::tf_colors.push_back(color);
+    } else if (arg == "-tcs" || arg == "--tf-scale") {
+      OSPRayFixture::tf_scale = atof(argv[++i]);
+    } else if (arg == "-dr" || arg == "--data-range") {
+      OSPRayFixture::volume_data_range.x = atof(argv[++i]);
+      OSPRayFixture::volume_data_range.y = atof(argv[++i]);
     } else if (arg == "-is" || arg == "--surface") {
       OSPRayFixture::isosurfaces.push_back(atof(argv[++i]));
     } else if (arg == "-bg" || arg == "--background") {
