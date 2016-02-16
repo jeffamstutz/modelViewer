@@ -18,7 +18,6 @@ set(CMAKE_CXX_FLAGS "-Wall -fPIC --std=c++11 -no-ansi-alias -static-intel -openm
 set(CMAKE_CXX_FLAGS_DEBUG          "-DDEBUG  -g")
 set(CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG    -O3 -no-ansi-alias -restrict -fp-model fast -fimf-precision=low -no-prec-div -no-prec-sqrt -fma -no-inline-max-total-size -inline-factor=200 ")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -g -O3 -no-ansi-alias -restrict -fp-model fast -fimf-precision=low -no-prec-div -no-prec-sqrt  -fma  -no-inline-max-total-size -inline-factor=200")
-set(CMAKE_EXE_LINKER_FLAGS "")
 
 if (APPLE)
   set (CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} -dynamiclib)
