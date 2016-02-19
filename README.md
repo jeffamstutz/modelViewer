@@ -1,6 +1,5 @@
 # ospDebugViewer
-external version of the ospModelViewer from the ospray source tree
+External version of the ospModelViewer from the ospray source tree with added scripting and benchmark capabilities.
 
-This project requires the CMake find_package config found in the 'devel' branch of OSPRay. An install of the 'devel'
-branch of https://github.com/jeffamstutz/OSPRay will suffice until the CMake config changes make it into an offical
-future release of OSPRay.
+This project requires a valid install of OSPRay, which can be found at https://github.com/ospray/OSPRay.
+
