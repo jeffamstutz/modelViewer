@@ -137,7 +137,7 @@ void parseCommandLine(int argc, const char *argv[])
     } else if (arg == "-s" || arg == "--sampling-rate") {
       OSPRayFixture::samplingRate = atof(argv[++i]);
     } else if (arg == "-tc" || arg == "--tf-color") {
-      ospray::vec3f color;
+      ospcommon::vec3f color;
       color.x = atof(argv[++i]);
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
@@ -150,7 +150,7 @@ void parseCommandLine(int argc, const char *argv[])
     } else if (arg == "-is" || arg == "--surface") {
       OSPRayFixture::isosurfaces.push_back(atof(argv[++i]));
     } else if (arg == "-bg" || arg == "--background") {
-      ospray::vec3f &color = OSPRayFixture::bg_color;
+      ospcommon::vec3f &color = OSPRayFixture::bg_color;
       color.x = atof(argv[++i]);
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);

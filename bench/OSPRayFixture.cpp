@@ -14,16 +14,12 @@ using std::string;
 
 #include "OSPRayFixture.h"
 
-using ospray::box3f;
-using ospray::vec2i;
-using ospray::vec3f;
-
-using ospray::uint32;
+using namespace ospcommon;
 
 bool OSPRayFixture::customView = false;
-ospray::vec3f OSPRayFixture::pos;
-ospray::vec3f OSPRayFixture::at;
-ospray::vec3f OSPRayFixture::up;
+vec3f OSPRayFixture::pos;
+vec3f OSPRayFixture::at;
+vec3f OSPRayFixture::up;
 
 string OSPRayFixture::renderer_type;
 string OSPRayFixture::imageOutputFile;
@@ -36,19 +32,19 @@ int OSPRayFixture::height = 1024;
 float OSPRayFixture::samplingRate = 0.125f;
 
 float OSPRayFixture::tf_scale = 1.f;
-std::vector<ospray::vec3f> OSPRayFixture::tf_colors;
+std::vector<vec3f> OSPRayFixture::tf_colors;
 std::vector<float> OSPRayFixture::isosurfaces;
 
-ospray::vec2f OSPRayFixture::volume_data_range = {
+vec2f OSPRayFixture::volume_data_range = {
   std::numeric_limits<float>::infinity(),
   std::numeric_limits<float>::infinity()
 };
 
-ospray::vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
+vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
 
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
-                     const uint32 *pixel)
+                     const uint32_t *pixel)
 {
   FILE *file = fopen(fileName.c_str(), "wb");
   fprintf(file, "P6\n%i %i\n255\n", sizeX, sizeY);
@@ -84,20 +80,23 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
   if (alreadyCreatedTextures.find(msgTex) != alreadyCreatedTextures.end())
     return alreadyCreatedTextures[msgTex];
 
-  //TODO: We need to come up with a better way to handle different possible
-  //      pixel layouts
-  OSPDataType type = OSP_VOID_PTR;
+  //TODO: We need to come up with a better way to handle different possible pixel layouts
+  OSPTextureFormat type = OSP_TEXTURE_R8;
 
   if (msgTex->depth == 1) {
-    if( msgTex->channels == 3 ) type = OSP_UCHAR3;
-    if( msgTex->channels == 4 ) type = OSP_UCHAR4;
+    if( msgTex->channels == 1 ) type = OSP_TEXTURE_R8;
+    if( msgTex->channels == 3 )
+      type = msgTex->prefereLinear ? OSP_TEXTURE_RGB8 : OSP_TEXTURE_SRGB;
+    if( msgTex->channels == 4 )
+      type = msgTex->prefereLinear ? OSP_TEXTURE_RGBA8 : OSP_TEXTURE_SRGBA;
   } else if (msgTex->depth == 4) {
-    if( msgTex->channels == 3 ) type = OSP_FLOAT3;
-    if( msgTex->channels == 4 ) type = OSP_FLOAT3A;
+    if( msgTex->channels == 1 ) type = OSP_TEXTURE_R32F;
+    if( msgTex->channels == 3 ) type = OSP_TEXTURE_RGB32F;
+    if( msgTex->channels == 4 ) type = OSP_TEXTURE_RGBA32F;
   }
 
-  OSPTexture2D ospTex = ospNewTexture2D(msgTex->width,
-                                        msgTex->height,
+  vec2i texSize(msgTex->width, msgTex->height);
+  OSPTexture2D ospTex = ospNewTexture2D((osp::vec2i&)texSize,
                                         type,
                                         msgTex->data);
 
@@ -239,7 +238,7 @@ static void importObjectsFromFile(const std::string &filename,
       // Add the loaded volume(s) to the model.
       model.addVolume(volume);
 
-      ospray::vec2f voxelRange;
+      vec2f voxelRange;
       if (f->volume_data_range.x != std::numeric_limits<float>::infinity() &&
           f->volume_data_range.y != std::numeric_limits<float>::infinity()) {
         voxelRange = {f->volume_data_range.x, f->volume_data_range.y};
@@ -258,7 +257,7 @@ static void importObjectsFromFile(const std::string &filename,
       // Get the volume's bounding box for a decent default view
       // NOTE(jda) - This uses depricated API functions...need to calculate
       //             within the loaders.
-      ospray::box3f boundingBox;
+      box3f boundingBox;
       ospGetVec3f(volume.handle(),
                   "boundingBoxMin",
                   (osp::vec3f*)&boundingBox.lower);
@@ -291,7 +290,7 @@ static void importObjectsFromFile(const std::string &filename,
 static void loadModelFromFile(OSPRayFixture *f)
 {
   for (auto &file : f->benchmarkModelFiles) {
-    embree::FileName fn = file;
+    FileName fn = file;
     if (fn.ext() == "stl") {
       ospray::miniSG::importSTL(f->sgModel,fn);
     } else if (fn.ext() == "msg") {
@@ -317,7 +316,7 @@ static void loadModelFromFile(OSPRayFixture *f)
 static void addMeshToModel(OSPRayFixture *f)
 {
   for (size_t i = 0; i < f->sgModel.mesh.size(); i++) {
-    ospray::Ref<ospray::miniSG::Mesh> msgMesh = f->sgModel.mesh[i];
+    Ref<ospray::miniSG::Mesh> msgMesh = f->sgModel.mesh[i];
 
     if (msgMesh->triangle.empty()) {
       continue;
@@ -448,7 +447,7 @@ static void addMeshToModel(OSPRayFixture *f)
 static void createOSPCamera(OSPRayFixture *f)
 {
   const box3f worldBounds(f->sgModel.getBBox());
-  vec3f center = embree::center(worldBounds);
+  vec3f center = worldBounds.center();
   vec3f diag   = worldBounds.size();
   diag         = max(diag, vec3f(0.3f*length(diag)));
 
@@ -475,10 +474,10 @@ static void createOSPCamera(OSPRayFixture *f)
 static void createDefaultTransferFunction(OSPRayFixture *f)
 {
   // Add colors
-  std::vector<ospray::vec3f> colors;
+  std::vector<vec3f> colors;
   if (f->tf_colors.empty()) {
-    colors.push_back(ospray::vec3f(0.f));
-    colors.push_back(ospray::vec3f(0.9f));
+    colors.push_back(vec3f(0.f));
+    colors.push_back(vec3f(0.9f));
   } else {
     colors = f->tf_colors;
   }
@@ -548,7 +547,7 @@ void OSPRayFixture::SetUp()
 void OSPRayFixture::TearDown()
 {
   if (!imageOutputFile.empty()) {
-    auto *lfb = (uint32*)fb.map(OSP_FB_COLOR);
+    auto *lfb = (uint32_t*)fb.map(OSP_FB_COLOR);
     writePPM(imageOutputFile + ".ppm", width, height, lfb);
     fb.unmap(lfb);
   }

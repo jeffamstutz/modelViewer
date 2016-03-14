@@ -14,9 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include <map>
-#include "ospray/common/Library.h"
 #include "VolumeFile.h"
+#include <map>
 
 OSPVolume VolumeFile::importVolume(const std::string &filename, OSPVolume volume)
 {
@@ -40,7 +39,7 @@ OSPVolume VolumeFile::importVolume(const std::string &filename, OSPVolume volume
   std::string creationFunctionName = "ospray_import_volume_file_" + std::string(type);
 
   // Look for the named function.
-  symbolRegistry[type] = (creationFunctionPointer) ospray::getSymbol(creationFunctionName);
+  symbolRegistry[type] = (creationFunctionPointer) ospcommon::getSymbol(creationFunctionName);
 
   // The named function may not be found of the requested subtype is not known.
   if (!symbolRegistry[type]) std::cerr << "  ospray_module_loaders::VolumeFile  WARNING: unrecognized file type '" + type + "'." << std::endl;
@@ -49,49 +48,5 @@ OSPVolume VolumeFile::importVolume(const std::string &filename, OSPVolume volume
   return(symbolRegistry[type] ? (*symbolRegistry[type])(fullfilename, volume) : NULL);
 }
 
-std::string VolumeFile::toString() const
-{
-  return("ospray_module_loaders::VolumeFile");
-}
+std::map<OSPVolume, ospcommon::vec2f> VolumeFile::voxelRangeOf;
 
-void VolumeFile::emitMessage(const std::string &kind,
-                             const std::string &message) const
-{
-  std::cerr << "  " + toString() + "  " + kind + ": " + message + "."
-            << std::endl;
-}
-
-void VolumeFile::exitOnCondition(bool condition,
-                                 const std::string &message) const
-{
-  if (!condition) return;
-  emitMessage("ERROR", message);
-  exit(1);
-}
-
-void VolumeFile::warnOnCondition(bool condition,
-                                 const std::string &message) const
-{
-  if (!condition) return;
-  emitMessage("WARNING", message);
-}
-
-std::string VolumeFile::getFullFilePath(const std::string &filename)
-{
-#ifdef _WIN32
-  //getfullpathname
-  throw std::runtime_error("no realpath() under windows");
-#else
-  char *fullpath = realpath(filename.c_str(), NULL);
-  return(fullpath != NULL ? fullpath : filename);
-#endif
-}
-
-std::map<OSPVolume, ospray::vec2f> VolumeFile::voxelRangeOf;
-
-VolumeFile::VolumeFile(const std::string &fileName) :
-  fileName(fileName)
-{
-}
-
-VolumeFile::~VolumeFile() {}

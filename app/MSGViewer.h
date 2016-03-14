@@ -53,9 +53,9 @@ public:
 
 private:
 
-  void reshape(const ospray::vec2i &newSize) override;
-  void keypress(char key, const vec2f where) override;
-  void mouseButton(int32 whichButton, bool released, const vec2i &pos) override;
+  void reshape(const ospcommon::vec2i &newSize) override;
+  void keypress(char key, const ospcommon::vec2i &where) override;
+  void mouseButton(int32_t whichButton, bool released, const ospcommon::vec2i &pos) override;
 
   void display() override;
 
@@ -75,7 +75,7 @@ private:
 
   ViewerConfig m_config;
 
-  vec2i m_windowSize;
+  ospcommon::vec2i m_windowSize;
   int m_accumID;
   bool m_fullScreen;
   glut3D::Glut3DWidget::ViewPort m_viewPort;

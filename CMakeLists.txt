@@ -73,21 +73,22 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 find_package(ospray REQUIRED)
 
-SET(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-FIND_PACKAGE(Threads REQUIRED)
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+find_package(Threads REQUIRED)
 
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${OSPRAY_INCLUDE_DIRS}
   common
+  common/ospcommon
   common/script/chaiscript
 )
 
 # RPath settings
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_SKIP_BUILD_RPATH  FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 ##############################################################
 # Build apps
@@ -97,10 +98,13 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 add_subdirectory(common)
 
 # debug app
-add_subdirectory(app)
+option(BUILD_VIEWER "Enable/Disable building of viewer app" ON)
+if(BUILD_VIEWER)
+  add_subdirectory(app)
+endif()
 
 # benchmarks
-option(BUILD_BENCHMARKS "Enable/Disable building of benchmark apps" ON)
+option(BUILD_BENCHMARKS "Enable/Disable building of benchmark app" ON)
 if(BUILD_BENCHMARKS)
   add_subdirectory(bench)
 endif()

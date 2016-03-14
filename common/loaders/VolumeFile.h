@@ -16,12 +16,17 @@
 
 #pragma once
 
+// ospcommon
+#include "common/common.h"
+#include "common/vec.h"
+// ospray public
+#include "ospray/ospray.h"
+// std
 #include <stdlib.h>
 #include <string>
-#include "ospray/ospray.h"
-#include "ospray/common/OSPCommon.h"
 //stl
 #include <map>
+#include <vector>
 
 //! \brief Define a function to create an instance of the InternalClass
 //!  associated with ExternalName.
@@ -38,7 +43,7 @@
 
 /*! helper function to help build voxel ranges during parsing */
 template<typename T>
-inline void extendVoxelRange(ospray::vec2f &voxelRange, const T *voxel, size_t num)
+inline void extendVoxelRange(ospcommon::vec2f &voxelRange, const T *voxel, size_t num)
 {
   for (size_t i=0;i<num;i++) {
     voxelRange.x = std::min(voxelRange.x,(float)voxel[i]);
@@ -57,41 +62,48 @@ inline void extendVoxelRange(ospray::vec2f &voxelRange, const T *voxel, size_t n
 //!  This subclass must be registered in OSPRay proper, or in a loaded
 //!  module via OSP_REGISTER_VOLUME_FILE.
 //!
-class VolumeFile
-{
+class VolumeFile {
 public:
 
-  VolumeFile(const std::string &fileName);
+//! Constructor.
+  VolumeFile() {};
 
-  virtual ~VolumeFile();
+  //! Destructor.
+  virtual ~VolumeFile() {};
 
-  //! Create a VolumeFile object of the subtype given by the file extension and
-  //! import the volume.
+  //! Create a VolumeFile object of the subtype given by the file extension and import the volume.
   static OSPVolume importVolume(const std::string &filename, OSPVolume volume);
 
   //! Import the volume specification and voxel data.
   virtual OSPVolume importVolume(OSPVolume volume) = 0;
 
   //! A string description of this class.
-  virtual std::string toString() const;
+  virtual std::string toString() const { return("ospray_module_loaders::VolumeFile"); }
 
-  static std::map<OSPVolume, ospray::vec2f> voxelRangeOf;
+  static std::map<OSPVolume, ospcommon::vec2f> voxelRangeOf;
 
   //! Print an error message.
-  void emitMessage(const std::string &kind, const std::string &message) const;
+  void emitMessage(const std::string &kind, const std::string &message) const
+  { std::cerr << "  " + toString() + "  " + kind + ": " + message + "." << std::endl; }
 
   //! Error checking.
-  void exitOnCondition(bool condition, const std::string &message) const;
+  void exitOnCondition(bool condition, const std::string &message) const
+  { if (!condition) return;  emitMessage("ERROR", message);  exit(1); }
 
   //! Warning condition.
-  void warnOnCondition(bool condition, const std::string &message) const;
+  void warnOnCondition(bool condition, const std::string &message) const
+  { if (!condition) return;  emitMessage("WARNING", message); }
 
   //! Get the absolute file path.
-  static std::string getFullFilePath(const std::string &filename);
+  static std::string getFullFilePath(const std::string &filename)
+  {
+#ifdef _WIN32
+    //getfullpathname
+    throw std::runtime_error("no realpath() under windows");
+#else
+    char *fullpath = realpath(filename.c_str(), NULL);  return(fullpath != NULL ? fullpath : filename); 
+#endif
+  }
 
-protected:
-
-  //! Path to the file containing the volume data.
-  std::string fileName;
 };
 

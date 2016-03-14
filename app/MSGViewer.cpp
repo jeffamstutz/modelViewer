@@ -8,13 +8,13 @@ using std::string;
 using std::lock_guard;
 using std::mutex;
 
-using ospray::uint32;
+using namespace ospcommon;
 
 // Static local helper functions //////////////////////////////////////////////
 
 // helper function to write the rendered image as PPM file
 static void writePPM(const string &fileName, const int sizeX, const int sizeY,
-                     const uint32 *pixel)
+                     const uint32_t *pixel)
 {
   FILE *file = fopen(fileName.c_str(), "wb");
   fprintf(file, "P6\n%i %i\n255\n", sizeX, sizeY);
@@ -114,7 +114,7 @@ void MSGViewer::printViewport()
 
 void MSGViewer::saveScreenshot(const std::string &basename)
 {
-  const uint32 *p = (uint32*)m_fb.map(OSP_FB_COLOR);
+  const uint32_t *p = (uint32_t*)m_fb.map(OSP_FB_COLOR);
   writePPM(basename + ".ppm", m_windowSize.x, m_windowSize.y, p);
   cout << "#ospDebugViewer: saved current frame to '" << basename << ".ppm'"
        << endl;
@@ -136,7 +136,7 @@ void MSGViewer::reshape(const vec2i &newSize)
   forceRedraw();
 }
 
-void MSGViewer::keypress(char key, const vec2f where)
+void MSGViewer::keypress(char key, const vec2i &where)
 {
   switch (key) {
   case ':':
@@ -201,7 +201,7 @@ void MSGViewer::keypress(char key, const vec2f where)
   }
 }
 
-void MSGViewer::mouseButton(int32 whichButton, bool released, const vec2i &pos)
+void MSGViewer::mouseButton(int32_t whichButton, bool released, const vec2i &pos)
 {
   Glut3DWidget::mouseButton(whichButton, released, pos);
   if((currButtonState ==  (1<<GLUT_LEFT_BUTTON)) &&
@@ -213,7 +213,7 @@ void MSGViewer::mouseButton(int32 whichButton, bool released, const vec2i &pos)
     ospPick(&pick, (OSPRenderer)m_renderer.handle(),
             reinterpret_cast<osp::vec2f&>(normpos));
     if(pick.hit) {
-      viewPort.at = reinterpret_cast<ospray::vec3f&>(pick.position);
+      viewPort.at = reinterpret_cast<ospcommon::vec3f&>(pick.position);
       viewPort.modified = true;
       computeFrame();
       forceRedraw();
@@ -272,7 +272,7 @@ void MSGViewer::display()
 
   // set the glut3d widget's frame buffer to the opsray frame buffer,
   // then display
-  ucharFB = (uint32 *)m_fb.map(OSP_FB_COLOR);
+  ucharFB = (uint32_t *)m_fb.map(OSP_FB_COLOR);
   frameBufferMode = Glut3DWidget::FRAMEBUFFER_UCHAR;
   Glut3DWidget::display();
 

@@ -15,7 +15,7 @@
 // ======================================================================== //
 
 #include <map>
-#include "ospray/common/Library.h"
+#include "common/common.h"
 #include "ObjectFile.h"
 
 OSPObject *ObjectFile::importObjects(const std::string &filename)
@@ -40,51 +40,11 @@ OSPObject *ObjectFile::importObjects(const std::string &filename)
   std::string creationFunctionName = "ospray_import_object_file_" + std::string(type);
 
   // Look for the named function.
-  symbolRegistry[type] = (creationFunctionPointer) ospray::getSymbol(creationFunctionName);
+  symbolRegistry[type] = (creationFunctionPointer) ospcommon::getSymbol(creationFunctionName);
 
   // The named function may not be found if the requested subtype is not known.
   if (!symbolRegistry[type]) std::cerr << "  ospray_module_loaders::ObjectFile  WARNING: unrecognized file type '" + type + "'." << std::endl;
 
   // Return a list of objects loaded from the file.
   return symbolRegistry[type] ? (*symbolRegistry[type])(fullfilename) : NULL;
-}
-
-std::string ObjectFile::toString() const
-{
-  return("ospray_module_loaders::ObjectFile");
-}
-
-ObjectFile::~ObjectFile() {}
-
-void ObjectFile::emitMessage(const std::string &kind,
-                             const std::string &message) const
-{
-  std::cerr << "  " + toString() + "  " + kind + ": " + message + "."
-            << std::endl;
-}
-
-void ObjectFile::exitOnCondition(bool condition,
-                                 const std::string &message) const
-{
-  if (!condition) return;
-  emitMessage("ERROR", message);
-  exit(1);
-}
-
-void ObjectFile::warnOnCondition(bool condition,
-                                 const std::string &message) const
-{
-  if (!condition) return;
-  emitMessage("WARNING", message);
-}
-
-std::string ObjectFile::getFullFilePath(const std::string &filename)
-{
-#ifdef _WIN32
-  //getfullpathname
-  throw std::runtime_error("no realpath() under windows");
-#else
-  char *fullpath = realpath(filename.c_str(), NULL);
-  return(fullpath != NULL ? fullpath : filename);
-#endif
 }

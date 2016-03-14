@@ -16,25 +16,31 @@
 
 #pragma once
 
-#include "ospray/common/OSPCommon.h"
+// ospcommon
+#include "common/vec.h"
+// std
 #include <string>
+#include <vector>
+// own
 #include "TriangleMeshFile.h"
 
 //! \brief A concrete implementation of the TriangleMeshFile class
 //!  for reading triangle data stored in the PLY file format on disk.
 //!
-class PLYTriangleMeshFile : public TriangleMeshFile
-{
+class PLYTriangleMeshFile : public TriangleMeshFile {
 public:
 
   //! Constructor.
   PLYTriangleMeshFile(const std::string &filename);
 
+  //! Destructor.
+  virtual ~PLYTriangleMeshFile() {}
+
   //! Import the triangle data.
-  OSPGeometry importTriangleMesh(OSPGeometry triangleMesh) override;
+  virtual OSPGeometry importTriangleMesh(OSPGeometry triangleMesh);
 
   //! A string description of this class.
-  std::string toString() const override;
+  virtual std::string toString() const;
 
 private:
 
@@ -42,22 +48,22 @@ private:
   std::string filename;
 
   //! Scaling for vertex coordinates.
-  ospray::vec3f scale;
+  ospcommon::vec3f scale;
 
   //! Verbose logging.
   bool verbose;
 
   //! Vertices.
-  std::vector<ospray::vec3fa> vertices;
+  std::vector<ospcommon::vec3fa> vertices;
 
   //! Vertex colors.
-  std::vector<ospray::vec4f> vertexColors;
+  std::vector<ospcommon::vec4f> vertexColors;
 
   //! Vertex normals.
-  std::vector<ospray::vec3fa> vertexNormals;
+  std::vector<ospcommon::vec3fa> vertexNormals;
 
   //! Triangle definitions.
-  std::vector<ospray::vec3i>  triangles;
+  std::vector<ospcommon::vec3i>  triangles;
 
   //! Parse the file, determining the vertices, vertex colors, and triangles.
   bool parse();

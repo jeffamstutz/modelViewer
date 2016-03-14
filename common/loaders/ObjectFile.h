@@ -42,36 +42,48 @@
 //!  must be registered in OSPRay proper, or in a loaded module via
 //!  OSP_REGISTER_OBJECT_FILE.
 //!
-class ObjectFile
-{
+class ObjectFile {
 public:
 
-  //! Destructor.
-  virtual ~ObjectFile();
+  //! Constructor.
+  ObjectFile() {};
 
-  //! Create an ObjectFile object of the subtype given by the file extension
-  //! and import the objects.
+  //! Destructor.
+  virtual ~ObjectFile() {};
+
+  //! Create an ObjectFile object of the subtype given by the file extension and import the objects.
   static OSPObject *importObjects(const std::string &filename);
 
   //! Import the object data.
   virtual OSPObject *importObjects() = 0;
 
   //! A string description of this class.
-  virtual std::string toString() const;
+  virtual std::string toString() const { return("ospray_module_loaders::ObjectFile"); }
 
 protected:
 
   //! Print an error message.
-  void emitMessage(const std::string &kind, const std::string &message) const;
+  void emitMessage(const std::string &kind, const std::string &message) const
+    { std::cerr << "  " + toString() + "  " + kind + ": " + message + "." << std::endl; }
 
   //! Error checking.
-  void exitOnCondition(bool condition, const std::string &message) const;
+  void exitOnCondition(bool condition, const std::string &message) const
+    { if (!condition) return;  emitMessage("ERROR", message);  exit(1); }
 
   //! Warning condition.
-  void warnOnCondition(bool condition, const std::string &message) const;
+  void warnOnCondition(bool condition, const std::string &message) const
+    { if (!condition) return;  emitMessage("WARNING", message); }
 
   //! Get the absolute file path.
-  static std::string getFullFilePath(const std::string &filename);
+  static std::string getFullFilePath(const std::string &filename)
+  { 
+#ifdef _WIN32
+    //getfullpathname
+    throw std::runtime_error("no realpath() under windows");
+#else
+    char *fullpath = realpath(filename.c_str(), NULL);  return(fullpath != NULL ? fullpath : filename); 
+#endif
+  }
 
 };
 

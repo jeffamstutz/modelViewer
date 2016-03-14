@@ -17,10 +17,13 @@
 #include "miniSG.h"
 
 #ifdef USE_IMAGEMAGICK
-#define MAGICKCORE_QUANTUM_DEPTH 16
-#define MAGICKCORE_HDRI_ENABLE 0
+//#define MAGICKCORE_QUANTUM_DEPTH 16
+//#define MAGICKCORE_HDRI_ENABLE 1
 # include <Magick++.h>
 using namespace Magick;
+#  ifndef MaxRGB
+#    define MaxRGB QuantumRange
+#  endif
 #endif
 
 namespace ospray {
@@ -41,9 +44,9 @@ namespace ospray {
       // setParam( "Ka", vec3f(0.f) );
     }
 
-    Texture2D *loadTexture(const std::string &path, const std::string &fileNameBase)
+    Texture2D *loadTexture(const std::string &path, const std::string &fileNameBase, const bool prefereLinear)
     {
-      const embree::FileName fileName = path+"/"+fileNameBase;
+      const FileName fileName = path+"/"+fileNameBase;
 
       static std::map<std::string,Texture2D*> textureCache;
       if (textureCache.find(fileName.str()) != textureCache.end()) 
@@ -108,39 +111,44 @@ namespace ospray {
           tex->height   = height;
           tex->channels = 3;
           tex->depth    = 1;
+          tex->prefereLinear = prefereLinear;
           tex->data     = new unsigned char[width*height*3];
           fread(tex->data,width*height*3,1,file);
-          char *texels = (char *)tex->data;
+          // flip in y, because OSPRay's textures have the origin at the lower left corner
+          unsigned char *texels = (unsigned char *)tex->data;
+          for (size_t y=0; y < height/2; y++)
+            for (size_t x=0; x < width*3; x++)
+              std::swap(texels[y*width*3+x], texels[(height-1-y)*width*3+x]);
         } catch(std::runtime_error e) {
           std::cerr << e.what() << std::endl;
         }
       } else {
 #ifdef USE_IMAGEMAGICK
         Magick::Image image(fileName.str().c_str());
-        // Image* out = new Image4c(image.columns(),image.rows(),fileName);
         tex = new Texture2D;
         tex->width    = image.columns();
         tex->height   = image.rows();
-        tex->channels = 4;
+        tex->channels = image.matte() ? 4 : 3;
         tex->depth    = 4;
+        tex->prefereLinear = prefereLinear;
         float rcpMaxRGB = 1.0f/float(MaxRGB);
-        Magick::Pixels pixel_cache(image);
-        Magick::PixelPacket* pixels = pixel_cache.get(0,0,tex->width,tex->height);
+        const Magick::PixelPacket* pixels = image.getConstPixels(0,0,tex->width,tex->height);
         if (!pixels) {
           std::cerr << "#osp:minisg: failed to load texture '"+fileName.str()+"'" << std::endl;
           delete tex; 
           tex = NULL;
         } else {
-          tex->data = new vec4f[tex->width*tex->height];
+          tex->data = new float[tex->width*tex->height*tex->channels];
+          // convert pixels and flip image (because OSPRay's textures have the origin at the lower left corner)
           for (size_t y=0; y<tex->height; y++) {
             for (size_t x=0; x<tex->width; x++) {
-              vec4f c;
-              c.x = float(pixels[y*tex->width+x].red    )*rcpMaxRGB;
-              c.y = float(pixels[y*tex->width+x].green  )*rcpMaxRGB;
-              c.z = float(pixels[y*tex->width+x].blue   )*rcpMaxRGB;
-              c.w = float(pixels[y*tex->width+x].opacity)*rcpMaxRGB;
-              ((vec4f*)tex->data)[x+y*tex->width] = c;
-              //tex->set(x,y,c);
+              const Magick::PixelPacket &pixel = pixels[y*tex->width+x];
+              float *dst = &((float*)tex->data)[(x+(tex->height-1-y)*tex->width)*tex->channels];
+              *dst++ = pixel.red * rcpMaxRGB;
+              *dst++ = pixel.green * rcpMaxRGB;
+              *dst++ = pixel.blue * rcpMaxRGB;
+              if (tex->channels == 4)
+                *dst++ = pixel.opacity * rcpMaxRGB;
             }
           }
         }
@@ -195,7 +203,7 @@ namespace ospray {
       return defaultVal;
     }
 
-    int32 Material::getParam(const char *name, int32 defaultVal) 
+    int32_t Material::getParam(const char *name, int32_t defaultVal) 
     {
       ParamMap::iterator it = params.find(name);
       if (it != params.end()) {
@@ -240,7 +248,7 @@ namespace ospray {
     }
 
 
-    uint32 Material::getParam(const char *name, uint32 defaultVal) 
+    uint32_t Material::getParam(const char *name, uint32_t defaultVal) 
     {
       ParamMap::iterator it = params.find(name);
       if (it != params.end()) {
@@ -332,7 +340,7 @@ namespace ospray {
     box3f Model::getBBox() 
     {
       // this does not yet properly support instancing with transforms!
-      box3f bBox = embree::empty;
+      box3f bBox = ospcommon::empty;
       if (!instance.empty()) {
         std::vector<box3f> meshBounds;
         for (int i=0;i<mesh.size();i++)

@@ -8,6 +8,8 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+using namespace ospcommon;
+
 // Static local helper functions //////////////////////////////////////////////
 
 static void error(const std::string &msg)
@@ -49,20 +51,23 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
   if (alreadyCreatedTextures.find(msgTex) != alreadyCreatedTextures.end())
     return alreadyCreatedTextures[msgTex];
 
-  //TODO: We need to come up with a better way to handle different possible
-  //      pixel layouts
-  OSPDataType type = OSP_VOID_PTR;
+  //TODO: We need to come up with a better way to handle different possible pixel layouts
+  OSPTextureFormat type = OSP_TEXTURE_R8;
 
   if (msgTex->depth == 1) {
-    if( msgTex->channels == 3 ) type = OSP_UCHAR3;
-    if( msgTex->channels == 4 ) type = OSP_UCHAR4;
+    if( msgTex->channels == 1 ) type = OSP_TEXTURE_R8;
+    if( msgTex->channels == 3 )
+      type = msgTex->prefereLinear ? OSP_TEXTURE_RGB8 : OSP_TEXTURE_SRGB;
+    if( msgTex->channels == 4 )
+      type = msgTex->prefereLinear ? OSP_TEXTURE_RGBA8 : OSP_TEXTURE_SRGBA;
   } else if (msgTex->depth == 4) {
-    if( msgTex->channels == 3 ) type = OSP_FLOAT3;
-    if( msgTex->channels == 4 ) type = OSP_FLOAT3A;
+    if( msgTex->channels == 1 ) type = OSP_TEXTURE_R32F;
+    if( msgTex->channels == 3 ) type = OSP_TEXTURE_RGB32F;
+    if( msgTex->channels == 4 ) type = OSP_TEXTURE_RGBA32F;
   }
 
-  OSPTexture2D ospTex = ospNewTexture2D(msgTex->width,
-                                        msgTex->height,
+  vec2i texSize(msgTex->width, msgTex->height);
+  OSPTexture2D ospTex = ospNewTexture2D((osp::vec2i&)texSize,
                                         type,
                                         msgTex->data);
 
@@ -83,7 +88,7 @@ CommandLineSceneBuilder::CommandLineSceneBuilder(int ac, const char **&av) :
   m_alpha(false),
   m_createDefaultMaterial(true),
   m_spp(1),
-  m_maxObjectsToConsider((uint32)-1),
+  m_maxObjectsToConsider((uint32_t)-1),
   m_forceInstancing(false),
   m_rendererType("ao1"),
   m_cameraType("perspective")
@@ -179,7 +184,7 @@ void CommandLineSceneBuilder::parseCommandLine(int ac, const char **&av)
     } else if (av[i][0] == '-') {
       error("unknown commandline argument '" + arg + "'");
     } else {
-      embree::FileName fn = arg;
+      FileName fn = arg;
       if (fn.ext() == "stl") {
         miniSG::importSTL(*m_msgModel,fn);
       } else if (fn.ext() == "msg") {

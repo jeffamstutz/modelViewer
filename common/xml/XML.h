@@ -16,10 +16,15 @@
 
 #pragma once
 
-// ospray
-#include "ospray/common/OSPCommon.h"
-// embree
-#include "common/sys/filename.h"
+// // ospray
+// #include "ospray/common/OSPCommon.h"
+// // embree
+// #include "common/sys/filename.h"
+
+// ospcomon
+#include "common/common.h"
+#include "common/vec.h"
+#include "common/FileName.h"
 // stl
 #include <stack>
 #include <vector>
@@ -37,8 +42,8 @@
 namespace ospray {
   namespace xml {
 
-    using embree::FileName;
-
+    struct Node;
+    using ospcommon::FileName;
     struct XMLDoc;
 
     /*! 'prop'erties in xml nodes are the 'name="value"' inside the
@@ -47,6 +52,7 @@ namespace ospray {
       std::string name;
       std::string value;
     };
+
     /*! a XML node, consisting of a name, a list of properties, and a
       set of child nodes */
     struct Node {
@@ -111,9 +117,9 @@ namespace ospray {
       
     /*! @{ */
     //! \brief helper function(s) to convert data tyeps into strings 
-    std::string toString(const int64 value);
+    std::string toString(const int64_t value);
     std::string toString(const float value);
-    std::string toString(const ospray::vec3f &value);
+    std::string toString(const ospcommon::vec3f &value);
     /*! @} */
     
     /*! helper class for writing sg nodes in XML format */

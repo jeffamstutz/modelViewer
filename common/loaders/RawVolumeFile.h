@@ -16,25 +16,34 @@
 
 #pragma once
 
-#include "ospray/common/OSPCommon.h"
-#include <string>
+// own
 #include "VolumeFile.h"
+// std
+#include <string>
 
 //! \brief A concrete implementation of the VolumeFile class for reading
 //!  voxel data stored in a file on disk as a single monolithic brick,
 //!  where the volume specification is defined elsewhere.
 //!
-class RawVolumeFile : public VolumeFile
-{
+class RawVolumeFile : public VolumeFile {
 public:
 
   //! Constructor.
-  RawVolumeFile(const std::string &fileName);
+  RawVolumeFile(const std::string &filename) : filename(filename) {}
+
+  //! Destructor.
+  virtual ~RawVolumeFile() {};
 
   //! Import the volume data.
-  OSPVolume importVolume(OSPVolume volume) override;
+  virtual OSPVolume importVolume(OSPVolume volume);
 
   //! A string description of this class.
-  std::string toString() const override;
+  virtual std::string toString() const { return("ospray_module_loaders::RawVolumeFile"); }
+
+private:
+
+  //! Path to the file containing the volume data.
+  std::string filename;
+
 };
 

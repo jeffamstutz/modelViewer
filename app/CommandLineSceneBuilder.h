@@ -65,12 +65,12 @@ private:
 
   // Previously global data //
 
-  Ref<miniSG::Model> m_msgModel;
+  ospcommon::Ref<miniSG::Model> m_msgModel;
   std::vector<miniSG::Model *> m_msgAnimation;
 
   /*! when using the OBJ renderer, we create a automatic dirlight with this
    * direction; use ''--sun-dir x y z' to change */
-  vec3f m_defaultDirLight_direction;
+  ospcommon::vec3f m_defaultDirLight_direction;
 
   bool m_fullScreen;
 

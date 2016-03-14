@@ -30,17 +30,20 @@
 //!  committed, to allow an application to set additional parameters
 //!  through the returned ObjectCatalog type.
 //!
-class OSPObjectFile : public ObjectFile
-{
+class OSPObjectFile : public ObjectFile {
 public:
 
-  OSPObjectFile(const std::string &filename);
+  //! Constructor.
+  OSPObjectFile(const std::string &filename) : filename(filename) {}
+
+  //! Destructor.
+  virtual ~OSPObjectFile() {};
 
   //! Import a collection of objects.
-  OSPObject *importObjects() override;
+  virtual OSPObject *importObjects();
 
   //! A string description of this class.
-  std::string toString() const override;
+  virtual std::string toString() const { return("ospray_module_loaders::OSPObjectFile"); }
 
 private:
 

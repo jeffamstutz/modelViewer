@@ -15,14 +15,15 @@
 // ======================================================================== //
 
 #include "XML.h"
+#include <sstream>
 
 namespace ospray {
   namespace xml {
 
-    std::string toString(const float f) 
+    std::string toString(const float f)
     { std::stringstream ss; ss << f; return ss.str(); }
 
-    std::string toString(const vec3f &v) 
+    std::string toString(const ospcommon::vec3f &v)
     { std::stringstream ss; ss << v.x << " " << v.y << " " << v.z; return ss.str(); }
 
     Node::~Node()
@@ -30,7 +31,7 @@ namespace ospray {
       for (int i=0;i<prop.size();i++) delete prop[i];
       for (int i=0;i<child.size();i++) delete child[i];
     }
-    
+
     inline bool isWhite(char s) {
       return
         s == ' ' ||
@@ -63,7 +64,7 @@ namespace ospray {
     inline void consume(char *&s, const char *word)
     {
       const char *in = word;
-      while (*word) { 
+      while (*word) {
         try {
           consume(s,*word); ++word;
         } catch (...) {
@@ -74,7 +75,7 @@ namespace ospray {
       }
     }
 
-    inline std::string makeString(const char *begin, const char *end) 
+    inline std::string makeString(const char *begin, const char *end)
     {
       if (!begin || !end)
         throw std::runtime_error("invalid substring in osp::xml::makeString");
@@ -154,7 +155,7 @@ namespace ospray {
           throw std::runtime_error("XML error: could not parse node name");
 
         skipWhites(s);
-      
+
         Prop prop;
         while (parseProp(s,prop)) {
           node->prop.push_back(new Prop(prop));
@@ -214,13 +215,13 @@ namespace ospray {
       if (!isWhite(*s)) return false; ++s;
 
       skipWhites(s);
-    
+
       Prop headerProp;
       while (parseProp(s,headerProp)) {
         // ignore header prop
         skipWhites(s);
       }
-    
+
       consume(s,"?>");
       return true;
     }
@@ -234,7 +235,8 @@ namespace ospray {
       skipWhites(s);
       while (*s != 0) {
         Node *node = parseNode(s, xml);
-        if (node)xml->child.push_back(node);
+        if (node)
+          xml->child.push_back(node);
         skipWhites(s);
       }
 
@@ -247,7 +249,7 @@ namespace ospray {
       for (int i=0;i<state.size();i++)
         fprintf(xml,"  ");
     }
-    
+
     void Writer::writeProperty(const std::string &name, const std::string &value)
     {
       assert(xml);
@@ -266,7 +268,7 @@ namespace ospray {
       s->type = type;
       state.push(s);
     }
-    
+
     void Writer::closeNode()
     {
       assert(xml);
@@ -275,7 +277,7 @@ namespace ospray {
       assert(s);
       if (s->hasContent)
         fprintf(xml,"</%s>",s->type.c_str());
-      else 
+      else
         fprintf(xml,"/>\n");
       delete s;
       state.pop();
@@ -289,7 +291,12 @@ namespace ospray {
       }
 
       fseek(file,0,SEEK_END);
-      long numBytes = ftell(file);
+      ssize_t numBytes =
+#ifdef _WIN32
+        _ftelli64(file);
+#else
+        ftell(file);
+#endif
       fseek(file,0,SEEK_SET);
       char *mem = new char[numBytes+1];
       mem[numBytes] = 0;

@@ -19,20 +19,26 @@
 #include <string>
 #include "VolumeFile.h"
 
-//! \brief specific importer for the LLNL "RM" (Richtmyer-Meshkov) instability
-//! files
+//! \brief specific importer for the LLNL "RM" (Richtmyer-Meshkov) instability files
 /*! Note this exists only for a specific demo */
-class RMVolumeFile : public VolumeFile
-{
+class RMVolumeFile : public VolumeFile {
 public:
 
   //! Constructor.
-  RMVolumeFile(const std::string &fileName);
+  RMVolumeFile(const std::string &fileName) : fileName(fileName) {}
+
+  //! Destructor.
+  virtual ~RMVolumeFile() {};
 
   //! Import the volume data.
-  OSPVolume importVolume(OSPVolume volume) override;
+  virtual OSPVolume importVolume(OSPVolume volume);
 
   //! A string description of this class.
-  std::string toString() const override;
+  virtual std::string toString() const { return("ospray_module_loaders::RawVolumeFile"); }
+
+private:
+
+  //! Path to the file containing the volume data.
+  std::string fileName;
 };
 

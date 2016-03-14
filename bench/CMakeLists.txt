@@ -30,6 +30,7 @@ add_executable(${APP_NAME}
 )
 
 target_link_libraries(${APP_NAME}
+  ospray_common
   ospray_loaders
   ospray_minisg
 )

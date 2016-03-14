@@ -31,9 +31,9 @@ struct OSPRayFixture : public hayai::Fixture
   static float samplingRate;
 
   static bool customView;
-  static ospray::vec3f pos;
-  static ospray::vec3f at;
-  static ospray::vec3f up;
+  static ospcommon::vec3f pos;
+  static ospcommon::vec3f at;
+  static ospcommon::vec3f up;
 
   static std::string renderer_type;
   static std::string imageOutputFile;
@@ -41,13 +41,13 @@ struct OSPRayFixture : public hayai::Fixture
   static std::vector<std::string> benchmarkModelFiles;
 
   static float tf_scale;
-  static std::vector<ospray::vec3f> tf_colors;
+  static std::vector<ospcommon::vec3f> tf_colors;
   static std::vector<float> isosurfaces;
 
-  static ospray::vec2f volume_data_range;
+  static ospcommon::vec2f volume_data_range;
 
   static int width;
   static int height;
 
-  static ospray::vec3f bg_color;
+  static ospcommon::vec3f bg_color;
 };

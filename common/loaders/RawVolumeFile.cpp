@@ -14,38 +14,36 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#include "RawVolumeFile.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "RawVolumeFile.h"
-#include "common/sys/filename.h"
+#include "common/FileName.h"
 
-RawVolumeFile::RawVolumeFile(const std::string &fileName) :
-  VolumeFile(fileName)
-{
-}
+using ospcommon::FileName;
 
 OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
 {
   // Look for the volume data file at the given path.
   FILE *file = NULL;
-  embree::FileName fn = fileName;
+  FileName fn = filename;
   bool gzipped = fn.ext() == "gz";
   if (gzipped) {
-    std::string cmd = "/usr/bin/gunzip -c "+fileName;
+    std::string cmd = "/usr/bin/gunzip -c "+filename;
     file = popen(cmd.c_str(),"r");
   } else {
-    file = fopen(fileName.c_str(),"rb");
+    file = fopen(filename.c_str(),"rb");
   }
-  //FILE *file = fopen(fileName.c_str(), "rb");
-  exitOnCondition(!file, "unable to open file '" + fileName + "'");
+  //FILE *file = fopen(filename.c_str(), "rb");
+  exitOnCondition(!file, "unable to open file '" + filename + "'");
 
   // Offset into the volume data file if any.
   int offset = 0;  
-  ospGeti(volume, "fileName offset", &offset);  fseek(file, offset, SEEK_SET);
+  ospGeti(volume, "filename offset", &offset);  fseek(file, offset, SEEK_SET);
 
   // Volume dimensions.
-  ospray::vec3i volumeDimensions;  
+  ospcommon::vec3i volumeDimensions;  
   exitOnCondition(!ospGetVec3i(volume,
                                "dimensions",
                                &(osp::vec3i&)volumeDimensions),
@@ -72,20 +70,20 @@ OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
   // Subvolume params: subvolumeOffsets, subvolumeDimensions, subvolumeSteps.
   // The subvolume defaults to full dimensions (allowing for just subsampling,
   // for example).
-  ospray::vec3i subvolumeOffsets = ospray::vec3i(0);  
+  ospcommon::vec3i subvolumeOffsets = ospcommon::vec3i(0);  
   ospGetVec3i(volume, "subvolumeOffsets", (osp::vec3i*)&subvolumeOffsets);
   exitOnCondition(reduce_min(subvolumeOffsets) < 0 ||
                   reduce_max(subvolumeOffsets - volumeDimensions) >= 0,
                   "invalid subvolume offsets");
 
-  ospray::vec3i subvolumeDimensions = volumeDimensions - subvolumeOffsets;  
+  ospcommon::vec3i subvolumeDimensions = volumeDimensions - subvolumeOffsets;  
   ospGetVec3i(volume, "subvolumeDimensions", (osp::vec3i*)&subvolumeDimensions);
   exitOnCondition(reduce_min(subvolumeDimensions) < 1 ||
                   reduce_max(subvolumeDimensions -
                              (volumeDimensions - subvolumeOffsets)) > 0,
                   "invalid subvolume dimension(s) specified");
 
-  ospray::vec3i subvolumeSteps = ospray::vec3i(1);  
+  ospcommon::vec3i subvolumeSteps = ospcommon::vec3i(1);  
   ospGetVec3i(volume, "subvolumeSteps", (osp::vec3i*)&subvolumeSteps);
   exitOnCondition(reduce_min(subvolumeSteps) < 1 ||
                   reduce_max(subvolumeSteps -
@@ -96,7 +94,7 @@ OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
 
   // The dimensions of the volume to be imported; this will be changed if a
   // subvolume is specified.
-  ospray::vec3i importVolumeDimensions = volumeDimensions;
+  ospcommon::vec3i importVolumeDimensions = volumeDimensions;
 
   if (reduce_max(subvolumeOffsets) > 0 ||
       subvolumeDimensions != volumeDimensions ||
@@ -112,7 +110,7 @@ OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
         (subvolumeDimensions.y % subvolumeSteps.y != 0);
     int zdim = subvolumeDimensions.z / subvolumeSteps.z +
         (subvolumeDimensions.z % subvolumeSteps.z != 0);
-    importVolumeDimensions = ospray::vec3i(xdim, ydim, zdim);
+    importVolumeDimensions = ospcommon::vec3i(xdim, ydim, zdim);
 
     // Range check.
     exitOnCondition(reduce_min(importVolumeDimensions) <= 0,
@@ -122,7 +120,7 @@ OSPVolume RawVolumeFile::importVolume(OSPVolume volume)
     ospSetVec3i(volume, "dimensions", (osp::vec3i&)importVolumeDimensions);
   }
 
-ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
+ospcommon::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
                            -std::numeric_limits<float>::infinity());
 
   if (!useSubvolume) {
@@ -171,9 +169,8 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
         exitOnCondition(true, "unsupported voxel type");
       }
 
-
-      ospray::vec3i region_lo(0, 0, z);
-      ospray::vec3i region_sz(volumeDimensions.x,
+      ospcommon::vec3i region_lo(0, 0, z);
+      ospcommon::vec3i region_sz(volumeDimensions.x,
                               volumeDimensions.y,
                               slicesToRead);
       // Copy the voxels into the volume.
@@ -182,9 +179,9 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
                    (osp::vec3i&)region_lo,
                    (osp::vec3i&)region_sz);
 
-      std::cerr << "volume load: "
-                << float(z) / float(volumeDimensions.z) * 100. << " %"
-                << std::endl;
+      // std::cerr << "volume load: "
+      //           << float(z) / float(volumeDimensions.z) * 100. << " %"
+      //           << std::endl;
     }
 
     // Clean up.
@@ -235,10 +232,10 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
         }
 
         // Copy subvolume row into the volume.
-        ospray::vec3i region_lo(0, 
+        ospcommon::vec3i region_lo(0, 
                                 (i2 - subvolumeOffsets.y) / subvolumeSteps.y, 
                                 (i3 - subvolumeOffsets.z) / subvolumeSteps.z);
-        ospray::vec3i region_sz(importVolumeDimensions.x, 1, 1);
+        ospcommon::vec3i region_sz(importVolumeDimensions.x, 1, 1);
         ospSetRegion(volume,
                      &subvolumeRowData[0],
                      (osp::vec3i&)region_lo,
@@ -260,9 +257,4 @@ ospray::vec2f voxelRange(+std::numeric_limits<float>::infinity(),
   VolumeFile::voxelRangeOf[volume] = voxelRange;
   
   return(volume);
-}
-
-std::string RawVolumeFile::toString() const
-{
-  return("ospray_module_loaders::RawVolumeFile");
 }

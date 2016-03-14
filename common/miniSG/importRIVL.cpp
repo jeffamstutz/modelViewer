@@ -21,13 +21,14 @@
 #define  O_LARGEFILE  0
 #endif
 
+#define WARN_ON_INCLUDING_OSPCOMMON 1
+
 // header
-#include "ospray/common/Managed.h"
-#include "ospray/common/Data.h"
 #include "miniSG.h"
 // stl
 #include <map>
-// // libxml
+#include <sstream>
+// libxml
 #include "common/xml/XML.h"
 // stdlib, for mmap
 #include <sys/types.h>
@@ -38,6 +39,8 @@
 #  include <sys/mman.h>
 #endif
 #include <fcntl.h>
+#include <string>
+#include <cstring>
 
 namespace ospray {
   namespace miniSG {
@@ -50,7 +53,7 @@ namespace ospray {
     unsigned char *binBasePtr = NULL;
 
     /*! Base class for all scene graph node types */
-    struct Node : public embree::RefCount
+    struct Node : public ospcommon::RefCount
     {
       virtual string toString() const { return "ospray::miniSG::Node"; } 
 
@@ -232,6 +235,7 @@ namespace ospray {
 
           txt.ptr->texData->channels = channels;
           txt.ptr->texData->depth = depth;
+          txt.ptr->texData->prefereLinear = true;
           txt.ptr->texData->width = width;
           txt.ptr->texData->height = height;
           if (channels == 4) { // RIVL bin stores alpha channel inverted, fix here
@@ -335,31 +339,31 @@ namespace ospray {
               } else if (!childType.compare("int")) {
                 //This *could* be a texture, handle it!
                 if(childName.find("map_") == std::string::npos) {
-                  mat->setParam(childName.c_str(), (int32)atol(s));
+                  mat->setParam(childName.c_str(), (int32_t)atol(s));
                 } else {
-                  Texture2D* tex = mat->textures[(int32)atol(s)].ptr;
+                  Texture2D* tex = mat->textures[(int32_t)atol(s)].ptr;
                   mat->setParam(childName.c_str(), (void*)tex, Material::Param::TEXTURE);
                 }
               } else if (!childType.compare("int2")) {
-                int32 x = atol(s);
+                int32_t x = atol(s);
                 s = NEXT_TOK;
-                int32 y = atol(s);
+                int32_t y = atol(s);
                 mat->setParam(childName.c_str(), vec2i(x,y));
               } else if (!childType.compare("int3")) {
-                int32 x = atol(s);
+                int32_t x = atol(s);
                 s = NEXT_TOK;
-                int32 y = atol(s);
+                int32_t y = atol(s);
                 s = NEXT_TOK;
-                int32 z = atol(s);
+                int32_t z = atol(s);
                 mat->setParam(childName.c_str(), vec3i(x,y,z));
               } else if (!childType.compare("int4")) {
-                int32 x = atol(s);
+                int32_t x = atol(s);
                 s = NEXT_TOK;
-                int32 y = atol(s);
+                int32_t y = atol(s);
                 s = NEXT_TOK;
-                int32 z = atol(s);
+                int32_t z = atol(s);
                 s = NEXT_TOK;
-                int32 w = atol(s);
+                int32_t w = atol(s);
                 mat->setParam(childName.c_str(), vec4i(x,y,z,w));
               } else {
                 //error!
@@ -395,8 +399,8 @@ namespace ospray {
                 free(tokenBuffer);
               }
               if (mat->textures.size() != num) {
-                FATAL("invalid number of textures in material "
-                      "(found either more or less than the 'num' field specifies");
+                throw std::runtime_error("invalid number of textures in material "
+                                         "(found either more or less than the 'num' field specifies");
               }
             }
           }
@@ -460,7 +464,7 @@ namespace ospray {
                                &xfm->xfm.p.z);
           //xmlFree(value);
           if (numRead != 12)  {
-            FATAL("invalid number of elements in RIVL transform node");
+            throw std::runtime_error("invalid number of elements in RIVL transform node");
           }
           
           // -------------------------------------------------------
@@ -611,7 +615,12 @@ namespace ospray {
       if (!file)
         perror("could not open binary file");
       fseek(file,0,SEEK_END);
-      size_t fileSize = ftell(file);
+      ssize_t fileSize =
+#ifdef _WIN32
+        _ftelli64(file);
+#else
+        ftell(file);
+#endif
       fclose(file);
       
 #ifdef _WIN32
@@ -643,7 +652,7 @@ namespace ospray {
       return node;
     }
 
-    void traverseSG(Model &model, Ref<miniSG::Node> &node, const affine3f &xfm=embree::one)
+    void traverseSG(Model &model, Ref<miniSG::Node> &node, const affine3f &xfm=ospcommon::one)
     {
       Group *g = dynamic_cast<Group *>(node.ptr);
       if (g) {
@@ -752,7 +761,7 @@ namespace ospray {
     }
 
     /*! import a wavefront OBJ file, and add it to the specified model */
-    void importRIVL(Model &model, const embree::FileName &fileName)
+    void importRIVL(Model &model, const ospcommon::FileName &fileName)
     {
       nodeList.clear();
       Ref<miniSG::Node> sg = importRIVL(fileName);
