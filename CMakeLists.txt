@@ -68,8 +68,8 @@ endif()
 
 include(${CMAKE_SOURCE_DIR}/cmake/glut.cmake)
 
-set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR}/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 find_package(ospray REQUIRED)
 
