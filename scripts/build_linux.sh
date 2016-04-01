@@ -29,7 +29,7 @@ if [ ! -d ospray ]; then
     -DCMAKE_CXX_COMPILER=g++ \
     -DCMAKE_INSTALL_PREFIX=${OSPRAY_INSTALL_DIR} \
     ../src &> /dev/null
-  make -j`nproc` &> /dev/null
+  make -j`nproc` install &> /dev/null
   echo 'done'
 else
   echo 'Updating exisiting OSPRay build:'
