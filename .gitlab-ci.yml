@@ -10,6 +10,9 @@ build-centos7:
     - scripts/build_linux.sh
   tags:
     - centos7
+  cache:
+    paths:
+      - ospray/
   allow_failure: false
 
 test-centos7:
@@ -18,3 +21,6 @@ test-centos7:
     - scripts/test_linux.sh
   tags:
     - centos7
+  cache:
+    paths:
+      - ospray/
