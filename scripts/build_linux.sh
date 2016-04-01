@@ -1,6 +1,7 @@
 #/bin/sh
 
 ROOT_DIR=${PWD}
+OSPRAY_INSTALL_DIR=${ROOT_DIR}/ospray/install
 
 # Clone and build ospray if we don't have one yet
 if [ ! -d ospray ]; then
@@ -24,9 +25,11 @@ if [ ! -d ospray ]; then
   mkdir build
   cd build
   cmake \
-    -DCMAKE_INSTALL_PREFIX=../install\
+    -DCMAKE_C_COMPILER=gcc \
+    -DCMAKE_CXX_COMPILER=g++ \
+    -DCMAKE_INSTALL_PREFIX=${OSPRAY_INSTALL_DIR} \
     ../src &> /dev/null
-  make -j`nproc` install &> /dev/null
+  make -j`nproc` &> /dev/null
   echo 'done'
 else
   echo 'Updating exisiting OSPRay build:'
@@ -45,7 +48,7 @@ echo 'OSPRay build is up to date!...moving on to ospDebugViewer'
 echo ' '
 
 # Set variables we need to find OSPRay
-export ospray_DIR=${ROOT_DIR}/ospray/install
+export ospray_DIR=${OSPRAY_INSTALL_DIR}
 
 # Make sure we return to our original clone directory
 cd ${ROOT_DIR}
