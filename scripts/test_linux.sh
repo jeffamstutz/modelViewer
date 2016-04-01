@@ -3,6 +3,13 @@
 ROOT_DIR=${PWD}
 CORNELL_BOX_TARBALL=cornell_box.bz2
 
+# If build doesn't exist, run the build again
+if [ ! -d build ]; then
+  echo -n 'build does not exist, making a new one...'
+  ${ROOT_DIR}/scripts/build_linux.sh &> /dev/null
+  echo 'done'
+fi
+
 # Fetch test data
 mkdir test_data
 cd test_data
