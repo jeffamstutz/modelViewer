@@ -11,11 +11,6 @@ build-centos7:
   tags:
     - centos7
   allow_failure: false
-  cache:
-    paths:
-      - ospray/
-      - build/
-    untracked: true
 
 test-centos7:
   type: test
@@ -23,8 +18,3 @@ test-centos7:
     - scripts/test_linux.sh
   tags:
     - centos7
-  cache:
-    paths:
-      - ospray/
-      - build/
-    untracked: true
