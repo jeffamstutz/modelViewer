@@ -5,7 +5,7 @@ build-centos7:
   type: build
   script:
     - export CC=clang
-    - export CC=clang++
+    - export CXX=clang++
     - scripts/build_linux.sh
   tags:
     - centos7
