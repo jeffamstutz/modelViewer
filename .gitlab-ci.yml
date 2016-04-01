@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
 
 build-centos7:
   type: build
@@ -7,5 +8,13 @@ build-centos7:
     - export CC=clang
     - export CXX=clang++
     - scripts/build_linux.sh
+  tags:
+    - centos7
+  allow_failure: false
+
+test-centos7:
+  type: test
+  script:
+    - scripts/test_linux.sh
   tags:
     - centos7
