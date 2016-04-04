@@ -32,7 +32,7 @@ int OSPRayFixture::height = 1024;
 float OSPRayFixture::samplingRate = 0.125f;
 
 float OSPRayFixture::tf_scale = 1.f;
-std::vector<vec3f> OSPRayFixture::tf_colors;
+std::vector<vec4f> OSPRayFixture::tf_colors;
 std::vector<float> OSPRayFixture::isosurfaces;
 
 vec2f OSPRayFixture::volume_data_range = {
@@ -474,14 +474,17 @@ static void createOSPCamera(OSPRayFixture *f)
 static void createDefaultTransferFunction(OSPRayFixture *f)
 {
   // Add colors
-  std::vector<vec3f> colors;
+  std::vector<vec4f> colors;
   if (f->tf_colors.empty()) {
-    colors.push_back(vec3f(0.f));
-    colors.push_back(vec3f(0.9f));
+    colors.emplace_back(0.f, 0.f, 0.f, 0.f);
+    colors.emplace_back(0.9f, 0.9f, 0.9f, 1.f);
   } else {
     colors = f->tf_colors;
   }
-  auto colorsData = ospray::cpp::Data(colors.size(), OSP_FLOAT3, colors.data());
+  std::vector<vec3f> colorsAsVec3;
+  for (auto &c : colors) colorsAsVec3.emplace_back(c.x, c.y, c.z);
+  auto colorsData = ospray::cpp::Data(colors.size(), OSP_FLOAT3,
+                                      colorsAsVec3.data());
   f->tf.set("colors", colorsData);
 
   // Add opacities
@@ -489,8 +492,19 @@ static void createDefaultTransferFunction(OSPRayFixture *f)
 
   const int N_OPACITIES = 64;//NOTE(jda) - This affects image quality and
                              //            performance!
+  const int N_INTERVALS = colors.size() - 1;
+  const float OPACITIES_PER_INTERVAL = N_OPACITIES / float(N_INTERVALS);
   for (int i = 0; i < N_OPACITIES; ++i) {
-    opacityValues.push_back(f->tf_scale/N_OPACITIES);
+    int lcolor = static_cast<int>(i/OPACITIES_PER_INTERVAL);
+    int hcolor = lcolor + 1;
+
+    float v0 = colors[lcolor].w;
+    float v1 = colors[hcolor].w;
+    float t = (i / OPACITIES_PER_INTERVAL) - lcolor;
+
+    float opacity = (1-t)*v0 + t*v1;
+    if (opacity > 1.f) opacity = 1.f;
+    opacityValues.push_back(f->tf_scale*opacity);
   }
   auto opacityValuesData = ospray::cpp::Data(opacityValues.size(),
                                              OSP_FLOAT,

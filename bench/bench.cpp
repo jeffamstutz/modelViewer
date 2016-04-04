@@ -84,13 +84,13 @@ void printUsageAndExit()
   cout << "                           Format: low high" << endl;
 
   cout << endl;
-  cout << "    -tc | --tf-color --> Specify the next color to in the transfer"
+  cout << "    -tfc | --tf-color --> Specify the next color to in the transfer"
        << " function for volumes. Each entry will add to the total list of"
        << " colors in the order they are specified." << endl;
-  cout << "                              Format: R G B" << endl;
+  cout << "                              Format: R G B A" << endl;
   cout << "                         Value Range: [0,1]" << endl;
 
-  cout << "    -tcs | --tf-scale --> Specify the opacity the transfer function"
+  cout << "    -tfs | --tf-scale --> Specify the opacity the transfer function"
        << " will scale to: [0,x] where x is the input value." << endl;
   cout << "                          default: 1.0" << endl;
 
@@ -136,13 +136,14 @@ void parseCommandLine(int argc, const char *argv[])
       OSPRayFixture::height = atoi(argv[++i]);
     } else if (arg == "-s" || arg == "--sampling-rate") {
       OSPRayFixture::samplingRate = atof(argv[++i]);
-    } else if (arg == "-tc" || arg == "--tf-color") {
-      ospcommon::vec3f color;
+    } else if (arg == "-tfc" || arg == "--tf-color") {
+      ospcommon::vec4f color;
       color.x = atof(argv[++i]);
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
+      color.w = atof(argv[++i]);
       OSPRayFixture::tf_colors.push_back(color);
-    } else if (arg == "-tcs" || arg == "--tf-scale") {
+    } else if (arg == "-tfs" || arg == "--tf-scale") {
       OSPRayFixture::tf_scale = atof(argv[++i]);
     } else if (arg == "-dr" || arg == "--data-range") {
       OSPRayFixture::volume_data_range.x = atof(argv[++i]);

@@ -41,7 +41,7 @@ struct OSPRayFixture : public hayai::Fixture
   static std::vector<std::string> benchmarkModelFiles;
 
   static float tf_scale;
-  static std::vector<ospcommon::vec3f> tf_colors;
+  static std::vector<ospcommon::vec4f> tf_colors;
   static std::vector<float> isosurfaces;
 
   static ospcommon::vec2f volume_data_range;
