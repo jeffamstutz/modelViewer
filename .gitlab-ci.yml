@@ -2,19 +2,25 @@ stages:
   - build
   - test
 
-build-centos7:
-  type: build
+build_centos7:
+  stage: build
   script:
     - export CC=clang
     - export CXX=clang++
     - scripts/build_linux.sh
+  artifacts:
+    paths:
+    - build/
+    - ospray/
   tags:
     - centos7
   allow_failure: false
 
-test-centos7:
-  type: test
+test_centos7:
+  stage: test
   script:
     - scripts/test_linux.sh
+  dependencies:
+    - build_centos7
   tags:
     - centos7
