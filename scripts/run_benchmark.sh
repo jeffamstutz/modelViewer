@@ -42,11 +42,11 @@ csafe="test_data/csafe-heptane-302-volume.osp"
 # CSAFE/scivis/view 1
 ${exe} ${csafe} \
     -r scivis \
-    -tc 0 0 0 0.00 \
-    -tc 1 0 0 0.11 \
-    -tc 1 1 0 0.22 \
-    -tc 1 1 1 0.33 \
-    -tcs 0.25 \
+    -tfc 0 0 0 0.00 \
+    -tfc 1 0 0 0.11 \
+    -tfc 1 1 0 0.22 \
+    -tfc 1 1 1 0.33 \
+    -tfs 0.25 \
     -i ${img_dir}/test_${test_num}
 
 test_num=$((test_num+1))
@@ -57,11 +57,11 @@ ${exe} ${csafe} \
     -vp -36.2362 86.8541 230.026 \
     -vi 150.5 150.5 150.5 \
     -vu 0 0 1 \
-    -tc 0 0 0 0.00 \
-    -tc 1 0 0 0.11 \
-    -tc 1 1 0 0.22 \
-    -tc 1 1 1 0.33 \
-    -tcs 0.25 \
+    -tfc 0 0 0 0.00 \
+    -tfc 1 0 0 0.11 \
+    -tfc 1 1 0 0.22 \
+    -tfc 1 1 1 0.33 \
+    -tfs 0.25 \
     -i ${img_dir}/test_${test_num}
 
 test_num=$((test_num+1))
