@@ -66,3 +66,45 @@ ${exe} ${csafe} \
 
 test_num=$((test_num+1))
 
+# MAGNETIC TESTS ############################################################
+
+magnetic="test_data/magnetic-512-volume.osp"
+
+# MAGNETIC/scivis/view 1
+${exe} ${magnetic} \
+    -r scivis \
+    -tfc 0.1 0.1 0.1 0 \
+    -tfc 0 0 1 0.25 \
+    -tfc 1 0 0 1 \
+    -tfs 1 \
+    -i ${img_dir}/test_${test_num}
+
+test_num=$((test_num+1))
+
+# MAGNETIC/scivis/view 2
+${exe} ${magnetic} \
+    -r scivis \
+    -vp 431.923 -99.5843 408.068 \
+    -vi 255.5 255.5 255.5 \
+    -vu 0 0 1 \
+    -tfc 0.1 0.1 0.1 0 \
+    -tfc 0 0 1 0.25 \
+    -tfc 1 0 0 1 \
+    -tfs 1 \
+    -i ${img_dir}/test_${test_num}
+
+# MAGNETIC/scivis/view 2 + isosurface
+${exe} ${magnetic} \
+    -r scivis \
+    -vp 431.923 -99.5843 408.068 \
+    -vi 255.5 255.5 255.5 \
+    -vu 0 0 1 \
+    -tfc 0.1 0.1 0.1 0 \
+    -tfc 0 0 1 0.25 \
+    -tfc 1 0 0 1 \
+    -tfs 1 \
+    -is 2.0 \
+    -i ${img_dir}/test_${test_num}
+
+test_num=$((test_num+1))
+

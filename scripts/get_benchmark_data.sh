@@ -22,3 +22,10 @@ if [ ! -e ${csafe} ]; then
   wget http://sdvis.org/~jdamstut/test_data/${csafe}
   tar -xaf ${csafe}
 fi
+
+# MAGNETIC
+magnetic="magnetic-512-volume.bz2"
+if [ ! -e ${magnetic} ]; then
+  wget http://sdvis.org/~jdamstut/test_data/${magnetic}
+  tar -xaf ${magnetic}
+fi
