@@ -27,6 +27,7 @@ add_executable(${APP_NAME}
   bench.cpp
   OSPRayFixture.cpp
   OSPRayFixture.h
+  simple_outputter.hpp
 )
 
 target_link_libraries(${APP_NAME}

@@ -225,8 +225,6 @@ OSPVolume OSPObjectFile::importVolume(const tinyxml2::XMLNode *root)
   OSPVolume volume = NULL;
   if (dpFromEnv) {
     // Create the OSPRay object.
-    std::cout << "#osp.loader: found OSPRAY_DATA_PARALLEL env-var, "
-              << "#osp.loader: trying to use data _parallel_ mode..." << std::endl;
     osp::vec3i blockDims;
     int rc = sscanf(dpFromEnv,"%dx%dx%d",&blockDims.x,&blockDims.y,&blockDims.z);
     if (rc !=3)
@@ -237,10 +235,6 @@ OSPVolume OSPObjectFile::importVolume(const tinyxml2::XMLNode *root)
    ospSetVec3i(volume,"num_dp_blocks",blockDims);
   } else {
     // Create the OSPRay object.
-    std::cout << "#osp.loader: no OSPRAY_DATA_PARALLEL dimensions set, "
-              << "#osp.loader: assuming data replicated mode is desired" << std::endl;
-    std::cout << "#osp.loader: to use data parallel mode, set OSPRAY_DATA_PARALLEL env-var to <X>x<Y>x<Z>" << std::endl;
-    std::cout << "#osp.loader: where X, Y, and Z are the desired _number_ of data parallel blocks" << std::endl;
     volume = ospNewVolume("block_bricked_volume");
   }
   if (volume == NULL)

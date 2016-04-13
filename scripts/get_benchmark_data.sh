@@ -29,3 +29,10 @@ if [ ! -e ${magnetic} ]; then
   wget http://sdvis.org/~jdamstut/test_data/${magnetic}
   tar -xaf ${magnetic}
 fi
+
+# LLNL ISO
+llnl_iso="llnl-2048-iso.tar.bz2"
+if [ ! -e ${magnetic} ]; then
+  wget http://sdvis.org/~jdamstut/test_data/${llnl_iso}
+  tar -xaf ${llnl_iso}
+fi

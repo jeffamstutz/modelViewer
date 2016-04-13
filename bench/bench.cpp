@@ -1,4 +1,5 @@
 #include "hayai/hayai.hpp"
+#include "simple_outputter.hpp"
 
 #include "OSPRayFixture.h"
 
@@ -166,9 +167,14 @@ int main(int argc, const char *argv[])
   ospInit(&argc, argv);
   parseCommandLine(argc, argv);
 
+# if 0
   hayai::ConsoleOutputter consoleOutputter;
-
   hayai::Benchmarker::AddOutputter(consoleOutputter);
+#else
+  hayai::SimpleOutputter simpleOutputter;
+  hayai::Benchmarker::AddOutputter(simpleOutputter);
+#endif
+
   hayai::Benchmarker::RunAllTests();
   return 0;
 }
