@@ -1,7 +1,14 @@
 #!/bin/sh
 
-bench_img_width=1024
-bench_img_height=1024
+if [ $# -lt 2 ]; then
+  echo "No dimensions passed, using defaults"
+  bench_img_width=1024
+  bench_img_height=1024
+else
+  bench_img_width=$1
+  bench_img_height=$2
+fi
+
 echo "All tests run at $bench_img_width x $bench_img_height"
 
 exe="./ospBenchmark -w $bench_img_width -h $bench_img_height"
