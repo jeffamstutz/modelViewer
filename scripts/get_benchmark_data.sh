@@ -32,7 +32,7 @@ fi
 
 # LLNL ISO
 llnl_iso="llnl-2048-iso.tar.bz2"
-if [ ! -e ${magnetic} ]; then
+if [ ! -e ${llnl_iso} ]; then
   wget http://sdvis.org/~jdamstut/test_data/${llnl_iso}
   tar -xaf ${llnl_iso}
 fi
