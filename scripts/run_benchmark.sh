@@ -149,7 +149,7 @@ ${exe} ${magnetic} \
     -is 2.0 \
     -i ${img_dir}/test_${test_num}
 
-echo " : MAGNETIC/scivis/view2 + isosurface"
+echo " : MAGNETIC/scivis/view 2 + isosurface"
 
 test_num=$((test_num+1))
 
