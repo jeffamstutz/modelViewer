@@ -1,12 +1,5 @@
-
-#define USE_HAYAI 0
-
-#if USE_HAYAI
-#  include "hayai/hayai.hpp"
-#  include "simple_outputter.hpp"
-#else
-#  include "pico_bench/pico_bench.h"
-#endif
+#include "hayai/hayai.hpp"
+#include "simple_outputter.hpp"
 
 #include "OSPRayFixture.h"
 
@@ -14,12 +7,10 @@ using std::cout;
 using std::endl;
 using std::string;
 
-#if USE_HAYAI
 BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 {
   renderer.renderFrame(fb, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
-#endif
 
 void printUsageAndExit()
 {
@@ -176,31 +167,14 @@ int main(int argc, const char *argv[])
   ospInit(&argc, argv);
   parseCommandLine(argc, argv);
 
-#if USE_HAYAI
 # if 0
   hayai::ConsoleOutputter consoleOutputter;
   hayai::Benchmarker::AddOutputter(consoleOutputter);
-# else
+#else
   hayai::SimpleOutputter simpleOutputter;
   hayai::Benchmarker::AddOutputter(simpleOutputter);
 #endif
+
   hayai::Benchmarker::RunAllTests();
-#else
-  OSPRayFixture fixture;
-  fixture.SetUp();
-
-  using Benchmark_T = pico_bench::Benchmarker<std::chrono::milliseconds>;
-  auto bencher = Benchmark_T{100, std::chrono::seconds{1000}};
-
-  auto stats = bencher([&](){
-    fixture.renderer.renderFrame(fixture.fb, OSP_FB_COLOR | OSP_FB_ACCUM);
-  });
-
-  std::cout << std::setprecision(5) << std::setw(9)
-            << 1000.f/stats.mean().count() << " fps";
-
-  fixture.TearDown();
-#endif
-
   return 0;
 }

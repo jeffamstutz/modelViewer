@@ -14,7 +14,7 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(CMAKE_CXX_FLAGS "-Wall -fPIC --std=c++14 -no-ansi-alias -static-intel -openmp")
+set(CMAKE_CXX_FLAGS "-Wall -fPIC --std=c++11 -no-ansi-alias -static-intel -openmp")
 set(CMAKE_CXX_FLAGS_DEBUG          "-DDEBUG  -g")
 set(CMAKE_CXX_FLAGS_RELEASE        "-DNDEBUG    -O3 -no-ansi-alias -restrict -fp-model fast -fimf-precision=low -no-prec-div -no-prec-sqrt -fma -no-inline-max-total-size -inline-factor=200 ")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -g -O3 -no-ansi-alias -restrict -fp-model fast -fimf-precision=low -no-prec-div -no-prec-sqrt  -fma  -no-inline-max-total-size -inline-factor=200")
