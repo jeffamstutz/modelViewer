@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class TransferFunction : public ManagedObject
+class TransferFunction : public ManagedObject<OSPTransferFunction>
 {
 public:
 

@@ -24,7 +24,7 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
     for (int x = 0; x < sizeX; x++) {
       out[3*x + 0] = in[4*x + 0];
       out[3*x + 1] = in[4*x + 1];
-      out[3*x + 2] = in[4*x +2 ];
+      out[3*x + 2] = in[4*x + 2];
     }
     fwrite(out, 3*sizeX, sizeof(char), file);
   }
@@ -49,9 +49,9 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
     m_config(config),
     m_accumID(-1),
     m_fullScreen(false),
-    m_scriptHandler((OSPModel)model.handle(),
-                    (OSPRenderer)renderer.handle(),
-                    (OSPCamera)camera.handle(),
+    m_scriptHandler(model.handle(),
+                    renderer.handle(),
+                    camera.handle(),
                     this)
 {
   const box3f worldBounds(m_sgmodel->getBBox());
@@ -210,7 +210,7 @@ void MSGViewer::mouseButton(int32_t whichButton, bool released, const vec2i &pos
     vec2f normpos = vec2f(pos.x / (float)windowSize.x,
                           1.0f - pos.y / (float)windowSize.y);
     OSPPickResult pick;
-    ospPick(&pick, (OSPRenderer)m_renderer.handle(),
+    ospPick(&pick, m_renderer.handle(),
             reinterpret_cast<osp::vec2f&>(normpos));
     if(pick.hit) {
       viewPort.at = reinterpret_cast<ospcommon::vec3f&>(pick.position);

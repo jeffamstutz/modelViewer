@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Data : public ManagedObject
+class Data : public ManagedObject<OSPData>
 {
 public:
 

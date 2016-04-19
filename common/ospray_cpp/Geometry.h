@@ -22,7 +22,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Geometry : public ManagedObject
+class Geometry : public ManagedObject<OSPGeometry>
 {
 public:
 
@@ -58,14 +58,13 @@ inline Geometry::Geometry(OSPGeometry existing) :
 
 inline void Geometry::setMaterial(Material &m)
 {
-  setMaterial((OSPMaterial)m.handle());
+  setMaterial(m.handle());
 }
 
 inline void Geometry::setMaterial(OSPMaterial m)
 {
-  ospSetMaterial((OSPGeometry)handle(), m);
+  ospSetMaterial(handle(), m);
 }
-
 
 }// namespace cpp
 }// namespace ospray

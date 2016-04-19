@@ -23,7 +23,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Model : public ManagedObject
+class Model : public ManagedObject<OSPModel>
 {
 public:
 
@@ -65,32 +65,32 @@ inline Model::Model(OSPModel existing) :
 
 inline void Model::addGeometry(Geometry &v)
 {
-  addGeometry((OSPGeometry)v.handle());
+  addGeometry(v.handle());
 }
 
 inline void Model::addGeometry(OSPGeometry v)
 {
-  ospAddGeometry((OSPModel)handle(), v);
+  ospAddGeometry(handle(), v);
 }
 
 inline void Model::removeGeometry(Geometry &v)
 {
-  removeGeometry((OSPGeometry)v.handle());
+  removeGeometry(v.handle());
 }
 
 inline void Model::removeGeometry(OSPGeometry v)
 {
-  ospRemoveGeometry((OSPModel)handle(), v);
+  ospRemoveGeometry(handle(), v);
 }
 
 inline void Model::addVolume(Volume &v)
 {
-  addVolume((OSPVolume)v.handle());
+  addVolume(v.handle());
 }
 
 inline void Model::addVolume(OSPVolume v)
 {
-  ospAddVolume((OSPModel)handle(), v);
+  ospAddVolume(handle(), v);
 }
 
 }// namespace cpp

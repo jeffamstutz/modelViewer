@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Volume : public ManagedObject
+class Volume : public ManagedObject<OSPVolume>
 {
 public:
 

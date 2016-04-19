@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Light : public ManagedObject
+class Light : public ManagedObject<OSPLight>
 {
 public:
 

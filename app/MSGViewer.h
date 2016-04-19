@@ -55,7 +55,9 @@ private:
 
   void reshape(const ospcommon::vec2i &newSize) override;
   void keypress(char key, const ospcommon::vec2i &where) override;
-  void mouseButton(int32_t whichButton, bool released, const ospcommon::vec2i &pos) override;
+  void mouseButton(int32_t whichButton,
+                   bool released,
+                   const ospcommon::vec2i &pos) override;
 
   void display() override;
 
@@ -64,10 +66,12 @@ private:
   // Data //
 
   miniSG::Model *m_sgmodel;
+
   cpp::Model       m_model;
   cpp::FrameBuffer m_fb;
   cpp::Renderer    m_renderer;
   cpp::Camera      m_camera;
+
   ospray::glut3D::FPSCounter m_fps;
 
   std::mutex m_rendererMutex;

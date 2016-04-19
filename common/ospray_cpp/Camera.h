@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Camera : public ManagedObject
+class Camera : public ManagedObject<OSPCamera>
 {
 public:
 

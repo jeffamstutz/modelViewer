@@ -22,7 +22,7 @@
 namespace ospray {
 namespace cpp    {
 
-class FrameBuffer : public ManagedObject
+class FrameBuffer : public ManagedObject<OSPFrameBuffer>
 {
 public:
 
@@ -102,33 +102,33 @@ inline FrameBuffer::~FrameBuffer()
 
 inline void FrameBuffer::setPixelOp(PixelOp &p)
 {
-  setPixelOp((OSPPixelOp)p.handle());
+  setPixelOp(p.handle());
 }
 
 inline void FrameBuffer::setPixelOp(OSPPixelOp p)
 {
-  ospSetPixelOp((OSPFrameBuffer)handle(), p);
+  ospSetPixelOp(handle(), p);
 }
 
 inline const void *FrameBuffer::map(OSPFrameBufferChannel channel)
 {
-  return ospMapFrameBuffer((OSPFrameBuffer)handle(), channel);
+  return ospMapFrameBuffer(handle(), channel);
 }
 
 inline void FrameBuffer::unmap(void *ptr)
 {
-  ospUnmapFrameBuffer(ptr, (OSPFrameBuffer)handle());
+  ospUnmapFrameBuffer(ptr, handle());
 }
 
 inline void FrameBuffer::clear(uint32_t channel)
 {
-  ospFrameBufferClear((OSPFrameBuffer)handle(), channel);
+  ospFrameBufferClear(handle(), channel);
 }
 
 inline void FrameBuffer::free()
 {
   if (m_owner && handle()) {
-    ospFreeFrameBuffer((OSPFrameBuffer)handle());
+    ospFreeFrameBuffer(handle());
   }
 }
 

@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Material : public ManagedObject
+class Material : public ManagedObject<OSPMaterial>
 {
 public:
 

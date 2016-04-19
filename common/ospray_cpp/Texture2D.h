@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Texture2D : public ManagedObject
+class Texture2D : public ManagedObject<OSPTexture2D>
 {
 public:
 

@@ -26,11 +26,12 @@ namespace cpp    {
 
 //! \todo auto-commit mode
 
+template <typename OSP_TYPE = OSPObject>
 class ManagedObject
 {
 public:
 
-  ManagedObject(OSPObject object = nullptr);
+  ManagedObject(OSP_TYPE object = nullptr);
   virtual ~ManagedObject();
 
   // Parameter 'set' functions //
@@ -71,128 +72,163 @@ public:
   void set(const std::string &name, OSPObject v);
 
   // osp::cpp::ManagedObject
-  void set(const std::string &name, const ManagedObject &v);
+  template <typename OTHER_OSP_TYPE>
+  void set(const std::string &name, const ManagedObject<OTHER_OSP_TYPE> &v);
 
   //! Commit to ospray
   void commit() const;
 
   //! Get the underlying OSPObject handle
-  OSPObject handle() const;
+  OSP_TYPE handle() const;
 
 protected:
 
-  OSPObject m_object;
+  OSP_TYPE m_object;
 };
 
 // Inlined function definitions ///////////////////////////////////////////////
 
-inline ManagedObject::ManagedObject(OSPObject object) :
+template <typename OSP_TYPE>
+inline ManagedObject<OSP_TYPE>::ManagedObject(OSP_TYPE object) :
   m_object(object)
 {
 }
 
-inline ManagedObject::~ManagedObject()
+template <typename OSP_TYPE>
+inline ManagedObject<OSP_TYPE>::~ManagedObject()
 {
 }
 
-inline void ManagedObject::set(const std::string &name, const std::string &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const std::string &v)
 {
   ospSetString(m_object, name.c_str(), v.c_str());
 }
 
-inline void ManagedObject::set(const std::string &name, int v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name, int v)
 {
   ospSet1i(m_object, name.c_str(), v);
 }
 
-inline void ManagedObject::set(const std::string &name, int v1, int v2)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         int v1, int v2)
 {
   ospSet2i(m_object, name.c_str(), v1, v2);
 }
 
-inline void ManagedObject::set(const std::string &name, int v1, int v2, int v3)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         int v1, int v2, int v3)
 {
   ospSet3i(m_object, name.c_str(), v1, v2, v3);
 }
 
-inline void ManagedObject::set(const std::string &name, float v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name, float v)
 {
   ospSet1f(m_object, name.c_str(), v);
 }
 
-inline void ManagedObject::set(const std::string &name, float v1, float v2)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         float v1, float v2)
 {
   ospSet2f(m_object, name.c_str(), v1, v2);
 }
 
-inline void ManagedObject::set(const std::string &name,
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
                                float v1, float v2, float v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
 }
 
-inline void ManagedObject::set(const std::string &name, double v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name, double v)
 {
   ospSet1f(m_object, name.c_str(), v);
 }
 
-inline void ManagedObject::set(const std::string &name, double v1, double v2)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         double v1, double v2)
 {
   ospSet2f(m_object, name.c_str(), v1, v2);
 }
 
-inline void ManagedObject::set(const std::string &name,
-                               double v1, double v2, double v3)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         double v1, double v2, double v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
 }
 
-inline void ManagedObject::set(const std::string &name, const ospcommon::vec2i &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ospcommon::vec2i &v)
 {
   ospSetVec2i(m_object, name.c_str(), (const osp::vec2i&)v);
 }
 
-inline void ManagedObject::set(const std::string &name, const ospcommon::vec2f &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ospcommon::vec2f &v)
 {
   ospSetVec2f(m_object, name.c_str(), (const osp::vec2f&)v);
 }
 
-inline void ManagedObject::set(const std::string &name, const ospcommon::vec3i &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ospcommon::vec3i &v)
 {
   ospSetVec3i(m_object, name.c_str(), (const osp::vec3i&)v);
 }
 
-inline void ManagedObject::set(const std::string &name, const ospcommon::vec3f &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ospcommon::vec3f &v)
 {
   ospSetVec3f(m_object, name.c_str(), (const osp::vec3f&)v);
 }
 
-inline void ManagedObject::set(const std::string &name, const ospcommon::vec4f &v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ospcommon::vec4f &v)
 {
   ospSetVec4f(m_object, name.c_str(), (const osp::vec4f&)v);
 }
 
-inline void ManagedObject::set(const std::string &name, void *v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name, void *v)
 {
   ospSetVoidPtr(m_object, name.c_str(), v);
 }
 
-inline void ManagedObject::set(const std::string &name, OSPObject v)
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name, OSPObject v)
 {
   ospSetObject(m_object, name.c_str(), v);
 }
 
-inline void ManagedObject::set(const std::string &name, const ManagedObject &v)
+template <typename OSP_TYPE>
+template <typename OTHER_OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::set(const std::string &name,
+                                         const ManagedObject<OTHER_OSP_TYPE> &v)
 {
   ospSetObject(m_object, name.c_str(), v.handle());
 }
 
-inline void ManagedObject::commit() const
+template <typename OSP_TYPE>
+inline void ManagedObject<OSP_TYPE>::commit() const
 {
   ospCommit(m_object);
 }
 
-inline OSPObject ManagedObject::handle() const
+template <typename OSP_TYPE>
+inline OSP_TYPE ManagedObject<OSP_TYPE>::handle() const
 {
   return m_object;
 }

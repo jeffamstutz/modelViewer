@@ -373,9 +373,9 @@ void CommandLineSceneBuilder::createScene()
       std::vector<OSPTexture2D> alphaMaps;
       std::vector<float> alphas;
       for (int i=0;i<msgMesh->materialList.size();i++) {
-        auto m = (OSPMaterial)createMaterial(m_renderer,
-                                        msgMesh->materialList[i].ptr).handle();
-        materialList.push_back(m);
+        auto m = createMaterial(m_renderer, msgMesh->materialList[i].ptr);
+        auto handle = m.handle();
+        materialList.push_back(handle);
 
         for (miniSG::Material::ParamMap::const_iterator it =
              msgMesh->materialList[i]->params.begin();
@@ -427,7 +427,7 @@ void CommandLineSceneBuilder::createScene()
       cpp::Model model_i;
       model_i.addGeometry(ospMesh);
       model_i.commit();
-      instanceModels.push_back((OSPModel)model_i.handle());
+      instanceModels.push_back(model_i.handle());
     } else {
       m_model.addGeometry(ospMesh);
     }
@@ -583,7 +583,7 @@ void CommandLineSceneBuilder::createSunLight()
     ospLight.set("direction", m_defaultDirLight_direction);
     ospLight.set("angularDiameter", 0.53f);
     ospLight.commit();
-    lights.push_back((OSPLight)ospLight.handle());
+    lights.push_back(ospLight.handle());
   }
 
   auto lightArray = cpp::Data(lights.size(), OSP_OBJECT, lights.data());

@@ -24,7 +24,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Renderer : public ManagedObject
+class Renderer : public ManagedObject<OSPRenderer>
 {
 public:
 
@@ -62,7 +62,7 @@ inline Renderer::Renderer(OSPRenderer existing) :
 
 inline Material Renderer::newMaterial(const std::string &type)
 {
-  auto mat = Material(ospNewMaterial((OSPRenderer)handle(), type.c_str()));
+  auto mat = Material(ospNewMaterial(handle(), type.c_str()));
 
   if (!mat.handle()) {
     throw std::runtime_error("Failed to create OSPMaterial!");
@@ -73,12 +73,12 @@ inline Material Renderer::newMaterial(const std::string &type)
 
 inline Light Renderer::newLight(const std::string &type)
 {
-  return Light(ospNewLight((OSPRenderer)handle(), type.c_str()));
+  return Light(ospNewLight(handle(), type.c_str()));
 }
 
 inline void Renderer::renderFrame(const FrameBuffer &fb, uint32_t channels)
 {
-  ospRenderFrame((OSPFrameBuffer)fb.handle(), (OSPRenderer)handle(), channels);
+  ospRenderFrame(fb.handle(), handle(), channels);
 }
 
 

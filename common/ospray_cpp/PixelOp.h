@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class PixelOp : public ManagedObject
+class PixelOp : public ManagedObject<OSPPixelOp>
 {
 public:
 
