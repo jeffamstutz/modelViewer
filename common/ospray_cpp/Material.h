@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Material : public ManagedObject<OSPMaterial>
+class Material : public ManagedObject_T<OSPMaterial>
 {
 public:
 
@@ -33,12 +33,12 @@ public:
 // Inlined function definitions ///////////////////////////////////////////////
 
 inline Material::Material(const Material &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline Material::Material(OSPMaterial existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

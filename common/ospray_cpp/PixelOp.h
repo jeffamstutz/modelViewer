@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class PixelOp : public ManagedObject<OSPPixelOp>
+class PixelOp : public ManagedObject_T<OSPPixelOp>
 {
 public:
 
@@ -43,12 +43,12 @@ inline PixelOp::PixelOp(const std::string &type)
 }
 
 inline PixelOp::PixelOp(const PixelOp &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline PixelOp::PixelOp(OSPPixelOp existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

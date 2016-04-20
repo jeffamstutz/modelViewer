@@ -23,7 +23,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Model : public ManagedObject<OSPModel>
+class Model : public ManagedObject_T<OSPModel>
 {
 public:
 
@@ -54,12 +54,12 @@ inline Model::Model()
 }
 
 inline Model::Model(const Model &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline Model::Model(OSPModel existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

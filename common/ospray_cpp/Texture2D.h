@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Texture2D : public ManagedObject<OSPTexture2D>
+class Texture2D : public ManagedObject_T<OSPTexture2D>
 {
 public:
 
@@ -32,12 +32,12 @@ public:
 // Inlined function definitions ///////////////////////////////////////////////
 
 inline Texture2D::Texture2D(const Texture2D &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline Texture2D::Texture2D(OSPTexture2D existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

@@ -22,7 +22,7 @@
 namespace ospray {
 namespace cpp    {
 
-class FrameBuffer : public ManagedObject<OSPFrameBuffer>
+class FrameBuffer : public ManagedObject_T<OSPFrameBuffer>
 {
 public:
 
@@ -64,19 +64,19 @@ inline FrameBuffer::FrameBuffer(const osp::vec2i &size,
 }
 
 inline FrameBuffer::FrameBuffer(const FrameBuffer &copy) :
-  ManagedObject(copy.handle()),
+  ManagedObject_T(copy.handle()),
   m_owner(false)
 {
 }
 
 inline FrameBuffer::FrameBuffer(FrameBuffer &&move) :
-  ManagedObject(move.handle())
+  ManagedObject_T(move.handle())
 {
   move.m_object = nullptr;
 }
 
 inline FrameBuffer::FrameBuffer(OSPFrameBuffer existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

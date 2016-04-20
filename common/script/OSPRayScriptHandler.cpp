@@ -296,27 +296,27 @@ void OSPRayScriptHandler::registerScriptTypes()
 
   // Class types //
 
-  chaiscript::utility::add_class<ospray::cpp::ManagedObject<>>(*m, "ManagedObject",
+  chaiscript::utility::add_class<ospray::cpp::ManagedObject_T<>>(*m, "ManagedObject",
      {
-       chaiscript::constructor<ospray::cpp::ManagedObject<>()>(),
-       chaiscript::constructor<ospray::cpp::ManagedObject<>(OSPObject)>()
+       chaiscript::constructor<ospray::cpp::ManagedObject_T<>()>(),
+       chaiscript::constructor<ospray::cpp::ManagedObject_T<>(OSPObject)>()
      },
      {
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, const std::string &)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, int)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, int, int)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, int, int, int)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, float)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, float, float)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, float, float, float)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, double)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, double, double)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, double, double, double)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, void*)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, OSPObject)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject<>::*)(const std::string &, const ospray::cpp::ManagedObject<> &)>(&ospray::cpp::ManagedObject<>::set)), "set"},
-       {chaiscript::fun(&ospray::cpp::ManagedObject<>::commit), "commit"},
-       {chaiscript::fun(&ospray::cpp::ManagedObject<>::handle), "handle"}
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, const std::string &)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, int)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, int, int)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, int, int, int)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, float)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, float, float)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, float, float, float)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, double)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, double, double)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, double, double, double)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, void*)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, OSPObject)>(&ospray::cpp::ManagedObject::set)), "set"},
+       //{chaiscript::fun(static_cast<void (ospray::cpp::ManagedObject::*)(const std::string &, const ospray::cpp::ManagedObject &)>(&ospray::cpp::ManagedObject::set)), "set"},
+       {chaiscript::fun(&ospray::cpp::ManagedObject::commit), "commit"},
+       {chaiscript::fun(&ospray::cpp::ManagedObject::object), "handle"}
      }
      );
 
@@ -467,29 +467,29 @@ void OSPRayScriptHandler::registerScriptTypes()
   m_chai.add(chaiscript::base_class<osp::ManagedObject, osp::Volume>());
 
   // ospray::cpp objects
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPCamera>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Camera>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPData>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Data>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPFrameBuffer>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::FrameBuffer>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPGeometry>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Geometry>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPLight>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Light>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPMaterial>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Material>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPModel>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Model>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPPixelOp>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::PixelOp>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPRenderer>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Renderer>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPTransferFunction>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::TransferFunction>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPTexture2D>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Texture2D>());
-  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject<OSPVolume>,
+  m_chai.add(chaiscript::base_class<ospray::cpp::ManagedObject,
                                     ospray::cpp::Volume>());
 }
 

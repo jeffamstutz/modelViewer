@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Data : public ManagedObject<OSPData>
+class Data : public ManagedObject_T<OSPData>
 {
 public:
 
@@ -40,12 +40,12 @@ inline Data::Data(size_t numItems, OSPDataType format,
 }
 
 inline Data::Data(const Data &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline Data::Data(OSPData existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

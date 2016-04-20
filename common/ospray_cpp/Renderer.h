@@ -24,7 +24,7 @@
 namespace ospray {
 namespace cpp    {
 
-class Renderer : public ManagedObject<OSPRenderer>
+class Renderer : public ManagedObject_T<OSPRenderer>
 {
 public:
 
@@ -51,12 +51,12 @@ inline Renderer::Renderer(const std::string &type)
 }
 
 inline Renderer::Renderer(const Renderer &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline Renderer::Renderer(OSPRenderer existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 

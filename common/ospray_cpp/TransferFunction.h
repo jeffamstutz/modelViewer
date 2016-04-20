@@ -21,7 +21,7 @@
 namespace ospray {
 namespace cpp    {
 
-class TransferFunction : public ManagedObject<OSPTransferFunction>
+class TransferFunction : public ManagedObject_T<OSPTransferFunction>
 {
 public:
 
@@ -43,12 +43,12 @@ inline TransferFunction::TransferFunction(const std::string &type)
 }
 
 inline TransferFunction::TransferFunction(const TransferFunction &copy) :
-  ManagedObject(copy.handle())
+  ManagedObject_T(copy.handle())
 {
 }
 
 inline TransferFunction::TransferFunction(OSPTransferFunction existing) :
-  ManagedObject(existing)
+  ManagedObject_T(existing)
 {
 }
 
