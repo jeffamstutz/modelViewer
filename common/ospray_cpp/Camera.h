@@ -27,7 +27,7 @@ public:
 
   Camera(const std::string &type);
   Camera(const Camera &copy);
-  Camera(OSPCamera existing);
+  Camera(OSPCamera existing = nullptr);
 };
 
 // Inlined function definitions ///////////////////////////////////////////////

@@ -15,3 +15,27 @@
 // ======================================================================== //
 
 #pragma once
+
+#include <common/commandline/CommandLineParser.h>
+#include <ospray_cpp/Renderer.h>
+
+#include <string>
+
+class RendererParser : public CommandLineParser
+{
+public:
+  RendererParser() = default;
+
+  virtual void parse(int ac, const char **&av) override;
+
+  ospray::cpp::Renderer renderer();
+
+protected:
+
+  std::string           m_rendererType;
+  ospray::cpp::Renderer m_renderer;
+
+private:
+
+  void finalize();
+};

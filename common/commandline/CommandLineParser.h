@@ -15,3 +15,11 @@
 // ======================================================================== //
 
 #pragma once
+
+class CommandLineParser
+{
+public:
+  virtual ~CommandLineParser(){}
+
+  virtual void parse(int ac, const char **&av) = 0;
+};

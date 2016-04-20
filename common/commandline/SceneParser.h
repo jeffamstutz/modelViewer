@@ -15,3 +15,45 @@
 // ======================================================================== //
 
 #pragma once
+
+#include <common/commandline/CommandLineParser.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
+#include <common/miniSG/miniSG.h>
+
+#include <string>
+
+class SceneParser : public CommandLineParser
+{
+public:
+  SceneParser(ospray::cpp::Renderer);
+
+  virtual void parse(int ac, const char **&av) override;
+
+  ospray::cpp::Model     model();
+  ospray::miniSG::Model* sgmodel();
+
+protected:
+
+  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
+  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
+                                       ospray::miniSG::Material *mat);
+
+  ospray::cpp::Model    m_model;
+  ospray::cpp::Renderer m_renderer;
+
+  bool m_alpha;
+  bool m_createDefaultMaterial;
+  unsigned int m_maxObjectsToConsider;
+
+  // if turned on, we'll put each triangle mesh into its own instance,
+  // no matter what
+  bool m_forceInstancing;
+
+  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
+  std::vector<ospray::miniSG::Model *> m_msgAnimation;
+
+private:
+
+  void finalize();
+};

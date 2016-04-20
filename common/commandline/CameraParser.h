@@ -15,3 +15,27 @@
 // ======================================================================== //
 
 #pragma once
+
+#include <common/commandline/CommandLineParser.h>
+#include <ospray_cpp/Camera.h>
+
+#include <string>
+
+class CameraParser : public CommandLineParser
+{
+public:
+  CameraParser() = default;
+
+  virtual void parse(int ac, const char **&av) override;
+
+  ospray::cpp::Camera camera();
+
+protected:
+
+  std::string         m_cameraType;
+  ospray::cpp::Camera m_camera;
+
+private:
+
+  void finalize();
+};

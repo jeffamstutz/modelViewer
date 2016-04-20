@@ -30,7 +30,7 @@ public:
 
   Renderer(const std::string &type);
   Renderer(const Renderer &copy);
-  Renderer(OSPRenderer existing);
+  Renderer(OSPRenderer existing = nullptr);
 
   Material newMaterial(const std::string &type);
   Light    newLight(const std::string &type);
