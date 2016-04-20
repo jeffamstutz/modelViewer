@@ -300,7 +300,7 @@ void CommandLineSceneBuilder::createScene()
     // check if we have to transform the vertices:
     if (doesInstancing == false &&
         m_msgModel->instance[i] != miniSG::Instance(i)) {
-      for (size_t vID=0;vID<msgMesh->position.size();vID++) {
+      for (size_t vID = 0; vID < msgMesh->position.size(); vID++) {
         msgMesh->position[vID] = xfmPoint(m_msgModel->instance[i].xfm,
                                           msgMesh->position[vID]);
       }
@@ -310,7 +310,7 @@ void CommandLineSceneBuilder::createScene()
     OSPData position = ospNewData(msgMesh->position.size(),
                                   OSP_FLOAT3A,
                                   &msgMesh->position[0],
-        OSP_DATA_SHARED_BUFFER);
+                                  OSP_DATA_SHARED_BUFFER);
     ospMesh.set("position", position);
 
     // add triangle index array to mesh
@@ -318,7 +318,7 @@ void CommandLineSceneBuilder::createScene()
       OSPData primMatID = ospNewData(msgMesh->triangleMaterialId.size(),
                                      OSP_INT,
                                      &msgMesh->triangleMaterialId[0],
-          OSP_DATA_SHARED_BUFFER);
+                                     OSP_DATA_SHARED_BUFFER);
       ospMesh.set("prim.materialID", primMatID);
     }
 
@@ -326,7 +326,7 @@ void CommandLineSceneBuilder::createScene()
     OSPData index = ospNewData(msgMesh->triangle.size(),
                                OSP_INT3,
                                &msgMesh->triangle[0],
-        OSP_DATA_SHARED_BUFFER);
+                               OSP_DATA_SHARED_BUFFER);
     assert(msgMesh->triangle.size() > 0);
     ospMesh.set("index", index);
 
@@ -335,7 +335,7 @@ void CommandLineSceneBuilder::createScene()
       OSPData normal = ospNewData(msgMesh->normal.size(),
                                   OSP_FLOAT3A,
                                   &msgMesh->normal[0],
-          OSP_DATA_SHARED_BUFFER);
+                                  OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->normal.size() > 0);
       ospMesh.set("vertex.normal", normal);
     }
@@ -345,7 +345,7 @@ void CommandLineSceneBuilder::createScene()
       OSPData color = ospNewData(msgMesh->color.size(),
                                  OSP_FLOAT3A,
                                  &msgMesh->color[0],
-          OSP_DATA_SHARED_BUFFER);
+                                 OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->color.size() > 0);
       ospMesh.set("vertex.color", color);
     }
@@ -354,7 +354,7 @@ void CommandLineSceneBuilder::createScene()
       OSPData texcoord = ospNewData(msgMesh->texcoord.size(),
                                     OSP_FLOAT2,
                                     &msgMesh->texcoord[0],
-          OSP_DATA_SHARED_BUFFER);
+                                    OSP_DATA_SHARED_BUFFER);
       assert(msgMesh->texcoord.size() > 0);
       ospMesh.set("vertex.texcoord", texcoord);
     }
