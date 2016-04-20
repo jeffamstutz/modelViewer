@@ -1,5 +1,5 @@
 ## ======================================================================== ##
-## Copyright 2009-2015 Intel Corporation                                    ##
+## Copyright 2009-2016 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
 ## you may not use this file except in compliance with the License.         ##
@@ -14,12 +14,12 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-subdirs(
-  commandline
-  common
-  loaders
-  miniSG
-  script
-  widgets
-  xml
+include_directories(${CMAKE_CURRENT_LIST_DIR})
+
+add_library(ospray_commandline SHARED
+  CommandLineParser.h
+  CameraParser.cpp
+  LightsParser.cpp
+  RendererParser.cpp
+  SceneParser.cpp
 )
