@@ -40,7 +40,6 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
                      cpp::Renderer renderer, cpp::Camera camera,
                      ViewerConfig config)
   : Glut3DWidget(Glut3DWidget::FRAMEBUFFER_NONE),
-    m_sgmodel(sgmodel),
     m_model(model),
     m_fb(nullptr),
     m_renderer(renderer),
@@ -54,7 +53,7 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
                     camera.handle(),
                     this)
 {
-  const box3f worldBounds(m_sgmodel->getBBox());
+  const box3f worldBounds(sgmodel->getBBox());
   setWorldBounds(worldBounds);
 
   if (m_config.verboseOutput) {
@@ -62,10 +61,10 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
          << ", motion speed " << motionSpeed << endl;
   }
 
-  if (m_sgmodel->camera.size() > 0) {
-    setViewPort(m_sgmodel->camera[0]->from,
-                m_sgmodel->camera[0]->at,
-                m_sgmodel->camera[0]->up);
+  if (sgmodel->camera.size() > 0) {
+    setViewPort(sgmodel->camera[0]->from,
+                sgmodel->camera[0]->at,
+                sgmodel->camera[0]->up);
   }
 
   if (!m_config.scriptFileName.empty()) {

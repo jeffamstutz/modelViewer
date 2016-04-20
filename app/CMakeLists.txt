@@ -43,7 +43,7 @@ add_executable(${APP_NAME}
   MSGViewer.cpp
   MSGViewer.h
   ViewerConfig.h
-  modelViewer.cpp
+  debugViewer.cpp
 )
 
 target_link_libraries(${APP_NAME}

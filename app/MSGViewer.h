@@ -65,8 +65,6 @@ private:
 
   // Data //
 
-  miniSG::Model *m_sgmodel;
-
   cpp::Model       m_model;
   cpp::FrameBuffer m_fb;
   cpp::Renderer    m_renderer;
