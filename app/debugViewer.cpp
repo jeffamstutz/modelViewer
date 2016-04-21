@@ -18,7 +18,7 @@
 #include "common/commandline/LightsParser.h"
 #include "common/commandline/RendererParser.h"
 #include "common/commandline/SceneParser.h"
-#include "MSGViewer.h"
+#include "ScriptedOSPGlutViewer.h"
 
 std::string parseForScriptFile(int ac, const char **&av)
 {
@@ -57,8 +57,8 @@ int main(int ac, const char **av)
 
   auto scriptFileName = parseForScriptFile(ac, av);
 
-  ospray::MSGViewer window(sgmodel->getBBox(), model, renderer,
-                           camera, scriptFileName);
+  ospray::ScriptedOSPGlutViewer window(sgmodel->getBBox(), model, renderer,
+                                       camera, scriptFileName);
   window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
 
   ospray::glut3D::runGLUT();

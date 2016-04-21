@@ -28,20 +28,17 @@
 #include <ospray_cpp/Model.h>
 #include <ospray_cpp/Renderer.h>
 
-#include "DebugViewerScriptHandler.h"
-
 namespace ospray {
 
 /*! mini scene graph viewer widget. \internal Note that all handling
   of camera is almost exactly similar to the code in volView;
   might make sense to move that into a common class! */
-class MSGViewer : public ospray::glut3D::Glut3DWidget
+class OSPGlutViewer : public ospray::glut3D::Glut3DWidget
 {
 public:
 
-  MSGViewer(const ospcommon::box3f &worldBounds,
-            cpp::Model model, cpp::Renderer renderer,
-            cpp::Camera camera, std::string scriptFileName = "");
+  OSPGlutViewer(const ospcommon::box3f &worldBounds, cpp::Model model,
+                cpp::Renderer renderer, cpp::Camera camera);
 
   void setRenderer(OSPRenderer renderer);
   void resetAccumulation();
@@ -50,13 +47,14 @@ public:
   void printViewport();
   void saveScreenshot(const std::string &basename);
 
-private:
+protected:
 
-  void reshape(const ospcommon::vec2i &newSize) override;
-  void keypress(char key, const ospcommon::vec2i &where) override;
-  void mouseButton(int32_t whichButton,
-                   bool released,
-                   const ospcommon::vec2i &pos) override;
+  virtual void reshape(const ospcommon::vec2i &newSize) override;
+  virtual void keypress(char key, const ospcommon::vec2i &where) override;
+  virtual void mouseButton(int32_t whichButton, bool released,
+                           const ospcommon::vec2i &pos) override;
+
+private:
 
   void display() override;
 
@@ -80,8 +78,6 @@ private:
   int m_accumID;
   bool m_fullScreen;
   glut3D::Glut3DWidget::ViewPort m_viewPort;
-
-  DebugViewerScriptHandler m_scriptHandler;
 
   std::atomic<bool> m_resetAccum;
 };

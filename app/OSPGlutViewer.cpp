@@ -1,4 +1,4 @@
-﻿#include "MSGViewer.h"
+#include "OSPGlutViewer.h"
 
 using std::cout;
 using std::endl;
@@ -36,9 +36,8 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
 
 namespace ospray {
 
-MSGViewer::MSGViewer(const box3f &worldBounds, cpp::Model model,
-                     cpp::Renderer renderer, cpp::Camera camera,
-                     std::string scriptFileName)
+OSPGlutViewer::OSPGlutViewer(const box3f &worldBounds, cpp::Model model,
+                             cpp::Renderer renderer, cpp::Camera camera)
   : Glut3DWidget(Glut3DWidget::FRAMEBUFFER_NONE),
     m_model(model),
     m_fb(nullptr),
@@ -47,8 +46,7 @@ MSGViewer::MSGViewer(const box3f &worldBounds, cpp::Model model,
     m_queuedRenderer(nullptr),
     m_alwaysRedraw(true),
     m_accumID(-1),
-    m_fullScreen(false),
-    m_scriptHandler(model.handle(), renderer.handle(), camera.handle(), this)
+    m_fullScreen(false)
 {
   setWorldBounds(worldBounds);
 
@@ -62,25 +60,21 @@ MSGViewer::MSGViewer(const box3f &worldBounds, cpp::Model model,
        << ", motion speed " << motionSpeed << endl;
 #endif
 
-  if (!scriptFileName.empty()) {
-    m_scriptHandler.runScriptFromFile(scriptFileName);
-  }
-
   m_resetAccum = false;
 }
 
-void MSGViewer::setRenderer(OSPRenderer renderer)
+void OSPGlutViewer::setRenderer(OSPRenderer renderer)
 {
   lock_guard<mutex> lock{m_rendererMutex};
   m_queuedRenderer = renderer;
 }
 
-void MSGViewer::resetAccumulation()
+void OSPGlutViewer::resetAccumulation()
 {
   m_resetAccum = true;
 }
 
-void MSGViewer::toggleFullscreen()
+void OSPGlutViewer::toggleFullscreen()
 {
   m_fullScreen = !m_fullScreen;
   if(m_fullScreen) {
@@ -90,12 +84,12 @@ void MSGViewer::toggleFullscreen()
   }
 }
 
-void MSGViewer::resetView()
+void OSPGlutViewer::resetView()
 {
   viewPort = m_viewPort;
 }
 
-void MSGViewer::printViewport()
+void OSPGlutViewer::printViewport()
 {
   printf("-vp %f %f %f -vu %f %f %f -vi %f %f %f\n",
          viewPort.from.x, viewPort.from.y, viewPort.from.z,
@@ -104,7 +98,7 @@ void MSGViewer::printViewport()
   fflush(stdout);
 }
 
-void MSGViewer::saveScreenshot(const std::string &basename)
+void OSPGlutViewer::saveScreenshot(const std::string &basename)
 {
   const uint32_t *p = (uint32_t*)m_fb.map(OSP_FB_COLOR);
   writePPM(basename + ".ppm", m_windowSize.x, m_windowSize.y, p);
@@ -112,7 +106,7 @@ void MSGViewer::saveScreenshot(const std::string &basename)
        << endl;
 }
 
-void MSGViewer::reshape(const vec2i &newSize)
+void OSPGlutViewer::reshape(const vec2i &newSize)
 {
   Glut3DWidget::reshape(newSize);
   m_windowSize = newSize;
@@ -128,14 +122,9 @@ void MSGViewer::reshape(const vec2i &newSize)
   forceRedraw();
 }
 
-void MSGViewer::keypress(char key, const vec2i &where)
+void OSPGlutViewer::keypress(char key, const vec2i &where)
 {
   switch (key) {
-  case ':':
-    if (!m_scriptHandler.running()) {
-      m_scriptHandler.start();
-    }
-    break;
   case 'R':
     m_alwaysRedraw = !m_alwaysRedraw;
     forceRedraw();
@@ -184,7 +173,9 @@ void MSGViewer::keypress(char key, const vec2i &where)
   }
 }
 
-void MSGViewer::mouseButton(int32_t whichButton, bool released, const vec2i &pos)
+void OSPGlutViewer::mouseButton(int32_t whichButton,
+                                bool released,
+                                const vec2i &pos)
 {
   Glut3DWidget::mouseButton(whichButton, released, pos);
   if((currButtonState ==  (1<<GLUT_LEFT_BUTTON)) &&
@@ -204,7 +195,7 @@ void MSGViewer::mouseButton(int32_t whichButton, bool released, const vec2i &pos
   }
 }
 
-void MSGViewer::display()
+void OSPGlutViewer::display()
 {
   if (!m_fb.handle() || !m_renderer.handle()) return;
 
@@ -275,7 +266,7 @@ void MSGViewer::display()
   }
 }
 
-void MSGViewer::switchRenderers()
+void OSPGlutViewer::switchRenderers()
 {
   lock_guard<mutex> lock{m_rendererMutex};
 

@@ -16,28 +16,26 @@
 
 #pragma once
 
-#include "common/script/OSPRayScriptHandler.h"
+#include "OSPGlutViewer.h"
+#include "DebugViewerScriptHandler.h"
+
+#include <mutex>
 
 namespace ospray {
 
-class ScriptedOSPGlutViewer;
-
-class DebugViewerScriptHandler : public OSPRayScriptHandler
+class ScriptedOSPGlutViewer : public OSPGlutViewer
 {
 public:
 
-  DebugViewerScriptHandler(OSPModel     model,
-                           OSPRenderer  renderer,
-                           OSPCamera    camera,
-                           ScriptedOSPGlutViewer   *viewer);
+  ScriptedOSPGlutViewer(const ospcommon::box3f &worldBounds,
+                        cpp::Model model, cpp::Renderer renderer,
+                        cpp::Camera camera, std::string scriptFileName = "");
 
 private:
 
-  void registerScriptFunctions();
+  void keypress(char key, const ospcommon::vec2i &where) override;
 
-  // Data //
-
-  ScriptedOSPGlutViewer *m_viewer;
+  DebugViewerScriptHandler m_scriptHandler;
 };
 
 }// namespace ospray

@@ -38,8 +38,10 @@ include_directories(
 add_executable(${APP_NAME}
   DebugViewerScriptHandler.cpp
   DebugViewerScriptHandler.h
-  MSGViewer.cpp
-  MSGViewer.h
+  OSPGlutViewer.cpp
+  OSPGlutViewer.h
+  ScriptedOSPGlutViewer.cpp
+  ScriptedOSPGlutViewer.h
   debugViewer.cpp
 )
 

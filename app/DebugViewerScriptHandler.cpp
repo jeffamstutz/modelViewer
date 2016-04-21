@@ -1,6 +1,6 @@
 #include "DebugViewerScriptHandler.h"
 
-#include "MSGViewer.h"
+#include "ScriptedOSPGlutViewer.h"
 
 #include <iostream>
 using std::endl;
@@ -10,7 +10,7 @@ namespace ospray {
 DebugViewerScriptHandler::DebugViewerScriptHandler(OSPModel    model,
                                                    OSPRenderer renderer,
                                                    OSPCamera   camera,
-                                                   MSGViewer  *viewer) :
+                                                   ScriptedOSPGlutViewer  *viewer) :
   OSPRayScriptHandler(model, renderer, camera),
   m_viewer(viewer)
 {
