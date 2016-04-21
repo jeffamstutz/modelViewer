@@ -35,6 +35,8 @@ protected:
   std::string           m_rendererType;
   ospray::cpp::Renderer m_renderer;
 
+  int m_spp{1};
+
 private:
 
   void finalize();

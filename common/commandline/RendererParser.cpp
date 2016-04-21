@@ -7,6 +7,8 @@ void RendererParser::parse(int ac, const char **&av)
     if (arg == "--renderer" || arg == "-r") {
       assert(i+1 < ac);
       m_rendererType = av[++i];
+    } else if (arg == "--spp" || arg == "-spp") {
+      m_spp = atoi(av[++i]);
     }
   }
 
@@ -31,6 +33,8 @@ void RendererParser::finalize()
     m_renderer.set("aoSamples", 1);
     m_renderer.set("shadowsEnabled", 1);
   }
+
+  m_renderer.set("spp", m_spp);
 
   m_renderer.commit();
 }

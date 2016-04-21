@@ -59,7 +59,6 @@ int main(int ac, const char **av)
   renderer.set("world",  model);
   renderer.set("model",  model);
   renderer.set("camera", camera);
-  renderer.set("spp", 1);// NOTE(jda) - this should be set in the viewer??
   renderer.commit();
 
   ospray::MSGViewer window(sgmodel, model, renderer, camera, scriptFileName);
