@@ -139,7 +139,7 @@ inline ManagedObject_T<OSP_TYPE>::~ManagedObject_T()
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const std::string &v)
+                                           const std::string &v)
 {
   ospSetString(m_object, name.c_str(), v.c_str());
 }
@@ -152,14 +152,14 @@ inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name, int v)
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         int v1, int v2)
+                                           int v1, int v2)
 {
   ospSet2i(m_object, name.c_str(), v1, v2);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         int v1, int v2, int v3)
+                                           int v1, int v2, int v3)
 {
   ospSet3i(m_object, name.c_str(), v1, v2, v3);
 }
@@ -172,14 +172,14 @@ inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name, float v)
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         float v1, float v2)
+                                           float v1, float v2)
 {
   ospSet2f(m_object, name.c_str(), v1, v2);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                               float v1, float v2, float v3)
+                                           float v1, float v2, float v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
 }
@@ -192,49 +192,49 @@ inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name, double v)
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         double v1, double v2)
+                                           double v1, double v2)
 {
   ospSet2f(m_object, name.c_str(), v1, v2);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         double v1, double v2, double v3)
+                                           double v1, double v2, double v3)
 {
   ospSet3f(m_object, name.c_str(), v1, v2, v3);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const ospcommon::vec2i &v)
+                                           const ospcommon::vec2i &v)
 {
   ospSetVec2i(m_object, name.c_str(), (const osp::vec2i&)v);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const ospcommon::vec2f &v)
+                                           const ospcommon::vec2f &v)
 {
   ospSetVec2f(m_object, name.c_str(), (const osp::vec2f&)v);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const ospcommon::vec3i &v)
+                                           const ospcommon::vec3i &v)
 {
   ospSetVec3i(m_object, name.c_str(), (const osp::vec3i&)v);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const ospcommon::vec3f &v)
+                                           const ospcommon::vec3f &v)
 {
   ospSetVec3f(m_object, name.c_str(), (const osp::vec3f&)v);
 }
 
 template <typename OSP_TYPE>
 inline void ManagedObject_T<OSP_TYPE>::set(const std::string &name,
-                                         const ospcommon::vec4f &v)
+                                           const ospcommon::vec4f &v)
 {
   ospSetVec4f(m_object, name.c_str(), (const osp::vec4f&)v);
 }

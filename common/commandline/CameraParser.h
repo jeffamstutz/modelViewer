@@ -35,6 +35,10 @@ protected:
   std::string         m_cameraType;
   ospray::cpp::Camera m_camera;
 
+  ospcommon::vec3f m_eye {-1,  1, -1};
+  ospcommon::vec3f m_up  { 1, -1,  1};
+  ospcommon::vec3f m_gaze{ 0,  1,  0};
+
 private:
 
   void finalize();
