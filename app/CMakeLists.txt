@@ -38,8 +38,6 @@ include_directories(
 add_executable(${APP_NAME}
   DebugViewerScriptHandler.cpp
   DebugViewerScriptHandler.h
-  CommandLineSceneBuilder.cpp
-  CommandLineSceneBuilder.h
   MSGViewer.cpp
   MSGViewer.h
   ViewerConfig.h

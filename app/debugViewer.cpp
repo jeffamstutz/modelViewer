@@ -14,7 +14,6 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "CommandLineSceneBuilder.h"
 #include "common/commandline/CameraParser.h"
 #include "common/commandline/LightsParser.h"
 #include "common/commandline/RendererParser.h"
@@ -25,11 +24,6 @@ int main(int ac, const char **av)
 {
   ospInit(&ac,av);
   ospray::glut3D::initGLUT(&ac,av);
-#if 0
-  ospray::CommandLineSceneBuilder clb(ac, av);
-  ospray::MSGViewer window(clb.sgmodel(), clb.model(), clb.renderer(),
-                           clb.camera(), clb.viewerConfig());
-#else
   CameraParser cameraParser;
   cameraParser.parse(ac, av);
   auto camera = cameraParser.camera();
@@ -53,7 +47,7 @@ int main(int ac, const char **av)
   renderer.commit();
 
   ospray::MSGViewer window(sgmodel, model, renderer, camera, ViewerConfig());
-#endif
   window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
+
   ospray::glut3D::runGLUT();
 }
