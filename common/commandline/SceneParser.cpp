@@ -121,6 +121,8 @@ void SceneParser::parse(int ac, const char **&av)
       }
     }
   }
+
+  finalize();
 }
 
 cpp::Model SceneParser::model()

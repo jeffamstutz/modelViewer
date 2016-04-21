@@ -24,5 +24,13 @@ void RendererParser::finalize()
     m_rendererType = "ao1";
 
   m_renderer = ospray::cpp::Renderer(m_rendererType.c_str());
+
+  // Set renderer defaults (if not using 'aoX' renderers)
+  if (m_rendererType[0] != 'a' && m_rendererType[1] != 'o')
+  {
+    m_renderer.set("aoSamples", 1);
+    m_renderer.set("shadowsEnabled", 1);
+  }
+
   m_renderer.commit();
 }
