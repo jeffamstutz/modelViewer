@@ -18,9 +18,11 @@
 #include "common/commandline/LightsParser.h"
 #include "common/commandline/RendererParser.h"
 #include "common/commandline/SceneParser.h"
+#include "common/commandline/Utility.h"
+
 #include "ScriptedOSPGlutViewer.h"
 
-std::string parseForScriptFile(int ac, const char **&av)
+std::string scriptFileFromCommandLine(int ac, const char **&av)
 {
   std::string scriptFileName;
 
@@ -39,25 +41,19 @@ int main(int ac, const char **av)
   ospInit(&ac,av);
   ospray::glut3D::initGLUT(&ac,av);
 
-  CameraParser cameraParser;
-  cameraParser.parse(ac, av);
-  auto camera = cameraParser.camera();
+  auto ospObjs = parseCommandLine<RendererParser, CameraParser,
+                                  SceneParser, LightsParser>(ac, av);
 
-  RendererParser rendererParser;
-  rendererParser.parse(ac, av);
-  auto renderer = rendererParser.renderer();
+  ospcommon::box3f       bbox;
+  ospray::cpp::Model     model;
+  ospray::cpp::Renderer  renderer;
+  ospray::cpp::Camera    camera;
 
-  SceneParser sceneParser{rendererParser.renderer()};
-  sceneParser.parse(ac, av);
-  auto sgmodel = sceneParser.sgmodel();
-  auto model   = sceneParser.model();
+  std::tie(bbox, model, renderer, camera) = ospObjs;
 
-  LightsParser lightsParser(renderer);
-  lightsParser.parse(ac, av);
+  auto scriptFileName = scriptFileFromCommandLine(ac, av);
 
-  auto scriptFileName = parseForScriptFile(ac, av);
-
-  ospray::ScriptedOSPGlutViewer window(sgmodel->getBBox(), model, renderer,
+  ospray::ScriptedOSPGlutViewer window(bbox, model, renderer,
                                        camera, scriptFileName);
   window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
 

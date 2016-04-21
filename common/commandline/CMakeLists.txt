@@ -22,4 +22,5 @@ add_library(ospray_commandline SHARED
   LightsParser.cpp
   RendererParser.cpp
   SceneParser.cpp
+  Utility.h
 )
