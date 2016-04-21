@@ -20,6 +20,20 @@
 #include "common/commandline/SceneParser.h"
 #include "MSGViewer.h"
 
+std::string parseForScriptFile(int ac, const char **&av)
+{
+  std::string scriptFileName;
+
+  for (int i = 1; i < ac; i++) {
+    const std::string arg = av[i];
+    if (arg == "--script" || arg == "-s") {
+      scriptFileName = av[++i];
+    }
+  }
+
+  return scriptFileName;
+}
+
 int main(int ac, const char **av)
 {
   ospInit(&ac,av);
@@ -40,13 +54,15 @@ int main(int ac, const char **av)
   LightsParser lightsParser(renderer);
   lightsParser.parse(ac, av);
 
+  auto scriptFileName = parseForScriptFile(ac, av);
+
   renderer.set("world",  model);
   renderer.set("model",  model);
   renderer.set("camera", camera);
   renderer.set("spp", 1);// NOTE(jda) - this should be set in the viewer??
   renderer.commit();
 
-  ospray::MSGViewer window(sgmodel, model, renderer, camera, ViewerConfig());
+  ospray::MSGViewer window(sgmodel, model, renderer, camera, scriptFileName);
   window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
 
   ospray::glut3D::runGLUT();

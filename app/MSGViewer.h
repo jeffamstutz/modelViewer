@@ -28,8 +28,6 @@
 #include <ospray_cpp/Model.h>
 #include <ospray_cpp/Renderer.h>
 
-#include "ViewerConfig.h"
-
 #include "DebugViewerScriptHandler.h"
 
 namespace ospray {
@@ -42,7 +40,7 @@ class MSGViewer : public ospray::glut3D::Glut3DWidget
 public:
 
   MSGViewer(miniSG::Model *sgmodel, cpp::Model model, cpp::Renderer renderer,
-            cpp::Camera camera, ViewerConfig config = ViewerConfig());
+            cpp::Camera camera, std::string scriptFileName = "");
 
   void setRenderer(OSPRenderer renderer);
   void resetAccumulation();
@@ -75,7 +73,7 @@ private:
   std::mutex m_rendererMutex;
   cpp::Renderer m_queuedRenderer;
 
-  ViewerConfig m_config;
+  bool m_alwaysRedraw;
 
   ospcommon::vec2i m_windowSize;
   int m_accumID;

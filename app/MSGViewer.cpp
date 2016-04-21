@@ -38,14 +38,14 @@ namespace ospray {
 
 MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
                      cpp::Renderer renderer, cpp::Camera camera,
-                     ViewerConfig config)
+                     std::string scriptFileName)
   : Glut3DWidget(Glut3DWidget::FRAMEBUFFER_NONE),
     m_model(model),
     m_fb(nullptr),
     m_renderer(renderer),
     m_camera(camera),
     m_queuedRenderer(nullptr),
-    m_config(config),
+    m_alwaysRedraw(true),
     m_accumID(-1),
     m_fullScreen(false),
     m_scriptHandler(model.handle(),
@@ -56,10 +56,10 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
   const box3f worldBounds(sgmodel->getBBox());
   setWorldBounds(worldBounds);
 
-  if (m_config.verboseOutput) {
-    cout << "#ospDebugViewer: set world bounds " << worldBounds
-         << ", motion speed " << motionSpeed << endl;
-  }
+#if 0
+  cout << "#ospDebugViewer: set world bounds " << worldBounds
+       << ", motion speed " << motionSpeed << endl;
+#endif
 
   if (sgmodel->camera.size() > 0) {
     setViewPort(sgmodel->camera[0]->from,
@@ -67,8 +67,8 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
                 sgmodel->camera[0]->up);
   }
 
-  if (!m_config.scriptFileName.empty()) {
-    m_scriptHandler.runScriptFromFile(m_config.scriptFileName);
+  if (!scriptFileName.empty()) {
+    m_scriptHandler.runScriptFromFile(scriptFileName);
   }
 
   m_resetAccum = false;
@@ -77,8 +77,6 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
 void MSGViewer::setRenderer(OSPRenderer renderer)
 {
   lock_guard<mutex> lock{m_rendererMutex};
-  (void)lock;// NOTE(jda) - squash "unused variable" warning...
-
   m_queuedRenderer = renderer;
 }
 
@@ -144,16 +142,7 @@ void MSGViewer::keypress(char key, const vec2i &where)
     }
     break;
   case 'R':
-    m_config.alwaysRedraw = !m_config.alwaysRedraw;
-    forceRedraw();
-    break;
-  case 'S':
-    m_config.doShadows = !m_config.doShadows;
-    cout << "Switching shadows " << (m_config.doShadows?"ON":"OFF") << endl;
-    m_renderer.set("shadowsEnabled", m_config.doShadows);
-    m_renderer.commit();
-    m_accumID = 0;
-    m_fb.clear(OSP_FB_ACCUM);
+    m_alwaysRedraw = !m_alwaysRedraw;
     forceRedraw();
     break;
   case '!':
@@ -282,7 +271,7 @@ void MSGViewer::display()
 
   std::string title("OSPRay Debug Viewer");
 
-  if (m_config.alwaysRedraw) {
+  if (m_alwaysRedraw) {
     title += " (" + std::to_string(m_fps.getFPS()) + " fps)";
     setTitle(title);
     forceRedraw();
@@ -294,7 +283,6 @@ void MSGViewer::display()
 void MSGViewer::switchRenderers()
 {
   lock_guard<mutex> lock{m_rendererMutex};
-  (void)lock;// NOTE(jda) - squash "unused variable" warning...
 
   if (m_queuedRenderer.handle()) {
     m_renderer = m_queuedRenderer;

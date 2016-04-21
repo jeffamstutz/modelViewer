@@ -40,7 +40,6 @@ add_executable(${APP_NAME}
   DebugViewerScriptHandler.h
   MSGViewer.cpp
   MSGViewer.h
-  ViewerConfig.h
   debugViewer.cpp
 )
 
