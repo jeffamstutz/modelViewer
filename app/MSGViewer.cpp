@@ -36,7 +36,7 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
 
 namespace ospray {
 
-MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
+MSGViewer::MSGViewer(const box3f &worldBounds, cpp::Model model,
                      cpp::Renderer renderer, cpp::Camera camera,
                      std::string scriptFileName)
   : Glut3DWidget(Glut3DWidget::FRAMEBUFFER_NONE),
@@ -48,24 +48,19 @@ MSGViewer::MSGViewer(miniSG::Model *sgmodel, cpp::Model model,
     m_alwaysRedraw(true),
     m_accumID(-1),
     m_fullScreen(false),
-    m_scriptHandler(model.handle(),
-                    renderer.handle(),
-                    camera.handle(),
-                    this)
+    m_scriptHandler(model.handle(), renderer.handle(), camera.handle(), this)
 {
-  const box3f worldBounds(sgmodel->getBBox());
   setWorldBounds(worldBounds);
+
+  m_renderer.set("world",  m_model);
+  m_renderer.set("model",  m_model);
+  m_renderer.set("camera", m_camera);
+  m_renderer.commit();
 
 #if 0
   cout << "#ospDebugViewer: set world bounds " << worldBounds
        << ", motion speed " << motionSpeed << endl;
 #endif
-
-  if (sgmodel->camera.size() > 0) {
-    setViewPort(sgmodel->camera[0]->from,
-                sgmodel->camera[0]->at,
-                sgmodel->camera[0]->up);
-  }
 
   if (!scriptFileName.empty()) {
     m_scriptHandler.runScriptFromFile(scriptFileName);

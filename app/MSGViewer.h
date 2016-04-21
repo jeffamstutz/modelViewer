@@ -39,7 +39,8 @@ class MSGViewer : public ospray::glut3D::Glut3DWidget
 {
 public:
 
-  MSGViewer(miniSG::Model *sgmodel, cpp::Model model, cpp::Renderer renderer,
+  MSGViewer(const ospcommon::box3f &worldBounds,
+            cpp::Model model, cpp::Renderer renderer,
             cpp::Camera camera, std::string scriptFileName = "");
 
   void setRenderer(OSPRenderer renderer);

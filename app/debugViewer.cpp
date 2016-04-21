@@ -38,6 +38,7 @@ int main(int ac, const char **av)
 {
   ospInit(&ac,av);
   ospray::glut3D::initGLUT(&ac,av);
+
   CameraParser cameraParser;
   cameraParser.parse(ac, av);
   auto camera = cameraParser.camera();
@@ -56,12 +57,8 @@ int main(int ac, const char **av)
 
   auto scriptFileName = parseForScriptFile(ac, av);
 
-  renderer.set("world",  model);
-  renderer.set("model",  model);
-  renderer.set("camera", camera);
-  renderer.commit();
-
-  ospray::MSGViewer window(sgmodel, model, renderer, camera, scriptFileName);
+  ospray::MSGViewer window(sgmodel->getBBox(), model, renderer,
+                           camera, scriptFileName);
   window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
 
   ospray::glut3D::runGLUT();
