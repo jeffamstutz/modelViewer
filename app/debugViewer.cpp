@@ -43,6 +43,9 @@ int main(int ac, const char **av)
   auto sgmodel = sceneParser.sgmodel();
   auto model   = sceneParser.model();
 
+  LightsParser lightsParser(renderer);
+  lightsParser.parse(ac, av);
+
   renderer.set("world",  model);
   renderer.set("model",  model);
   renderer.set("camera", camera);
