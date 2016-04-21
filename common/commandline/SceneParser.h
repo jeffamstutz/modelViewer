@@ -55,5 +55,8 @@ protected:
 
 private:
 
+  void createSpheres();
+  void createCylinders();
+
   void finalize();
 };
