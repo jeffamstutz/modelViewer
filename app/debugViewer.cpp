@@ -41,13 +41,12 @@ int main(int ac, const char **av)
   ospInit(&ac,av);
   ospray::glut3D::initGLUT(&ac,av);
 
-  auto ospObjs = parseCommandLine<RendererParser, CameraParser,
-                                  SceneParser, LightsParser>(ac, av);
+  auto ospObjs = parseWithDefaultParsers(ac, av);
 
-  ospcommon::box3f       bbox;
-  ospray::cpp::Model     model;
-  ospray::cpp::Renderer  renderer;
-  ospray::cpp::Camera    camera;
+  ospcommon::box3f      bbox;
+  ospray::cpp::Model    model;
+  ospray::cpp::Renderer renderer;
+  ospray::cpp::Camera   camera;
 
   std::tie(bbox, model, renderer, camera) = ospObjs;
 

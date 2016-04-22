@@ -16,11 +16,17 @@
 
 #pragma once
 
-#include <tuple>
-
 #include <ospray_cpp/Camera.h>
 #include <ospray_cpp/Model.h>
 #include <ospray_cpp/Renderer.h>
+
+#include "commandline/CameraParser.h"
+#include "commandline/LightsParser.h"
+#include "commandline/SceneParser.h"
+#include "commandline/RendererParser.h"
+
+#include <tuple>
+#include <type_traits>
 
 using ParsedOSPObjects = std::tuple<ospcommon::box3f,
                                     ospray::cpp::Model,
@@ -31,8 +37,17 @@ template <typename RendererParser_T,
           typename CameraParser_T,
           typename SceneParser_T,
           typename LightsParser_T>
-ParsedOSPObjects parseCommandLine(int ac, const char **&av)
+inline ParsedOSPObjects parseCommandLine(int ac, const char **&av)
 {
+  static_assert(std::is_base_of<RendererParser, RendererParser_T>::value,
+                "RendererParser_T is not a subclass of RendererParser.");
+  static_assert(std::is_base_of<CameraParser, CameraParser_T>::value,
+                "CameraParser_T is not a subclass of CameraParser.");
+  static_assert(std::is_base_of<SceneParser, SceneParser_T>::value,
+                "SceneParser_T is not a subclass of SceneParser.");
+  static_assert(std::is_base_of<LightsParser, LightsParser_T>::value,
+                "LightsParser_T is not a subclass of LightsParser.");
+
   CameraParser_T cameraParser;
   cameraParser.parse(ac, av);
   auto camera = cameraParser.camera();
@@ -50,4 +65,10 @@ ParsedOSPObjects parseCommandLine(int ac, const char **&av)
   lightsParser.parse(ac, av);
 
   return std::make_tuple(sgmodel->getBBox(), model, renderer, camera);
+}
+
+inline ParsedOSPObjects parseWithDefaultParsers(int ac, const char**& av)
+{
+  return parseCommandLine<DefaultRendererParser, DefaultCameraParser,
+                          DefaultSceneParser, DefaultLightsParser>(ac, av);
 }

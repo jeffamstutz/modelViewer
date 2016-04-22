@@ -24,11 +24,15 @@
 class RendererParser : public CommandLineParser
 {
 public:
-  RendererParser() = default;
+  virtual ospray::cpp::Renderer renderer() = 0;
+};
 
-  virtual void parse(int ac, const char **&av) override;
-
-  ospray::cpp::Renderer renderer();
+class DefaultRendererParser : public RendererParser
+{
+public:
+  DefaultRendererParser() = default;
+  void parse(int ac, const char **&av) override;
+  ospray::cpp::Renderer renderer() override;
 
 protected:
 

@@ -80,7 +80,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 
 // SceneParser definitions ////////////////////////////////////////////////////
 
-SceneParser::SceneParser(cpp::Renderer renderer) :
+DefaultSceneParser::DefaultSceneParser(cpp::Renderer renderer) :
   m_renderer(renderer),
   m_msgModel(new miniSG::Model),
   m_alpha(false),
@@ -90,7 +90,7 @@ SceneParser::SceneParser(cpp::Renderer renderer) :
 {
 }
 
-void SceneParser::parse(int ac, const char **&av)
+void DefaultSceneParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -135,18 +135,18 @@ void SceneParser::parse(int ac, const char **&av)
 #endif
 }
 
-cpp::Model SceneParser::model()
+cpp::Model DefaultSceneParser::model()
 {
   return m_model;
 }
 
-miniSG::Model *SceneParser::sgmodel()
+miniSG::Model *DefaultSceneParser::sgmodel()
 {
   return m_msgModel.ptr;
 }
 
 cpp::Material
-SceneParser::createDefaultMaterial(cpp::Renderer renderer)
+DefaultSceneParser::createDefaultMaterial(cpp::Renderer renderer)
 {
   if(!m_createDefaultMaterial) return nullptr;
 
@@ -161,7 +161,7 @@ SceneParser::createDefaultMaterial(cpp::Renderer renderer)
   return ospMat;
 }
 
-cpp::Material SceneParser::createMaterial(cpp::Renderer renderer,
+cpp::Material DefaultSceneParser::createMaterial(cpp::Renderer renderer,
                                           miniSG::Material *mat)
 {
   if (mat == nullptr)
@@ -239,7 +239,7 @@ cpp::Material SceneParser::createMaterial(cpp::Renderer renderer,
   return ospMat;
 }
 
-void SceneParser::createSpheres()
+void DefaultSceneParser::createSpheres()
 {
   struct Sphere {
     vec3f center;
@@ -293,7 +293,7 @@ void SceneParser::createSpheres()
   m_model.commit();
 }
 
-void SceneParser::createCylinders()
+void DefaultSceneParser::createCylinders()
 {
   struct Cylinder {
     vec3f v0;
@@ -351,7 +351,7 @@ void SceneParser::createCylinders()
   m_model.commit();
 }
 
-void SceneParser::finalize()
+void DefaultSceneParser::finalize()
 {
   // code does not yet do instancing ... check that the model doesn't
   // contain instances

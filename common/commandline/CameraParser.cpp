@@ -1,6 +1,6 @@
 #include "CameraParser.h"
 
-void CameraParser::parse(int ac, const char **&av)
+void DefaultCameraParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -27,12 +27,12 @@ void CameraParser::parse(int ac, const char **&av)
   finalize();
 }
 
-ospray::cpp::Camera CameraParser::camera()
+ospray::cpp::Camera DefaultCameraParser::camera()
 {
   return m_camera;
 }
 
-void CameraParser::finalize()
+void DefaultCameraParser::finalize()
 {
   if (m_cameraType.empty())
     m_cameraType = "perspective";

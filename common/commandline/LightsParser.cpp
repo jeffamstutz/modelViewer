@@ -6,13 +6,13 @@
 
 using namespace ospcommon;
 
-LightsParser::LightsParser(ospray::cpp::Renderer renderer) :
+DefaultLightsParser::DefaultLightsParser(ospray::cpp::Renderer renderer) :
   m_renderer(renderer),
   m_defaultDirLight_direction(.3, -1, -.2)
 {
 }
 
-void LightsParser::parse(int ac, const char **&av)
+void DefaultLightsParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -30,7 +30,7 @@ void LightsParser::parse(int ac, const char **&av)
   finalize();
 }
 
-void LightsParser::finalize()
+void DefaultLightsParser::finalize()
 {
   //TODO: Need to figure out where we're going to read lighting data from
   std::vector<OSPLight> lights;

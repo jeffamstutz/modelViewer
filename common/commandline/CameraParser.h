@@ -24,11 +24,15 @@
 class CameraParser : public CommandLineParser
 {
 public:
-  CameraParser() = default;
+  virtual ospray::cpp::Camera camera() = 0;
+};
 
-  virtual void parse(int ac, const char **&av) override;
-
-  ospray::cpp::Camera camera();
+class DefaultCameraParser : public CameraParser
+{
+public:
+  DefaultCameraParser() = default;
+  void parse(int ac, const char **&av) override;
+  ospray::cpp::Camera camera() override;
 
 protected:
 

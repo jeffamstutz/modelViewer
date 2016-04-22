@@ -26,7 +26,14 @@
 class SceneParser : public CommandLineParser
 {
 public:
-  SceneParser(ospray::cpp::Renderer);
+  virtual ospray::cpp::Model     model()   = 0;
+  virtual ospray::miniSG::Model* sgmodel() = 0;
+};
+
+class DefaultSceneParser : public SceneParser
+{
+public:
+  DefaultSceneParser(ospray::cpp::Renderer);
 
   virtual void parse(int ac, const char **&av) override;
 
