@@ -37,8 +37,8 @@ public:
 
   virtual void parse(int ac, const char **&av) override;
 
-  ospray::cpp::Model     model();
-  ospray::miniSG::Model* sgmodel();
+  ospray::cpp::Model     model() override;
+  ospray::miniSG::Model* sgmodel() override;
 
 protected:
 
