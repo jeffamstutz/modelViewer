@@ -526,10 +526,9 @@ static void createOSPRenderer(OSPRayFixture *f)
 
 static void createFramebuffer(OSPRayFixture *f)
 {
-  f->fb = ospray::cpp::FrameBuffer(osp::vec2i{f->width, f->height}, OSP_RGBA_I8,
+  f->fb = ospray::cpp::FrameBuffer(osp::vec2i{f->width, f->height},
+                                   OSP_FB_SRGBA,
                                    OSP_FB_COLOR|OSP_FB_ACCUM);
-  f->fb.set("gamma", 2.2f);
-  f->fb.commit();
   f->fb.clear(OSP_FB_ACCUM | OSP_FB_COLOR);
 }
 

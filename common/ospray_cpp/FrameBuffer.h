@@ -29,7 +29,7 @@ public:
   FrameBuffer() = default;//NOTE(jda) - this does *not* create the underlying
                           //            OSP object
   FrameBuffer(const osp::vec2i &size,
-              OSPFrameBufferFormat format = OSP_RGBA_I8,
+              OSPFrameBufferFormat format = OSP_FB_SRGBA,
               int channels = OSP_FB_COLOR);
   FrameBuffer(const FrameBuffer &copy);
   FrameBuffer(FrameBuffer &&move);
