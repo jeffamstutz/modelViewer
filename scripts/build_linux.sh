@@ -28,6 +28,11 @@ if [ ! -d ospray ]; then
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
     -DCMAKE_INSTALL_PREFIX=${OSPRAY_INSTALL_DIR} \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DOSPRAY_APPS_MODELVIEWER=OFF \
+    -DOSPRAY_APPS_QTVIEWER=OFF \
+    -DOSPRAY_APPS_VOLUMEVIEWER=OFF \
+    -DOSPRAY_MODULE_OPENGL_UTIL=OFF \
     ../src &> /dev/null
   make -j`nproc` install &> /dev/null
   echo 'done'
