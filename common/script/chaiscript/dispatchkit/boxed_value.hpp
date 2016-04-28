@@ -1,7 +1,7 @@
 // This file is distributed under the BSD License.
 // See "license.txt" for details.
 // Copyright 2009-2012, Jonathan Turner (jonathan@emptycrate.com)
-// Copyright 2009-2015, Jason Turner (jason@emptycrate.com)
+// Copyright 2009-2016, Jason Turner (jason@emptycrate.com)
 // http://www.chaiscript.com
 
 #ifndef CHAISCRIPT_BOXED_VALUE_HPP_
@@ -294,6 +294,13 @@ namespace chaiscript
         {
           m_data->m_attrs = std::unique_ptr<std::map<std::string, std::shared_ptr<Data>>>(new std::map<std::string, std::shared_ptr<Data>>(*t_obj.m_data->m_attrs));
         }
+        return *this;
+      }
+
+      Boxed_Value &clone_attrs(const Boxed_Value &t_obj)
+      {
+        copy_attrs(t_obj);
+        reset_return_value();
         return *this;
       }
 
