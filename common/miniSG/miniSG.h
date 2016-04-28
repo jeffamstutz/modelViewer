@@ -74,7 +74,6 @@ namespace ospray {
         } DataType;
 
         void clear() {
-          Assert2(this != nullptr, "Tried to clear a null parameter");
           switch( type ) {
             case STRING:
               if (s) free((void*)s);

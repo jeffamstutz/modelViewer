@@ -47,15 +47,15 @@ namespace hayai
                               const std::string&,
                               const TestParametersDescriptor&,
                               const std::size_t&,
-                              const std::size_t&)
+                              const std::size_t&) override
         {
         }
 
 
-        virtual void EndTest(const std::string&,
-                             const std::string&,
-                             const TestParametersDescriptor&,
-                             const TestResult& result)
+        void EndTest(const std::string&,
+                     const std::string&,
+                     const TestParametersDescriptor&,
+                     const TestResult& result) override
         {
             _stream << Console::TextBlue
                     << Console::TextDefault
