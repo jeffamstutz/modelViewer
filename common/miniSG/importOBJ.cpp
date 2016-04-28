@@ -128,7 +128,6 @@ namespace ospray {
       /*! Material handling. */
       Material *curMaterial;
       Material *defaultMaterial;
-      //std::map<std::string, Handle<Device::RTMaterial> > material;
 
       /*! Internal methods. */
       int fix_v (int index);
@@ -136,13 +135,15 @@ namespace ospray {
       int fix_vn(int index);
       void flushFaceGroup();
       Vertex getInt3(const char*& token);
-      uint32_t getVertex(std::map<Vertex,uint32_t>& vertexMap, Mesh *mesh, const Vertex& i);
+      uint32_t getVertex(std::map<Vertex,uint32_t>& vertexMap,
+                         Mesh *mesh,
+                         const Vertex& i);
     };
 
-    OBJLoader::OBJLoader(Model &model, const ospcommon::FileName &fileName) 
-      : model(model),
-        curMaterial(NULL),
-        path(fileName.path())
+    OBJLoader::OBJLoader(Model &model, const ospcommon::FileName &fileName) :
+      model(model),
+      path(fileName.path()),
+      curMaterial(nullptr)
     {
       /* open file */
       std::ifstream cin;
@@ -156,7 +157,7 @@ namespace ospray {
       // Handle<Device::RTMaterial> defaultMaterial = g_device->rtNewMaterial("matte");
       // g_device->rtSetFloat3(defaultMaterial, "reflectance", 0.5f, 0.5f, 0.5f);
       // g_device->rtCommit(defaultMaterial);
-      defaultMaterial = NULL;
+      defaultMaterial = nullptr;
       curMaterial = defaultMaterial;
 
       char line[1000000];
@@ -239,8 +240,7 @@ namespace ospray {
       char line[10000];
       memset(line, 0, sizeof(line));
 
-      //      Handle<Device::RTMaterial> cur = null;
-      Material *cur = NULL;
+      Material *cur = nullptr;
       while (cin.peek() != -1)
         {
           /* load next multiline */

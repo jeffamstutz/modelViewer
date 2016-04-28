@@ -242,7 +242,7 @@ namespace ospray {
       PRINT(group->geometry.size());
 
       // post-checks:
-      for (int i=0;i<group->volume.size();i++) {
+      for (size_t i = 0; i < group->volume.size(); i++) {
         assert(group->volume[i]->handle != nullptr);
         assert(!group->volume[i]->bounds.empty());
       }

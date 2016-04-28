@@ -74,18 +74,18 @@ namespace ospray {
         } DataType;
 
         void clear() {
-          Assert2(this != NULL, "Tried to clear a null parameter");
+          Assert2(this != nullptr, "Tried to clear a null parameter");
           switch( type ) {
             case STRING:
               if (s) free((void*)s);
-              s = NULL;
+              s = nullptr;
               break;
             case TEXTURE:
-              ptr = NULL;
+              ptr = nullptr;
               break;
             default:
               type = TEXTURE;
-              ptr = NULL;
+              ptr = nullptr;
           };
         }
 
@@ -116,7 +116,7 @@ namespace ospray {
         void set(vec4ui v) { clear(); type = UINT_3; i[0] = v.x; i[1] = v.y; i[2] = v.z; i[3] = v.w; }
 
         Param() {
-          s = NULL;
+          s = nullptr;
           type = INT;
         }
         union {
@@ -217,17 +217,14 @@ namespace ospray {
     };
 
     struct Instance : public RefCount {
-      Instance() : meshID(0), xfm(ospcommon::one), ospGeometry(NULL) {}
-      Instance(int meshID, affine3f xfm=ospcommon::one) 
-        : meshID(meshID), xfm(xfm), ospGeometry(NULL) 
-      {};
+      Instance() : meshID(0), xfm(ospcommon::one), ospGeometry(nullptr) {}
+      Instance(int meshID, affine3f xfm = ospcommon::one)
+        : meshID(meshID), xfm(xfm), ospGeometry(nullptr) {}
       Instance(const Instance &o)
-        : meshID(o.meshID), xfm(o.xfm), ospGeometry(o.ospGeometry)
-      {}
+        : meshID(o.meshID), xfm(o.xfm), ospGeometry(o.ospGeometry) {}
 
-      affine3f xfm;
       int meshID;
-      
+      affine3f xfm;
       OSPGeometry ospGeometry;
     };
 

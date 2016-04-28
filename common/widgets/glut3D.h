@@ -175,8 +175,8 @@ namespace ospray {
                           its values get changed. */
 
         vec3f from;
-        vec3f up;
         vec3f at;
+        vec3f up;
         float openingAngle; //!< in radians, along Y direction
         float aspect; //!< aspect ratio X:Y
         // float focalDistance;

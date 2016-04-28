@@ -142,7 +142,7 @@ namespace ospray {
 
       if (!useSubvolume) {
 
-        size_t numSlicesPerSetRegion = 4;
+        int numSlicesPerSetRegion = 4;
 
         // Voxel count.
         size_t voxelCount = volumeDimensions.x * volumeDimensions.y;
@@ -152,7 +152,9 @@ namespace ospray {
           new unsigned char[numSlicesPerSetRegion * voxelCount * voxelSize];
 
         // We copy data into the volume by the slice in case memory is limited.
-        for (size_t z = 0 ; z < volumeDimensions.z ; z += numSlicesPerSetRegion) {
+        for (int z = 0 ;
+             z < volumeDimensions.z ;
+             z += numSlicesPerSetRegion) {
 
           // Copy voxel data into the buffer.
           size_t slicesToRead = std::min(numSlicesPerSetRegion,

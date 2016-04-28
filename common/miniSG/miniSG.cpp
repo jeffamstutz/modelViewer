@@ -116,8 +116,8 @@ namespace ospray {
           fread(tex->data,width*height*3,1,file);
           // flip in y, because OSPRay's textures have the origin at the lower left corner
           unsigned char *texels = (unsigned char *)tex->data;
-          for (size_t y=0; y < height/2; y++)
-            for (size_t x=0; x < width*3; x++)
+          for (int y = 0; y < height/2; y++)
+            for (int x = 0; x < width*3; x++)
               std::swap(texels[y*width*3+x], texels[(height-1-y)*width*3+x]);
         } catch(std::runtime_error e) {
           std::cerr << e.what() << std::endl;
@@ -330,7 +330,7 @@ namespace ospray {
     box3f Mesh::getBBox() 
     {
       if (bounds.empty()) {
-        for (int i=0;i<position.size();i++)
+        for (size_t i = 0; i < position.size(); i++)
           bounds.extend(position[i]);
       }
       return bounds;
@@ -343,9 +343,9 @@ namespace ospray {
       box3f bBox = ospcommon::empty;
       if (!instance.empty()) {
         std::vector<box3f> meshBounds;
-        for (int i=0;i<mesh.size();i++)
+        for (size_t i = 0; i < mesh.size(); i++)
           meshBounds.push_back(mesh[i]->getBBox());
-        for (int i=0;i<instance.size();i++) {
+        for (size_t i = 0;i < instance.size(); i++) {
           box3f b_i = meshBounds[instance[i].meshID];
           vec3f corner;
           for (int iz=0;iz<2;iz++) {
@@ -360,7 +360,7 @@ namespace ospray {
           }
         }
       } else {
-        for (int i=0;i<mesh.size();i++)
+        for (size_t i = 0; i < mesh.size(); i++)
           bBox.extend(mesh[i]->getBBox());
       }
       return bBox;
@@ -369,7 +369,7 @@ namespace ospray {
     size_t Model::numUniqueTriangles() const
     {
       size_t sum = 0;
-      for (int i=0;i<mesh.size();i++)
+      for (size_t i = 0; i < mesh.size(); i++)
         sum += mesh[i]->triangle.size();
       return sum;
     }

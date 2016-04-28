@@ -372,7 +372,7 @@ static void addMeshToModel(OSPRayFixture *f)
       std::vector<OSPMaterial > materialList;
       std::vector<OSPTexture2D > alphaMaps;
       std::vector<float> alphas;
-      for (int i=0;i<msgMesh->materialList.size();i++) {
+      for (size_t i = 0; i < msgMesh->materialList.size(); i++) {
         materialList.push_back(
               createMaterial((OSPRenderer)f->renderer.handle(),
                              msgMesh->materialList[i].ptr)

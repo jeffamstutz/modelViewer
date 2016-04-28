@@ -82,7 +82,7 @@ namespace ospray {
       while (tok) {
         long thisID = atol(tok);
         if (thisID == -1) {
-          for (int i=2;i<ID.size();i++) {
+          for (size_t i = 2; i < ID.size(); i++) {
             Triangle t;
             t.v0 = ID[0];
             t.v1 = ID[i-1];
@@ -100,7 +100,7 @@ namespace ospray {
       // -------------------------------------------------------
       // now, parse children for vertex arrays
       // -------------------------------------------------------
-      for (int childID=0;childID<root->child.size();childID++) {
+      for (size_t childID = 0; childID < root->child.size(); childID++) {
         xml::Node *node = root->child[childID];
         
         if (node->name == "Coordinate") {
@@ -118,7 +118,8 @@ namespace ospray {
           continue;
         }
 
-        throw std::runtime_error("importX3D: unknown child type '"+node->name+"' to 'IndexedFaceSet' node");
+        throw std::runtime_error("importX3D: unknown child type '"
+                                 + node->name + "' to 'IndexedFaceSet' node");
       }
 
       model.mesh.push_back(mesh);
@@ -126,7 +127,7 @@ namespace ospray {
     }
     void parseShape(Model &model, const affine3f &xfm, xml::Node *root)
     {
-      for (int childID=0;childID<root->child.size();childID++) {
+      for (size_t childID = 0; childID < root->child.size(); childID++) {
         xml::Node *node = root->child[childID];
         
         if (node->name == "Appearance") {
@@ -153,7 +154,7 @@ namespace ospray {
       affine3f xfm = parentXFM;
 
       // TODO: parse actual xfm parmeters ...
-      for (int childID=0;childID<root->child.size();childID++) {
+      for (size_t childID = 0; childID < root->child.size(); childID++) {
         xml::Node *node = root->child[childID];
         
         if (node->name == "DirectionalLight") {
@@ -170,7 +171,8 @@ namespace ospray {
           continue;
         }
 
-        throw std::runtime_error("importX3D: unknown 'transform' child type '"+node->name+"'");
+        throw std::runtime_error("importX3D: unknown 'transform' child type '"
+                                 + node->name + "'");
       }
     }
     void parseX3D(Model &model, xml::Node *root)
@@ -179,7 +181,7 @@ namespace ospray {
       assert(root->child[0]->name == "head");
       assert(root->child[1]->name == "Scene");
       xml::Node *sceneNode = root->child[1];
-      for (int childID=0;childID<sceneNode->child.size();childID++) {
+      for (size_t childID = 0; childID < sceneNode->child.size(); childID++) {
         xml::Node *node = sceneNode->child[childID];
         if (node->name == "Background") {
           /* ignore */

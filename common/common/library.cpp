@@ -97,10 +97,11 @@ namespace ospcommon {
     std::string name = _name;
 #endif
 
-    for (int i=0;i<loadedLibs.size();i++)
+    for (size_t i = 0; i < loadedLibs.size(); i++) {
       if (loadedLibs[i]->name == name)
         // lib already loaded.
         return;
+    }
 
     Library *lib = new Library;
     lib->name = name;
@@ -112,7 +113,7 @@ namespace ospcommon {
   }
   void *getSymbol(const std::string &name)
   {
-    for (int i=0;i<loadedLibs.size();i++) {
+    for (size_t i = 0; i < loadedLibs.size(); i++) {
       void *sym = getSymbol(loadedLibs[i]->lib, name);
       if (sym) return sym;
     }
@@ -130,26 +131,5 @@ namespace ospcommon {
 #endif
     return sym;
   }
-
-//   void *getSymbol(const std::string &name)
-//   {
-//     // for (int i=0;i<loadedLibs.size();i++) {
-//     //   void *sym = embree_getSymbol(loadedLibs[i]->lib, name);
-//     //   if (sym) return sym;
-//     // }
-
-//     // if none found in the loaded libs, try the default lib ...
-// #ifdef _WIN32
-//     void *sym = GetProcAddress(GetModuleHandle(0), name.c_str()); // look in exe (i.e. when linked statically)
-//     if (!sym) {
-//       MEMORY_BASIC_INFORMATION mbi;
-//       VirtualQuery(getSymbol, &mbi, sizeof(mbi)); // get handle to current dll via a known function
-//       sym = GetProcAddress((HINSTANCE)(mbi.AllocationBase), name.c_str()); // look in ospray.dll (i.e. when linked dynamically)
-//     }
-// #else
-//     void *sym = dlsym(RTLD_DEFAULT,name.c_str());
-// #endif
-//     return sym;
-//   }
 }
 

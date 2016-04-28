@@ -13,16 +13,6 @@ using std::endl;
 
 // Static local helper functions //////////////////////////////////////////////
 
-static void error(const std::string &msg)
-{
-  cerr << "#ospDebugViewer fatal error : " << msg << endl;
-  cerr << endl;
-  cerr << "Proper usage: " << endl;
-  cerr << "  ./ospDebugViewer" << " <inFileName> [options]" << endl;
-  cerr << endl;
-  exit(1);
-}
-
 static void warnMaterial(const std::string &type)
 {
   static std::map<std::string,int> numOccurances;
@@ -82,11 +72,11 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 
 DefaultSceneParser::DefaultSceneParser(cpp::Renderer renderer) :
   m_renderer(renderer),
-  m_msgModel(new miniSG::Model),
   m_alpha(false),
   m_createDefaultMaterial(true),
   m_maxObjectsToConsider((uint32_t)-1),
-  m_forceInstancing(false)
+  m_forceInstancing(false),
+  m_msgModel(new miniSG::Model)
 {
 }
 
@@ -452,7 +442,7 @@ void DefaultSceneParser::finalize()
       std::vector<OSPMaterial> materialList;
       std::vector<OSPTexture2D> alphaMaps;
       std::vector<float> alphas;
-      for (int i=0;i<msgMesh->materialList.size();i++) {
+      for (size_t i = 0; i < msgMesh->materialList.size(); i++) {
         auto m = createMaterial(m_renderer, msgMesh->materialList[i].ptr);
         auto handle = m.handle();
         materialList.push_back(handle);
@@ -514,7 +504,7 @@ void DefaultSceneParser::finalize()
   }
 
   if (doesInstancing) {
-    for (int i=0;i<m_msgModel->instance.size();i++) {
+    for (size_t i = 0; i < m_msgModel->instance.size(); i++) {
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
           reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));

@@ -33,7 +33,7 @@ namespace ospray {
         it, yet */
     struct Geometry {
       box3f bounds;
-      OSPGeometry handle;
+      OSPGeometry handle {nullptr};
     };
 
     /*! abstraction for a volume object whose values are already
@@ -41,37 +41,23 @@ namespace ospray {
         the required ospSetRegion()'s on it, but will NOT commit
         it. */
     struct Volume {
-      Volume() 
-        : handle(NULL),
-          voxelRange(vec2f(1e8,-1e8)),
-          bounds(empty),
-          gridOrigin(0),
-          gridSpacing(vec3f(1)),
-          subVolumeOffsets(vec3i(0)),
-          subVolumeDimensions(vec3i(-1)),
-          subVolumeSteps(vec3i(-1)),
-          fileOffset(0),
-          dimensions(-1),
-          voxelType("")
-      {}
-
-      OSPVolume handle;
+      OSPVolume handle {nullptr};
       /* range of voxel values in the given volume. TODO: should be
          moved to a "ospray::range1f" type, not a implicit min/max
          stored in the x/y coordinates of a vec2f. */
-      vec2f voxelRange;
+      vec2f voxelRange {1e8, -1e8};
       //! desired sampling rate for this volume
-      float samplingRate;
+      float samplingRate {1.f};
       //! world space bounding box of this volume
       box3f bounds;
       
-      size_t fileOffset;
-      vec3f gridOrigin;
-      vec3f gridSpacing;
-      vec3i subVolumeOffsets;
-      vec3i subVolumeDimensions;
-      vec3i subVolumeSteps;
-      vec3i dimensions;
+      size_t fileOffset {0};
+      vec3f gridOrigin {0};
+      vec3f gridSpacing {1};
+      vec3i subVolumeOffsets {0};
+      vec3i subVolumeDimensions {-1};
+      vec3i subVolumeSteps {-1};
+      vec3i dimensions {-1};
 
       std::string voxelType;
     };
@@ -81,7 +67,8 @@ namespace ospray {
       std::vector<Volume *>   volume;
     };
 
-    Group *import(const std::string &fileName, Group *existingGroupToAddTo=NULL);
+    Group *import(const std::string &fileName,
+                  Group *existingGroupToAddTo=nullptr);
   }
 
   //! Print an error message.
@@ -96,6 +83,7 @@ namespace ospray {
   inline void warnOnCondition(bool condition, const std::string &message) 
   { if (!condition) return;  emitMessage("WARNING", message); }
   
+#if 0
   //! Get the absolute file path.
   static std::string getFullFilePath(const std::string &filename)
   { 
@@ -103,9 +91,10 @@ namespace ospray {
     //getfullpathname
     throw std::runtime_error("no realpath() under windows");
 #else
-    char *fullpath = realpath(filename.c_str(), NULL);  return(fullpath != NULL ? fullpath : filename); 
+    char *fullpath = realpath(filename.c_str(), nullptr);
+    return(fullpath != nullptr ? fullpath : filename);
 #endif
   }
-
+#endif
 
 }

@@ -50,7 +50,7 @@ namespace ospray {
     using std::endl;
 
     //! base pointer to mmapped binary file (that all offsets are relative to)
-    unsigned char *binBasePtr = NULL;
+    unsigned char *binBasePtr = nullptr;
 
     /*! Base class for all scene graph node types */
     struct Node : public ospcommon::RefCount
@@ -60,12 +60,12 @@ namespace ospray {
       /*! \brief create a new instance of given type, and parse its
         content from given xml doc 
 
-        doc may be NULL, in which case a new instnace of given node
+        doc may be nullptr, in which case a new instnace of given node
         type will be created with given default values for said
         type.
 
         if the given node type is not known or registered, this
-        function may return NULL.
+        function may return nullptr.
       */
 
       std::string name;
@@ -152,13 +152,13 @@ namespace ospray {
     std::vector<Ref<miniSG::Node> > nodeList;
 
     TriangleMesh::TriangleMesh()
-      : triangle(NULL),
+      : triangle(nullptr),
         numTriangles(0),
-        vertex(NULL),
+        vertex(nullptr),
         numVertices(0),
-        normal(NULL),
+        normal(nullptr),
         numNormals(0),
-        texCoord(NULL),
+        texCoord(nullptr),
         numTexCoords(0)
     {}
 
@@ -196,7 +196,7 @@ namespace ospray {
         throw std::runtime_error("emply RIVL model !?");
 
       Ref<miniSG::Node> lastNode;
-      for (int childID=0;childID<root->child.size();childID++) {//xmlNode *node = root->children; node; node = node->next) {
+      for (size_t childID = 0; childID < root->child.size(); childID++) {
         xml::Node *node = root->child[childID];
         std::string nodeName = node->name;
         if (nodeName == "text") {
@@ -210,7 +210,7 @@ namespace ospray {
           int height = -1, width = -1, ofs = -1, channels = -1, depth = -1;
           std::string format;
 
-          for (int pID=0;pID<node->prop.size();pID++) {
+          for (size_t pID = 0; pID < node->prop.size(); pID++) {
             xml::Prop *prop = node->prop[pID];
             if (prop->name == "ofs") {
               ofs = atol(prop->value.c_str());
@@ -226,12 +226,18 @@ namespace ospray {
               format = prop->value.c_str();
             }
           }
-          assert(ofs != size_t(-1) && "Offset not properly parsed for Texture2D nodes");
-          assert(width != size_t(-1) && "Width not properly parsed for Texture2D nodes");
-          assert(height != size_t(-1) && "Height not properly parsed for Texture2D nodes");
-          assert(channels != size_t(-1) && "Channel count not properly parsed for Texture2D nodes");
-          assert(depth != size_t(-1) && "Depth not properly parsed for Texture2D nodes");
-          assert( strcmp(format.c_str(), "") != 0 && "Format not properly parsed for Texture2D nodes");
+          assert(ofs != -1
+                 && "Offset not properly parsed for Texture2D nodes");
+          assert(width != -1
+                 && "Width not properly parsed for Texture2D nodes");
+          assert(height != -1
+                 && "Height not properly parsed for Texture2D nodes");
+          assert(channels != -1
+                 && "Channel count not properly parsed for Texture2D nodes");
+          assert(depth != -1
+                 && "Depth not properly parsed for Texture2D nodes");
+          assert(strcmp(format.c_str(), "") != 0
+                 && "Format not properly parsed for Texture2D nodes");
 
           txt.ptr->texData->channels = channels;
           txt.ptr->texData->depth = depth;
@@ -268,24 +274,19 @@ namespace ospray {
           std::string name;
           std::string type;
 
-          for (int pID=0;pID<node->prop.size();pID++) {
+          for (size_t pID = 0; pID < node->prop.size(); pID++) {
             xml::Prop *prop = node->prop[pID];
-          // for (xmlAttr *attr = node->properties; attr; attr = attr->next) {
             if (prop->name == "name") {
-              // xmlChar *value = xmlNodeListGetString(node->doc, attr->children, 1);
-              name = prop->value;//(const char*)value;
+              name = prop->value;
               mat->setParam("name", name.c_str());
               mat->name = name;
-              //xmlFree(value);
             } else if (prop->name == "type") {
-              // xmlChar *value = xmlNodeListGetString(node->doc, attr->children, 1);
-              type = prop->value; //(const char*)value;
+              type = prop->value;
               mat->setParam("type", type.c_str());
-              //xmlFree(value);
             }
           }
 
-          for (int childID=0;childID<node->child.size();childID++) {//xmlNode *child=node->children; child; child=child->next) {
+          for (size_t childID = 0; childID < node->child.size(); childID++) {
             xml::Node *child = node->child[childID];
             std::string childNodeType = child->name;
 
@@ -293,24 +294,18 @@ namespace ospray {
               std::string childName;
               std::string childType;
 
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr *attr = child->properties; attr; attr = attr->next) {
                 if (prop->name == "name") {
-                  // xmlChar *value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  childName = prop->value; //(const char*)value;
-                  //xmlFree(value);
+                  childName = prop->value;
                 } else if (prop->name == "type") { 
-                  // xmlChar *value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  childType = prop->value; //(const char*)value;
-                  //xmlFree(value);
+                  childType = prop->value;
                 }
               }
 
               //Get the data out of the node
-              // xmlChar *value = xmlNodeListGetString(node->doc, child->children, 1);
               char *value = strdup(child->content.c_str());
-#define NEXT_TOK strtok(NULL, " \t\n\r")
+#define NEXT_TOK strtok(nullptr, " \t\n\r")
               char *s = strtok((char*)value, " \t\n\r");
               //TODO: UGLY! Find a better way.
               if (!childType.compare("float")) {
@@ -372,22 +367,16 @@ namespace ospray {
               free(value);
             } else if (!childNodeType.compare("textures")) {
               int num = -1;
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr *attr = child->properties; attr; attr = attr->next) {
                 if (prop->name == "num") {
                   num = atol(prop->value.c_str());
-                  //xmlFree(value);
                 }
               }
 
-              // xmlChar *value = xmlNodaeListGetString(node->doc, child->children, 1);
-
               if (child->content == "") {
-                // empty texture node ....
               } else {
                 char *tokenBuffer = strdup(child->content.c_str());
-                //xmlFree(value); 
                 
                 char *s = strtok(tokenBuffer, " \t\n\r");
                 while (s) {
@@ -398,9 +387,10 @@ namespace ospray {
                 }
                 free(tokenBuffer);
               }
-              if (mat->textures.size() != num) {
-                throw std::runtime_error("invalid number of textures in material "
-                                         "(found either more or less than the 'num' field specifies");
+              if (mat->textures.size() != static_cast<size_t>(num)) {
+                throw std::runtime_error("invalid number of textures in"
+                                         " material (found either more or less"
+                                         " than the 'num' field specifies");
               }
             }
           }
@@ -412,7 +402,7 @@ namespace ospray {
           nodeList.push_back(camera.ptr);
 
           // parse values
-          for (int pID=0;pID<node->child.size();pID++) {
+          for (size_t pID = 0; pID < node->child.size(); pID++) {
             xml::Node *childNode = node->child[pID];
             if (childNode->name == "from") {
               sscanf(childNode->content.c_str(),"%f %f %f",
@@ -434,16 +424,13 @@ namespace ospray {
           nodeList.push_back(xfm.ptr);
 
           // find child ID
-          for (int pID=0;pID<node->prop.size();pID++) {
+          for (size_t pID = 0;pID < node->prop.size(); pID++) {
             xml::Prop *prop = node->prop[pID];
-          // for (xmlAttr* attr = node->properties; attr; attr = attr->next)
             if (prop->name == "child") {
-              // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-              size_t childID = atoi(prop->value.c_str());//(char*)value);
+              size_t childID = atoi(prop->value.c_str());
               miniSG::Node *child = nodeList[childID].ptr;
               assert(child);
               xfm->child = child;
-              //xmlFree(value); 
             }   
           }    
             
@@ -462,9 +449,9 @@ namespace ospray {
                                &xfm->xfm.p.x,
                                &xfm->xfm.p.y,
                                &xfm->xfm.p.z);
-          //xmlFree(value);
           if (numRead != 12)  {
-            throw std::runtime_error("invalid number of elements in RIVL transform node");
+            throw std::runtime_error("invalid number of elements in RIVL"
+                                     " transform node");
           }
           
           // -------------------------------------------------------
@@ -473,25 +460,20 @@ namespace ospray {
           Ref<miniSG::TriangleMesh> mesh = new miniSG::TriangleMesh;
           nodeList.push_back(mesh.ptr);
 
-          for (int childID=0;childID<node->child.size();childID++) {//xmlNode *child=node->children;child;child=child->next) {
+          for (size_t childID = 0; childID < node->child.size(); childID++) {
             xml::Node *child = node->child[childID];
             std::string childType = child->name;
             if (childType == "text") {
             } else if (childType == "vertex") {
               size_t ofs = -1, num = -1;
               // scan parameters ...
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr* attr = child->properties; attr; attr = attr->next)
                 if (prop->name == "ofs") {
-                  //xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  ofs = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                  ofs = atol(prop->value.c_str());
                 }       
                 else if (prop->name == "num") {
-                  // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  num = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                  num = atol(prop->value.c_str());
                 }       
               }
               assert(ofs != size_t(-1));
@@ -501,18 +483,13 @@ namespace ospray {
             } else if (childType == "normal") {
               size_t ofs = -1, num = -1;
               // scan parameters ...
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr* attr = child->properties; attr; attr = attr->next)
-                if (prop->name == "ofs"){ //!strcmp((const char*)attr->name,"ofs")) {
-                  // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  ofs = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                if (prop->name == "ofs"){
+                  ofs = atol(prop->value.c_str());
                 }       
-                else if (prop->name == "num") {//!strcmp((const char*)attr->name,"num")) {
-                  // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  num = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                else if (prop->name == "num") {
+                  num = atol(prop->value.c_str());
                 }       
               }
               assert(ofs != size_t(-1));
@@ -522,20 +499,13 @@ namespace ospray {
             } else if (childType == "texcoord") {
               size_t ofs = -1, num = -1;
               // scan parameters ...
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr* attr = child->properties; attr; attr = attr->next)
-                if (prop->name == "ofs") {//!strcmp((const char*)attr->name,"ofs")) {
-                  // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  // ofs = atol((char*)value);
-                  ofs = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                if (prop->name == "ofs") {
+                  ofs = atol(prop->value.c_str());
                 }       
-                else if (prop->name == "num") {//!strcmp((const char*)attr->name,"num")) {
-                  // xmlChar* value = xmlNodeListGetString(node->doc, attr->children, 1);
-                  // num = atol((char*)value);
-                  num = atol(prop->value.c_str()); //(char*)value);
-                  //xmlFree(value); 
+                else if (prop->name == "num") {
+                  num = atol(prop->value.c_str());
                 }       
               }
               assert(ofs != size_t(-1));
@@ -545,14 +515,13 @@ namespace ospray {
             } else if (childType == "prim") {
               size_t ofs = -1, num = -1;
               // scan parameters ...
-              for (int pID=0;pID<child->prop.size();pID++) {
+              for (size_t pID = 0; pID < child->prop.size(); pID++) {
                 xml::Prop *prop = child->prop[pID];
-              // for (xmlAttr* attr = child->properties; attr; attr = attr->next)
-                if (prop->name == "ofs") {//!strcmp((const char*)attr->name,"ofs")) {
-                  ofs = atol(prop->value.c_str()); //(char*)value);
+                if (prop->name == "ofs") {
+                  ofs = atol(prop->value.c_str());
                 }       
-                else if (prop->name == "num") {//!strcmp((const char*)attr->name,"num")) {
-                  num = atol(prop->value.c_str()); //(char*)value);
+                else if (prop->name == "num") {
+                  num = atol(prop->value.c_str());
                 }       
               }
               assert(ofs != size_t(-1));
@@ -561,7 +530,9 @@ namespace ospray {
               mesh->triangle = (vec4i*)(binBasePtr+ofs);
             } else if (childType == "materiallist") {
               char* value = strdup(child->content.c_str());
-              for(char *s=strtok((char*)value," \t\n\r");s;s=strtok(NULL," \t\n\r")) {
+              for(char *s=strtok((char*)value," \t\n\r");
+                  s;
+                  s=strtok(nullptr," \t\n\r")) {
                 size_t matID = atoi(s);
                 Ref<RIVLMaterial> mat = nodeList[matID].cast<miniSG::RIVLMaterial>();
                 mat.ptr->refInc();
@@ -585,10 +556,10 @@ namespace ospray {
           if (node->content == "")
             // empty group...
             ;
-          // std::cout << "warning: xmlNodeListGetString(...) returned NULL" << std::endl;
+          // std::cout << "warning: xmlNodeListGetString(...) returned nullptr" << std::endl;
           else {
             char *value = strdup(node->content.c_str());
-            for(char *s=strtok((char*)value," \t\n\r");s;s=strtok(NULL," \t\n\r")) {
+            for(char *s=strtok((char*)value," \t\n\r");s;s=strtok(nullptr," \t\n\r")) {
               size_t childID = atoi(s);
               miniSG::Node *child = nodeList[childID].ptr;
               //assert(child);
@@ -599,7 +570,7 @@ namespace ospray {
           }
           lastNode = group.ptr;
         } else {
-          nodeList.push_back(NULL);
+          nodeList.push_back(nullptr);
           //throw std::runtime_error("unknown node type '"+nodeName+"' in RIVL model");
         }
       }
@@ -624,11 +595,11 @@ namespace ospray {
       fclose(file);
       
 #ifdef _WIN32
-      HANDLE fileHandle = CreateFile(binFileName.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-      if (fileHandle == NULL)
+      HANDLE fileHandle = CreateFile(binFileName.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+      if (fileHandle == nullptr)
         fprintf(stderr, "could not open file '%s' (error %lu)\n", binFileName.c_str(), GetLastError());
-      HANDLE fileMappingHandle = CreateFileMapping(fileHandle, NULL, PAGE_READONLY, 0, 0, NULL);
-      if (fileMappingHandle == NULL)
+      HANDLE fileMappingHandle = CreateFileMapping(fileHandle, nullptr, PAGE_READONLY, 0, 0, nullptr);
+      if (fileMappingHandle == nullptr)
         fprintf(stderr, "could not create file mapping (error %lu)\n", GetLastError());
 #else
       int fd = ::open(binFileName.c_str(), O_LARGEFILE | O_RDONLY);
@@ -640,8 +611,7 @@ namespace ospray {
 #ifdef _WIN32
         MapViewOfFile(fileMappingHandle, FILE_MAP_READ, 0, 0, fileSize);
 #else
-        mmap(NULL,fileSize,PROT_READ,MAP_SHARED,fd,0);
-        // mmap(NULL,fileSize,PROT_READ|PROT_WRITE,MAP_SHARED,fd,0);
+        mmap(nullptr,fileSize,PROT_READ,MAP_SHARED,fd,0);
 #endif
 
       xml::XMLDoc *doc = xml::readXML(fileName);
@@ -656,7 +626,7 @@ namespace ospray {
     {
       Group *g = dynamic_cast<Group *>(node.ptr);
       if (g) {
-        for (int i=0;i<g->child.size();i++)
+        for (size_t i = 0; i < g->child.size(); i++)
           traverseSG(model,g->child[i],xfm);
         return;
       }
@@ -687,22 +657,20 @@ namespace ospray {
           mesh->triangle.resize(tm->numTriangles);
           mesh->triangleMaterialId.resize(tm->numTriangles);
           bool anyNotZero = false;
-          for (int i=0;i<tm->numTriangles;i++) {
+          for (size_t i = 0; i < tm->numTriangles; i++) {
             Triangle t;
             t.v0 = tm->triangle[i].x;
             t.v1 = tm->triangle[i].y;
             t.v2 = tm->triangle[i].z;
 
-            // if (std::max(std::max(t.v0,t.v1),t.v2) >= mesh->position.size())
-            //   t.v0 = t.v1 = t.v2 = 0;
-            // assert(t.v0 >= 0 && t.v0 < mesh->position.size());
-            // assert(t.v1 >= 0 && t.v1 < mesh->position.size());
-            // assert(t.v2 >= 0 && t.v2 < mesh->position.size());
             mesh->triangle[i] = t;
 
-            assert(mesh->triangle[i].v0 >= 0 && mesh->triangle[i].v0 < mesh->position.size());
-            assert(mesh->triangle[i].v1 >= 0 && mesh->triangle[i].v1 < mesh->position.size());
-            assert(mesh->triangle[i].v2 >= 0 && mesh->triangle[i].v2 < mesh->position.size());
+            assert(mesh->triangle[i].v0 >= 0
+                   && mesh->triangle[i].v0 < mesh->position.size());
+            assert(mesh->triangle[i].v1 >= 0
+                   && mesh->triangle[i].v1 < mesh->position.size());
+            assert(mesh->triangle[i].v2 >= 0
+                   && mesh->triangle[i].v2 < mesh->position.size());
 
             mesh->triangleMaterialId[i] = tm->triangle[i].w >>16;
             if (mesh->triangleMaterialId[i]) anyNotZero = true;
@@ -710,16 +678,15 @@ namespace ospray {
           if (!anyNotZero)
             mesh->triangleMaterialId.clear();
 
-          for (int i=0;i<tm->numVertices;i++) {
+          for (size_t i = 0; i < tm->numVertices; i++) {
             mesh->position[i].x = tm->vertex[i].x;
             mesh->position[i].y = tm->vertex[i].y;
             mesh->position[i].z = tm->vertex[i].z;
             mesh->position[i].w = 0;
           }
           if (tm->numNormals > 0) {
-            // assert(tm->numNormals == tm->numVertices);
             mesh->normal.resize(tm->numVertices);
-            for (int i=0;i<tm->numNormals;i++) {
+            for (size_t i = 0; i < tm->numNormals; i++) {
               mesh->normal[i].x = tm->normal[i].x;
               mesh->normal[i].y = tm->normal[i].y;
               mesh->normal[i].z = tm->normal[i].z;
@@ -727,9 +694,8 @@ namespace ospray {
             }
           }
           if (tm->numTexCoords > 0) {
-            // assert(tm->numTexCoords == tm->numVertices);
             mesh->texcoord.resize(tm->numVertices);
-            for (int i=0; i<tm->numTexCoords; i++) {
+            for (size_t i = 0; i < tm->numTexCoords; i++) {
               (vec2f&)mesh->texcoord[i] = (vec2f&)tm->texCoord[i];
             }
           }
@@ -748,16 +714,15 @@ namespace ospray {
         model.instance.push_back(Instance(meshID,xfm));
         
         return;
-        // throw std::runtime_error("meshes not yet implemented in importRIVL");
       }
 
       RIVLMaterial *mt = dynamic_cast<RIVLMaterial *>(node.ptr);
       if (mt) {
-        // model.material.push_back(mt->general);
         return;
       }
 
-      throw std::runtime_error("unhandled node type '"+node->toString()+"' in traverseSG");
+      throw std::runtime_error("unhandled node type '"
+                               + node->toString() + "' in traverseSG");
     }
 
     /*! import a wavefront OBJ file, and add it to the specified model */

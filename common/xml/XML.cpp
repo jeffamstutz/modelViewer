@@ -28,8 +28,8 @@ namespace ospray {
 
     Node::~Node()
     {
-      for (int i=0;i<prop.size();i++) delete prop[i];
-      for (int i=0;i<child.size();i++) delete child[i];
+      for (size_t i = 0; i < prop.size(); i++) delete prop[i];
+      for (size_t i = 0; i < child.size(); i++) delete child[i];
     }
 
     inline bool isWhite(char s) {
@@ -44,7 +44,8 @@ namespace ospray {
     {
       if (*s != w) {
         std::stringstream err;
-        err << "error reading XML file: expecting '" << w << "', but found '" << *s << "'";
+        err << "error reading XML file: expecting '" << w << "', but found '"
+            << *s << "'";
         throw std::runtime_error(err.str());
       }
     }
@@ -52,7 +53,8 @@ namespace ospray {
     {
       if (*s != w0 && *s != w1) {
         std::stringstream err;
-        err << "error reading XML file: expecting '" << w0 << "' or '" << w1 << "', but found '" << *s << "'";
+        err << "error reading XML file: expecting '" << w0 << "' or '" << w1
+            << "', but found '" << *s << "'";
         throw std::runtime_error(err.str());
       }
     }
@@ -69,7 +71,8 @@ namespace ospray {
           consume(s,*word); ++word;
         } catch (...) {
           std::stringstream err;
-          err << "error reading XML file: expecting '" << in << "', but could not find it";
+          err << "error reading XML file: expecting '" << in
+              << "', but could not find it";
           throw std::runtime_error(err.str());
         }
       }
@@ -176,7 +179,9 @@ namespace ospray {
             std::string name = "";
             parseIdentifier(s,name);
             if (name != node->name)
-              throw std::runtime_error("invalid XML node - started with '<"+node->name+"...'>, but ended with '</"+name+">");
+              throw std::runtime_error("invalid XML node - started with'<"
+                                       + node->name +
+                                       "...'>, but ended with '</"+name+">");
             consume(s,">");
             break;
             // either end of current node
@@ -185,11 +190,15 @@ namespace ospray {
             Node *child = parseNode(s, doc);
             node->child.push_back(child);
           } else if (*s == 0) {
-            std::cout << "#osp:xml: warning: xml file ended with still-open nodes (this typically indicates a partial xml file)" << std::endl;
+            std::cout << "#osp:xml: warning: xml file ended with still-open"
+                         " nodes (this typically indicates a partial xml file)"
+                      << std::endl;
             return node;
           } else {
-            if (node->content != "")
-              throw std::runtime_error("invalid XML node - two different contents!?");
+            if (node->content != "") {
+              throw std::runtime_error("invalid XML node - two different"
+                                       " contents!?");
+            }
             // content
             char *begin = s;
             while (*s != '<' && *s != 0) ++s;
@@ -240,17 +249,20 @@ namespace ospray {
         skipWhites(s);
       }
 
-      if (*s != 0) throw std::runtime_error("un-parsed junk at end of file"); ++s;
+      if (*s != 0)
+        throw std::runtime_error("un-parsed junk at end of file");
+      ++s;
       return xml;
     }
 
     void Writer::spaces()
     {
-      for (int i=0;i<state.size();i++)
+      for (size_t i = 0; i < state.size(); i++)
         fprintf(xml,"  ");
     }
 
-    void Writer::writeProperty(const std::string &name, const std::string &value)
+    void Writer::writeProperty(const std::string &name,
+                               const std::string &value)
     {
       assert(xml);
       assert(!state.empty());
@@ -287,7 +299,8 @@ namespace ospray {
     {
       FILE *file = fopen(fn.c_str(),"r");
       if (!file) {
-        throw std::runtime_error("ospray::XML error: could not open file '"+fn+"'");
+        throw std::runtime_error("ospray::XML error: could not open file '"
+                                 + fn +"'");
       }
 
       fseek(file,0,SEEK_END);

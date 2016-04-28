@@ -65,15 +65,16 @@ namespace ospray {
     {
       FILE *file = fopen(fileName,"wb");
       if (!file) {
-        std::cerr << "#osp:glut3D: Warning - could not create screen shot file '" 
+        std::cerr << "#osp:glut3D: Warning - could not create screenshot file '"
                   << fileName << "'" << std::endl;
         return;
       }
       fprintf(file,"P6\n%i %i\n255\n",sizeX,sizeY);
       unsigned char *out = (unsigned char *)alloca(3*sizeX);
-      for (int y=0;y<sizeY;y++) {
-        const unsigned char *in = (const unsigned char *)&pixel[(sizeY-1-y)*sizeX];
-        for (int x=0;x<sizeX;x++) {
+      for (size_t y = 0; y < sizeY; y++) {
+        const unsigned char *in =
+            (const unsigned char *)&pixel[(sizeY-1-y)*sizeX];
+        for (size_t x = 0; x < sizeX; x++) {
           out[3*x+0] = in[4*x+0];
           out[3*x+1] = in[4*x+1];
           out[3*x+2] = in[4*x+2];
@@ -82,19 +83,20 @@ namespace ospray {
       }
       fprintf(file,"\n");
       fclose(file);
-      std::cout << "#osp:glut3D: saved framebuffer to file " << fileName << std::endl;
+      std::cout << "#osp:glut3D: saved framebuffer to file "
+                << fileName << std::endl;
     }
 
 #define INVERT_RMB 
     /*! currently active window */
-    Glut3DWidget *Glut3DWidget::activeWindow = NULL;
+    Glut3DWidget *Glut3DWidget::activeWindow = nullptr;
     vec2i Glut3DWidget::defaultInitSize(1024,768);
 
     bool animating = false;
 
     // InspectCenter Glut3DWidget::INSPECT_CENTER;
     /*! viewport as specified on the command line */
-    Glut3DWidget::ViewPort *viewPortFromCmdLine = NULL;
+    Glut3DWidget::ViewPort *viewPortFromCmdLine = nullptr;
     vec3f upVectorFromCmdLine(0,1,0);
 
     // ------------------------------------------------------------------
@@ -149,13 +151,13 @@ namespace ospray {
     // ------------------------------------------------------------------
     // implementation of glut3d::viewPorts
     // ------------------------------------------------------------------
-    Glut3DWidget::ViewPort::ViewPort()
-      : from(0,0,-1),
-        at(0,0,0),
-        up(upVectorFromCmdLine),
-        aspect(1.f),
-        openingAngle(60.f*M_PI/360.f),
-        modified(true)
+    Glut3DWidget::ViewPort::ViewPort() :
+      modified(true),
+      from(0,0,-1),
+      at(0,0,0),
+      up(upVectorFromCmdLine),
+      openingAngle(60.f*M_PI/360.f),
+      aspect(1.f)
     {
       frame = AffineSpace3fa::translate(from) * AffineSpace3fa(ospcommon::one);
     }
@@ -205,17 +207,18 @@ namespace ospray {
 
     Glut3DWidget::Glut3DWidget(FrameBufferMode frameBufferMode,
                                ManipulatorMode initialManipulator,
-                               int allowedManipulators)
-      : motionSpeed(.003f),rotateSpeed(.003f),
-        windowID(-1),
-        lastMousePos(-1,-1),
-        currMousePos(-1,-1),
-        windowSize(-1,-1),
-        currModifiers(0),
-        lastButtonState(0),
-        currButtonState(0),
-        frameBufferMode(frameBufferMode),
-        ucharFB(NULL)
+                               int allowedManipulators) :
+      lastMousePos(-1,-1),
+      currMousePos(-1,-1),
+      lastButtonState(0),
+      currButtonState(0),
+      currModifiers(0),
+      windowID(-1),
+      windowSize(-1,-1),
+      motionSpeed(.003f),
+      rotateSpeed(.003f),
+      frameBufferMode(frameBufferMode),
+      ucharFB(nullptr)
     {
       worldBounds.lower = vec3f(-1);
       worldBounds.upper = vec3f(+1);
@@ -234,7 +237,7 @@ namespace ospray {
         manipulator = inspectCenterManipulator;
         break;
       }
-      Assert2(manipulator != NULL,"invalid initial manipulator mode");
+      Assert2(manipulator != nullptr,"invalid initial manipulator mode");
 
       if (viewPortFromCmdLine) {
         viewPort = *viewPortFromCmdLine;
@@ -311,7 +314,7 @@ namespace ospray {
           }
 
           char fileName[100000];
-          sprintf(fileName,"%s_%08ld.ppm",dumpFileRoot,times(NULL));
+          sprintf(fileName,"%s_%08ld.ppm",dumpFileRoot,times(nullptr));
           saveFrameBufferToFile(fileName,ucharFB,windowSize.x,windowSize.y);
         }
 #endif
@@ -615,10 +618,10 @@ namespace ospray {
       float du = (to.x - from.x);
       float dv = (to.y - from.y);
 
-      vec2i delta_mouse = (to - from);
-
-      AffineSpace3fa xfm = AffineSpace3fa::translate( widget->motionSpeed * dv * cam.frame.l.vz )
-        * AffineSpace3fa::translate( -1.0f * widget->motionSpeed * du * cam.frame.l.vx );
+      AffineSpace3fa xfm =
+          AffineSpace3fa::translate(widget->motionSpeed * dv * cam.frame.l.vz )
+        * AffineSpace3fa::translate(-1.0f * widget->motionSpeed
+                                    * du * cam.frame.l.vx);
 
       cam.frame = xfm * cam.frame;
       cam.from = xfmPoint(xfm, cam.from);
@@ -629,14 +632,11 @@ namespace ospray {
     void InspectCenter::dragLeft(Glut3DWidget *widget,
                                  const vec2i &to, const vec2i &from)
     {
-      // std::cout << "-------------------------------------------------------" << std::endl;
       Glut3DWidget::ViewPort &cam = widget->viewPort;
       float du = (to.x - from.x) * widget->rotateSpeed;
       float dv = (to.y - from.y) * widget->rotateSpeed;
 
-      vec2i delta_mouse = to - from;
-
-      const vec3f pivot = cam.at; //center(widget->worldBounds);
+      const vec3f pivot = cam.at;
       AffineSpace3fa xfm
         = AffineSpace3fa::translate(pivot)
         * AffineSpace3fa::rotate(cam.frame.l.vx,-dv)
@@ -726,8 +726,6 @@ namespace ospray {
       float du = (to.x - from.x);
       float dv = (to.y - from.y);
 
-      vec2i delta_mouse = (to - from);
-
       AffineSpace3fa xfm = AffineSpace3fa::translate( widget->motionSpeed * dv * cam.frame.l.vz )
         * AffineSpace3fa::translate( -1.0f * widget->motionSpeed * du * cam.frame.l.vx );
 
@@ -743,8 +741,6 @@ namespace ospray {
       Glut3DWidget::ViewPort &cam = widget->viewPort;
       float du = (to.x - from.x) * widget->rotateSpeed;
       float dv = (to.y - from.y) * widget->rotateSpeed;
-
-      vec2i delta_mouse = to - from;
 
       const vec3f pivot = cam.from; //center(widget->worldBounds);
       AffineSpace3fa xfm
