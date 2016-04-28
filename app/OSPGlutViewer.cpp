@@ -183,9 +183,11 @@ void OSPGlutViewer::mouseButton(int32_t whichButton,
                           1.0f - pos.y / (float)windowSize.y);
     OSPPickResult pick;
     ospPick(&pick, m_renderer.handle(),
-            reinterpret_cast<osp::vec2f&>(normpos));
+            osp::vec2f{normpos.x, normpos.y});
     if(pick.hit) {
-      viewPort.at = reinterpret_cast<ospcommon::vec3f&>(pick.position);
+      viewPort.at = ospcommon::vec3f{pick.position.x,
+                                     pick.position.y,
+                                     pick.position.z};
       viewPort.modified = true;
       computeFrame();
       forceRedraw();

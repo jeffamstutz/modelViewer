@@ -57,8 +57,8 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
     if( msgTex->channels == 4 ) type = OSP_TEXTURE_RGBA32F;
   }
 
-  vec2i texSize(msgTex->width, msgTex->height);
-  OSPTexture2D ospTex = ospNewTexture2D((osp::vec2i&)texSize,
+  OSPTexture2D ospTex = ospNewTexture2D(osp::vec2i{msgTex->width,
+                                                   msgTex->height},
                                         type,
                                         msgTex->data);
 
@@ -507,7 +507,7 @@ void DefaultSceneParser::finalize()
     for (size_t i = 0; i < m_msgModel->instance.size(); i++) {
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
-          reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));
+          reinterpret_cast<const float*>(&m_msgModel->instance[i].xfm));
       m_model.addGeometry(inst);
     }
   }

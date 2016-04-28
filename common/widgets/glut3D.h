@@ -79,7 +79,7 @@ namespace ospray {
       // this is the fct that gets called when any mouse button got
       // pressed or released in the associated window
       OSPRAY_GLUT3D_INTERFACE virtual void button(Glut3DWidget *widget,
-                                                  const vec2i &pos) {}
+                                                  const vec2i &pos);
       /*! key press handler - override this fct to catch keyboard. */
       OSPRAY_GLUT3D_INTERFACE virtual void keypress(Glut3DWidget *widget,
                                                     const int32_t key);

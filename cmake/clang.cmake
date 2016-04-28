@@ -15,7 +15,6 @@
 ## ======================================================================== ##
 
 set(CMAKE_CXX_FLAGS "-fPIC -std=c++11 ${CMAKE_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 
 if (APPLE)
   set(CMAKE_CXX_FLAGS

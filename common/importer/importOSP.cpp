@@ -46,6 +46,7 @@ namespace ospray {
     {
       vec2i v;
       int rc = sscanf(node->ToElement()->GetText(),"%i %i",&v.x,&v.y);
+      (void)rc;
       assert(rc == 2);
       return v;
     }
@@ -53,6 +54,7 @@ namespace ospray {
     {
       vec3i v;
       int rc = sscanf(node->ToElement()->GetText(),"%i %i %i",&v.x,&v.y,&v.z);
+      (void)rc;
       assert(rc == 3);
       return v;
     }
@@ -61,6 +63,7 @@ namespace ospray {
     {
       float v;
       int rc = sscanf(node->ToElement()->GetText(),"%f",&v);
+      (void)rc;
       assert(rc == 1);
       return v;
     }
@@ -68,6 +71,7 @@ namespace ospray {
     {
       vec2f v;
       int rc = sscanf(node->ToElement()->GetText(),"%f %f",&v.x,&v.y);
+      (void)rc;
       assert(rc == 2);
       return v;
     }
@@ -75,6 +79,7 @@ namespace ospray {
     {
       vec3f v;
       int rc = sscanf(node->ToElement()->GetText(),"%f %f %f",&v.x,&v.y,&v.z);
+      (void)rc;
       assert(rc == 3);
       return v;
     }

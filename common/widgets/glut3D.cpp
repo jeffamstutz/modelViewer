@@ -309,7 +309,8 @@ namespace ospray {
           if (!dumpFileRoot) 
             dumpFileRoot = getenv("OSPRAY_SCREEN_DUMP_ROOT");
           if (!dumpFileRoot) {
-            mkstemp(tmpFileName);
+            auto rc = mkstemp(tmpFileName);
+            (void)rc;
             dumpFileRoot = tmpFileName;
           }
 
@@ -516,6 +517,10 @@ namespace ospray {
       } else if (widget->currButtonState == (1<<GLUT_LEFT_BUTTON)) {
         dragLeft(widget,widget->currMousePos,widget->lastMousePos);
       } 
+    }
+
+    void Manipulator::button(Glut3DWidget *widget, const vec2i &pos)
+    {
     }
 
     // ------------------------------------------------------------------
@@ -771,7 +776,8 @@ namespace ospray {
             dumpFileRoot = getenv("OSPRAY_SCREEN_DUMP_ROOT");
 #ifndef _WIN32
           if (!dumpFileRoot) {
-            mkstemp(tmpFileName);
+            auto rc = mkstemp(tmpFileName);
+            (void)rc;
             dumpFileRoot = tmpFileName;
           }
 #endif
@@ -820,8 +826,6 @@ namespace ospray {
     }
 
 
-
-
     void Manipulator::keypress(Glut3DWidget *widget, const int32_t key)
     {
       switch(key) {
@@ -830,10 +834,11 @@ namespace ospray {
       case 'Q':
         _exit(0);
       }
-    };
+    }
+
     void Manipulator::specialkey(Glut3DWidget *widget, const int32_t key)
     {
-    };
+    }
 
 
     std::ostream &operator<<(std::ostream &o, const Glut3DWidget::ViewPort &cam)

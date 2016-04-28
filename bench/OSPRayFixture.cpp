@@ -97,8 +97,8 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
     if( msgTex->channels == 4 ) type = OSP_TEXTURE_RGBA32F;
   }
 
-  vec2i texSize(msgTex->width, msgTex->height);
-  OSPTexture2D ospTex = ospNewTexture2D((osp::vec2i&)texSize,
+  OSPTexture2D ospTex = ospNewTexture2D(osp::vec2i{msgTex->width,
+                                                   msgTex->height},
                                         type,
                                         msgTex->data);
 

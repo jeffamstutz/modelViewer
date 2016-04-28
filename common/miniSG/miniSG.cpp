@@ -34,7 +34,7 @@ namespace ospray {
       , depth(0)
       , width(0)
       , height(0)
-      , data(NULL)
+      , data(nullptr)
     {}
 
     Material::Material()
@@ -52,7 +52,7 @@ namespace ospray {
       if (textureCache.find(fileName.str()) != textureCache.end()) 
         return textureCache[fileName.str()];
 
-      Texture2D *tex = NULL;
+      Texture2D *tex = nullptr;
       const std::string ext = fileName.ext();
       if (ext == "ppm") {
         try {
@@ -68,7 +68,7 @@ namespace ospray {
           
           // read format specifier:
           int format=0;
-          fscanf(file,"P%i\n",&format);
+          rc = fscanf(file,"P%i\n",&format);
           if (format != 6) 
             throw std::runtime_error("#osp:miniSG: can currently load only binary P6 subformats for PPM texture files. "
                                      "Please report this bug at ospray.github.io.");
@@ -76,7 +76,8 @@ namespace ospray {
           // skip all comment lines
           peekchar = getc(file);
           while (peekchar == '#') {
-            fgets(lineBuf,LINESZ,file);
+            auto tmp = fgets(lineBuf,LINESZ,file);
+            (void)tmp;
             peekchar = getc(file);
           } ungetc(peekchar,file);
         
@@ -90,7 +91,8 @@ namespace ospray {
           // skip all comment lines
           peekchar = getc(file);
           while (peekchar == '#') {
-            fgets(lineBuf,LINESZ,file);
+            auto tmp = fgets(lineBuf,LINESZ,file);
+            (void)tmp;
             peekchar = getc(file);
           } ungetc(peekchar,file);
         
@@ -113,7 +115,7 @@ namespace ospray {
           tex->depth    = 1;
           tex->prefereLinear = prefereLinear;
           tex->data     = new unsigned char[width*height*3];
-          fread(tex->data,width*height*3,1,file);
+          rc = fread(tex->data,width*height*3,1,file);
           // flip in y, because OSPRay's textures have the origin at the lower left corner
           unsigned char *texels = (unsigned char *)tex->data;
           for (int y = 0; y < height/2; y++)
@@ -136,7 +138,7 @@ namespace ospray {
         if (!pixels) {
           std::cerr << "#osp:minisg: failed to load texture '"+fileName.str()+"'" << std::endl;
           delete tex; 
-          tex = NULL;
+          tex = nullptr;
         } else {
           tex->data = new float[tex->width*tex->height*tex->channels];
           // convert pixels and flip image (because OSPRay's textures have the origin at the lower left corner)

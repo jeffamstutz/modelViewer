@@ -267,6 +267,7 @@ namespace ospray {
       assert(xml);
       assert(!state.empty());
       State *s = state.top();
+      (void)s;
       assert(s);
       assert(!s->hasContent); // content may not be written before properties
       fprintf(xml," %s=\"%s\"",name.c_str(),value.c_str());
@@ -313,7 +314,8 @@ namespace ospray {
       fseek(file,0,SEEK_SET);
       char *mem = new char[numBytes+1];
       mem[numBytes] = 0;
-      fread(mem,1,numBytes,file);
+      auto rc = fread(mem,1,numBytes,file);
+      (void)rc;
       XMLDoc *xml = new XMLDoc;
       xml->fileName = fn;
       bool valid = false;
@@ -329,7 +331,7 @@ namespace ospray {
 
       if (!valid) {
         delete xml;
-        return NULL;
+        return nullptr;
       }
       return xml;
     }

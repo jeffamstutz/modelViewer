@@ -131,12 +131,17 @@ namespace ospray {
 
         // Update the provided dimensions of the volume for the
         // subvolume specified.
-        ospSetVec3i(volume->handle, "dimensions",
-                    (osp::vec3i&)importVolumeDimensions);
+        ospSet3i(volume->handle, "dimensions",
+                 importVolumeDimensions.x,
+                 importVolumeDimensions.y,
+                 importVolumeDimensions.z);
       }
-      else
-        ospSetVec3i(volume->handle, "dimensions",
-                    (osp::vec3i&)volumeDimensions);
+      else {
+        ospSet3i(volume->handle, "dimensions",
+                 volumeDimensions.x,
+                 volumeDimensions.y,
+                 volumeDimensions.z);
+      }
 
       if (!useSubvolume) {
 
@@ -193,8 +198,8 @@ namespace ospray {
           // Copy the voxels into the volume.
           ospSetRegion(volume->handle,
                        voxelData,
-                       (osp::vec3i&)region_lo,
-                       (osp::vec3i&)region_sz);
+                       osp::vec3i{region_lo.x, region_lo.y, region_lo.z},
+                       osp::vec3i{region_sz.x, region_sz.y, region_sz.z});
         }
 
         ospSet2f(volume->handle,"voxelRange",

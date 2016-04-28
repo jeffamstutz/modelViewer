@@ -25,8 +25,6 @@
 #include "common/AffineSpace.h"
 #include "common/FileName.h"
 
-// // embree 
-// #include "common/sys/filename.h"
 // stl 
 #include <vector>
 #include <map>
