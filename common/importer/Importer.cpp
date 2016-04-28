@@ -33,7 +33,8 @@ namespace ospray {
       if (fileName.ext() == "osp") {
         importOSP(fn, group);
       } else 
-        throw std::runtime_error("#ospray:vv: do not know how to import file of type "+fileName.ext());
+        throw std::runtime_error("#ospray:importer: do not know how to import"
+                                 "file of type " + fileName.ext());
 
       return group;
     }

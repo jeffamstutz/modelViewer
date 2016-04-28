@@ -137,8 +137,6 @@ namespace ospray {
       else
         ospSetVec3i(volume->handle, "dimensions",
                     (osp::vec3i&)volumeDimensions);
-      PRINT(volumeDimensions);
-
 
       if (!useSubvolume) {
 

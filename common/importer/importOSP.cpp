@@ -238,9 +238,6 @@ namespace ospray {
           importObject(fileName,group,node); 
       }
 
-      PRINT(group->volume.size());
-      PRINT(group->geometry.size());
-
       // post-checks:
       for (size_t i = 0; i < group->volume.size(); i++) {
         assert(group->volume[i]->handle != nullptr);
