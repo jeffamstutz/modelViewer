@@ -51,7 +51,6 @@ target_link_libraries(${APP_NAME}
   ospray_glut3d
   ospray_minisg
   ospray_script
-  ospray_loaders
   ${OPENGL_LIBRARIES}
   ${GLUT_LIBRARIES}
   ${OSPRAY_LIBRARIES}

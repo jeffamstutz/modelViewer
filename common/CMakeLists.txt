@@ -17,7 +17,7 @@
 subdirs(
   commandline
   common
-  loaders
+  importer
   miniSG
   script
   widgets

@@ -1,4 +1,4 @@
-# ======================================================================== ##
+## ======================================================================== ##
 ## Copyright 2009-2016 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
@@ -14,28 +14,15 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(APP_NAME ospBenchmark)
+set(LIBRARY_NAME ospray_importer)
 
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}
+add_library(${LIBRARY_NAME} SHARED
+  importOSP.cpp
+  importRAW.cpp
+  Importer.cpp
+  TinyXML2.cpp
 )
 
-# --------------------------------------------
-# main executable
-# --------------------------------------------
-add_executable(${APP_NAME}
-  bench.cpp
-  OSPRayFixture.cpp
-  OSPRayFixture.h
-  simple_outputter.hpp
-)
+target_link_libraries(${LIBRARY_NAME} ${OSPRAY_LIBRARIES})
 
-target_link_libraries(${APP_NAME}
-  ospray_common
-  ospray_importer
-  ospray_minisg
-)
-
-# ------------------------------------------------------------
-
-install(TARGETS ${APP_NAME} DESTINATION bin)
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

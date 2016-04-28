@@ -10,6 +10,8 @@ using std::string;
 #include "common/loaders/ObjectFile.h"
 #include "common/loaders/VolumeFile.h"
 
+#include "common/importer/Importer.h"
+
 #include <ospray_cpp/Data.h>
 
 #include "OSPRayFixture.h"
@@ -207,80 +209,48 @@ static void importObjectsFromFile(const std::string &filename,
   auto &model = f->model;
 
   // Load OSPRay objects from a file.
-  OSPObject *objects = ObjectFile::importObjects(filename.c_str());
+  ospray::importer::Group *imported = ospray::importer::import(filename);
 
-  // Iterate over the objects contained in the object list.
-  for (size_t i = 0; objects[i]; i++) {
-    OSPDataType type;
-    ospGetType(objects[i], NULL, &type);
+  // Iterate over geometries
+  for (size_t i = 0; i < imported->geometry.size(); i++) {
+    auto geometry = ospray::cpp::Geometry(imported->geometry[i]->handle);
+    geometry.commit();
+    model.addGeometry(geometry);
+  }
 
-    auto object = objects[i];
+  // Iterate over volumes
+  for (size_t i=0 ; i < imported->volume.size() ; i++) {
+    ospray::importer::Volume *vol = imported->volume[i];
+    auto volume = ospray::cpp::Volume(vol->handle);
 
-    if (type == OSP_GEOMETRY) {
+    // For now we set the same transfer function on all volumes.
+    volume.set("transferFunction", f->tf);
+    volume.set("samplingRate", f->samplingRate);
+    volume.commit();
 
-      auto geometry = ospray::cpp::Geometry((OSPGeometry)object);
+    // Add the loaded volume(s) to the model.
+    model.addVolume(volume);
 
-      // Commit the geometry.
-      geometry.commit();
+    // Set the minimum and maximum values in the domain for both color and
+    // opacity components of the transfer function.
+    f->tf.set("valueRange", vol->voxelRange.x, vol->voxelRange.y);
+    f->tf.commit();
 
-      // Add the loaded geometry to the model.
-      model.addGeometry(geometry);
+    auto volumeMesh = new ospray::miniSG::Mesh;
+    volumeMesh->bounds = vol->bounds;
+    f->sgModel.mesh.push_back(volumeMesh);
 
-    } else if (type == OSP_VOLUME) {
+    // Create any specified isosurfaces
+    if (!f->isosurfaces.empty()) {
+      auto isoValueData = ospray::cpp::Data(f->isosurfaces.size(), OSP_FLOAT,
+                                            f->isosurfaces.data());
+      auto isoGeometry = ospray::cpp::Geometry("isosurfaces");
 
-      auto volume = ospray::cpp::Volume((OSPVolume)object);
+      isoGeometry.set("isovalues", isoValueData);
+      isoGeometry.set("volume", volume);
+      isoGeometry.commit();
 
-      // For now we set the same transfer function on all volumes.
-      volume.set("transferFunction", f->tf);
-      volume.set("samplingRate", f->samplingRate);
-      volume.commit();
-
-      // Add the loaded volume(s) to the model.
-      model.addVolume(volume);
-
-      vec2f voxelRange;
-      if (f->volume_data_range.x != std::numeric_limits<float>::infinity() &&
-          f->volume_data_range.y != std::numeric_limits<float>::infinity()) {
-        voxelRange = {f->volume_data_range.x, f->volume_data_range.y};
-        std::cerr << "used voxel range: " << voxelRange.x << " "
-                  << voxelRange.y << std::endl;
-      } else {
-        voxelRange = VolumeFile::voxelRangeOf[(OSPVolume)volume.handle()];
-      }
-
-      // Set the minimum and maximum values in the domain for both color and
-      // opacity components of the transfer function.
-      f->tf.set("valueRange", voxelRange.x, voxelRange.y);
-
-      f->tf.commit();
-
-      // Get the volume's bounding box for a decent default view
-      // NOTE(jda) - This uses depricated API functions...need to calculate
-      //             within the loaders.
-      box3f boundingBox;
-      ospGetVec3f(volume.handle(),
-                  "boundingBoxMin",
-                  (osp::vec3f*)&boundingBox.lower);
-      ospGetVec3f(volume.handle(),
-                  "boundingBoxMax",
-                  (osp::vec3f*)&boundingBox.upper);
-
-      auto volumeMesh = new ospray::miniSG::Mesh;
-      volumeMesh->bounds = boundingBox;
-      f->sgModel.mesh.push_back(volumeMesh);
-
-      // Create any specified isosurfaces
-      if (!f->isosurfaces.empty()) {
-        auto isoValueData = ospray::cpp::Data(f->isosurfaces.size(), OSP_FLOAT,
-                                              f->isosurfaces.data());
-        auto isoGeometry = ospray::cpp::Geometry("isosurfaces");
-
-        isoGeometry.set("isovalues", isoValueData);
-        isoGeometry.set("volume", volume);
-        isoGeometry.commit();
-
-        model.addGeometry(isoGeometry);
-      }
+      model.addGeometry(isoGeometry);
     }
   }
 
