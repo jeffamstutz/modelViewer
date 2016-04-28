@@ -66,7 +66,7 @@ static void writePPM(const string &fileName, const int sizeX, const int sizeY,
 
 static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 {
-  if(msgTex == NULL)
+  if(msgTex == nullptr)
   {
     static int numWarnings = 0;
     if (++numWarnings < 10)
@@ -74,7 +74,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
       cerr << "WARNING: material does not have Textures"
            << " (only warning for the first 10 times)!" << endl;
     }
-    return NULL;
+    return nullptr;
   }
 
   static std::map<ospray::miniSG::Texture2D*,
@@ -110,7 +110,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 
 static OSPMaterial createDefaultMaterial(OSPRenderer renderer)
 {
-  static OSPMaterial ospMat = NULL;
+  static OSPMaterial ospMat = nullptr;
 
   if (ospMat) return ospMat;
 
@@ -130,7 +130,7 @@ static OSPMaterial createDefaultMaterial(OSPRenderer renderer)
 static OSPMaterial createMaterial(OSPRenderer renderer,
                                   ospray::miniSG::Material *mat)
 {
-  if (mat == NULL)
+  if (mat == nullptr)
   {
     static int numWarnings = 0;
     if (++numWarnings < 10)
@@ -395,7 +395,7 @@ static void addMeshToModel(OSPRayFixture *f)
         }
 
         while(materialList.size() > alphaMaps.size()) {
-          alphaMaps.push_back(NULL);
+          alphaMaps.push_back(nullptr);
         }
         while(materialList.size() > alphas.size()) {
           alphas.push_back(0.f);
