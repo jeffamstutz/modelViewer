@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 #include <ospray.h>
 #include "common/common/vec.h"
@@ -130,6 +131,13 @@ template <typename OSP_TYPE>
 inline ManagedObject_T<OSP_TYPE>::ManagedObject_T(OSP_TYPE object) :
   m_object(object)
 {
+  using OSPObject_T = typename std::remove_pointer<OSPObject>::type;
+  using OtherOSP_T  = typename std::remove_pointer<OSP_TYPE>::type;
+  static_assert(std::is_same<osp::ManagedObject, OSPObject_T>::value ||
+                std::is_base_of<osp::ManagedObject, OtherOSP_T>::value,
+                "ManagedObject_T<OSP_TYPE> can only be instantiated with "
+                "OSPObject (a.k.a. osp::ManagedObject*) or one of its"
+                "decendants (a.k.a. the OSP* family of types).");
 }
 
 template <typename OSP_TYPE>
