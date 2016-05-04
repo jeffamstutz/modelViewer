@@ -507,7 +507,7 @@ void DefaultSceneParser::finalize()
     for (size_t i = 0; i < m_msgModel->instance.size(); i++) {
       OSPGeometry inst =
           ospNewInstance(instanceModels[m_msgModel->instance[i].meshID],
-          reinterpret_cast<const float*>(&m_msgModel->instance[i].xfm));
+          reinterpret_cast<osp::affine3f&>(m_msgModel->instance[i].xfm));
       m_model.addGeometry(inst);
     }
   }
