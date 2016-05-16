@@ -29,10 +29,10 @@ should point to the root of your OSPRay install. Thus on a machine where OSPRay
 is installed into '/opt/ospray', compiling ospDebugViewer is a simple as:
 
     user@mymachine[~/Projects/ospDebugViewer]: mkdir build
-    user@mymachine[~/Projects/ospDebugViewer]: cd build
-    user@mymachine[~/Projects/ospDebugViewer]: export ospray_DIR=/opt/ospray
-    user@mymachine[~/Projects/ospDebugViewer]: cmake ..
-    user@mymachine[~/Projects/ospDebugViewer]: make
+    user@mymachine[~/Projects/ospDebugViewer/build]: cd build
+    user@mymachine[~/Projects/ospDebugViewer/build]: export ospray_DIR=/opt/ospray
+    user@mymachine[~/Projects/ospDebugViewer/build]: cmake ..
+    user@mymachine[~/Projects/ospDebugViewer/build]: make
 
 The 'scripts/' directory in the ospDebugViewer source tree has some scripts
 which know how to go fetch OSPRay, compile it with gcc, and build
