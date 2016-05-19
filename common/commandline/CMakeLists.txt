@@ -16,7 +16,9 @@
 
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-add_library(ospray_commandline SHARED
+set(LIBRARY_NAME ospray_commandline)
+
+add_library(${LIBRARY_NAME} SHARED
   CommandLineParser.h
   CameraParser.cpp
   LightsParser.cpp
@@ -24,3 +26,5 @@ add_library(ospray_commandline SHARED
   SceneParser.cpp
   Utility.h
 )
+
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)

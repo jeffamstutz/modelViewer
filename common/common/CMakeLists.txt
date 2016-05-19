@@ -14,7 +14,9 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-ADD_LIBRARY(ospray_common SHARED
+set(LIBRARY_NAME ospray_common)
+
+ADD_LIBRARY(${LIBRARY_NAME} SHARED
   common.cpp
   FileName.cpp
   sysinfo.cpp
@@ -35,3 +37,4 @@ ADD_LIBRARY(ospray_common SHARED
   vec.h
 )
 
+install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
