@@ -23,7 +23,8 @@ add_library(${LIBRARY_NAME} SHARED
   CameraParser.cpp
   LightsParser.cpp
   RendererParser.cpp
-  SceneParser.cpp
+  SceneParser/SceneParser.h
+  SceneParser/TriangleMeshSceneParser.cpp
   Utility.h
 )
 

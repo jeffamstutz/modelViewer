@@ -14,47 +14,44 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "common/commandline/CameraParser.h"
-#include "common/commandline/LightsParser.h"
-#include "common/commandline/RendererParser.h"
-#include "common/commandline/SceneParser/TriangleMeshSceneParser.h"
-#include "common/commandline/Utility.h"
+#pragma once
 
-#include "ScriptedOSPGlutViewer.h"
+#include <common/commandline/SceneParser/SceneParser.h>
 
-std::string scriptFileFromCommandLine(int ac, const char **&av)
+class TriangleMeshSceneParser : public SceneParser
 {
-  std::string scriptFileName;
+public:
+  TriangleMeshSceneParser(ospray::cpp::Renderer);
 
-  for (int i = 1; i < ac; i++) {
-    const std::string arg = av[i];
-    if (arg == "--script" || arg == "-s") {
-      scriptFileName = av[++i];
-    }
-  }
+  virtual void parse(int ac, const char **&av) override;
 
-  return scriptFileName;
-}
+  ospray::cpp::Model model() const override;
+  ospcommon::box3f   bbox()  const override;
 
-int main(int ac, const char **av)
-{
-  ospInit(&ac,av);
-  ospray::glut3D::initGLUT(&ac,av);
+protected:
 
-  auto ospObjs = parseWithDefaultParsers(ac, av);
+  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
+  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
+                                       ospray::miniSG::Material *mat);
 
-  ospcommon::box3f      bbox;
-  ospray::cpp::Model    model;
-  ospray::cpp::Renderer renderer;
-  ospray::cpp::Camera   camera;
+  ospray::cpp::Model    m_model;
+  ospray::cpp::Renderer m_renderer;
 
-  std::tie(bbox, model, renderer, camera) = ospObjs;
+  bool m_alpha;
+  bool m_createDefaultMaterial;
+  unsigned int m_maxObjectsToConsider;
 
-  auto scriptFileName = scriptFileFromCommandLine(ac, av);
+  // if turned on, we'll put each triangle mesh into its own instance,
+  // no matter what
+  bool m_forceInstancing;
 
-  ospray::ScriptedOSPGlutViewer window(bbox, model, renderer,
-                                       camera, scriptFileName);
-  window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
+  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
+  std::vector<ospray::miniSG::Model *> m_msgAnimation;
 
-  ospray::glut3D::runGLUT();
-}
+private:
+
+  void createSpheres();
+  void createCylinders();
+
+  void finalize();
+};

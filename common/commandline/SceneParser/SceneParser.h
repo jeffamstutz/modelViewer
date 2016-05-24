@@ -14,47 +14,18 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "common/commandline/CameraParser.h"
-#include "common/commandline/LightsParser.h"
-#include "common/commandline/RendererParser.h"
-#include "common/commandline/SceneParser/TriangleMeshSceneParser.h"
-#include "common/commandline/Utility.h"
+#pragma once
 
-#include "ScriptedOSPGlutViewer.h"
+#include <common/commandline/CommandLineParser.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
+#include <common/miniSG/miniSG.h>
 
-std::string scriptFileFromCommandLine(int ac, const char **&av)
+#include <string>
+
+class SceneParser : public CommandLineParser
 {
-  std::string scriptFileName;
-
-  for (int i = 1; i < ac; i++) {
-    const std::string arg = av[i];
-    if (arg == "--script" || arg == "-s") {
-      scriptFileName = av[++i];
-    }
-  }
-
-  return scriptFileName;
-}
-
-int main(int ac, const char **av)
-{
-  ospInit(&ac,av);
-  ospray::glut3D::initGLUT(&ac,av);
-
-  auto ospObjs = parseWithDefaultParsers(ac, av);
-
-  ospcommon::box3f      bbox;
-  ospray::cpp::Model    model;
-  ospray::cpp::Renderer renderer;
-  ospray::cpp::Camera   camera;
-
-  std::tie(bbox, model, renderer, camera) = ospObjs;
-
-  auto scriptFileName = scriptFileFromCommandLine(ac, av);
-
-  ospray::ScriptedOSPGlutViewer window(bbox, model, renderer,
-                                       camera, scriptFileName);
-  window.create("ospDebugViewer: OSPRay Mini-Scene Graph test viewer");
-
-  ospray::glut3D::runGLUT();
-}
+public:
+  virtual ospray::cpp::Model model() const = 0;
+  virtual ospcommon::box3f   bbox()  const = 0;
+};

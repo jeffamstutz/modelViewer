@@ -22,7 +22,7 @@
 
 #include "commandline/CameraParser.h"
 #include "commandline/LightsParser.h"
-#include "commandline/SceneParser.h"
+#include "commandline/SceneParser/TriangleMeshSceneParser.h"
 #include "commandline/RendererParser.h"
 
 #include <tuple>
@@ -58,17 +58,17 @@ inline ParsedOSPObjects parseCommandLine(int ac, const char **&av)
 
   SceneParser_T sceneParser{rendererParser.renderer()};
   sceneParser.parse(ac, av);
-  auto sgmodel = sceneParser.sgmodel();
-  auto model   = sceneParser.model();
+  auto model = sceneParser.model();
+  auto bbox  = sceneParser.bbox();
 
   LightsParser_T lightsParser(renderer);
   lightsParser.parse(ac, av);
 
-  return std::make_tuple(sgmodel->getBBox(), model, renderer, camera);
+  return std::make_tuple(bbox, model, renderer, camera);
 }
 
 inline ParsedOSPObjects parseWithDefaultParsers(int ac, const char**& av)
 {
   return parseCommandLine<DefaultRendererParser, DefaultCameraParser,
-                          DefaultSceneParser, DefaultLightsParser>(ac, av);
+                          TriangleMeshSceneParser, DefaultLightsParser>(ac, av);
 }

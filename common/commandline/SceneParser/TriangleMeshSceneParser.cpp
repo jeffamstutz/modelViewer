@@ -1,4 +1,4 @@
-#include "SceneParser.h"
+#include "TriangleMeshSceneParser.h"
 
 #include <ospray_cpp/Data.h>
 
@@ -42,7 +42,8 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
   if (alreadyCreatedTextures.find(msgTex) != alreadyCreatedTextures.end())
     return alreadyCreatedTextures[msgTex];
 
-  //TODO: We need to come up with a better way to handle different possible pixel layouts
+  //TODO: We need to come up with a better way to handle different possible
+  //      pixel layouts
   OSPTextureFormat type = OSP_TEXTURE_R8;
 
   if (msgTex->depth == 1) {
@@ -70,7 +71,7 @@ static OSPTexture2D createTexture2D(ospray::miniSG::Texture2D *msgTex)
 
 // SceneParser definitions ////////////////////////////////////////////////////
 
-DefaultSceneParser::DefaultSceneParser(cpp::Renderer renderer) :
+TriangleMeshSceneParser::TriangleMeshSceneParser(cpp::Renderer renderer) :
   m_renderer(renderer),
   m_alpha(false),
   m_createDefaultMaterial(true),
@@ -80,7 +81,7 @@ DefaultSceneParser::DefaultSceneParser(cpp::Renderer renderer) :
 {
 }
 
-void DefaultSceneParser::parse(int ac, const char **&av)
+void TriangleMeshSceneParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -125,18 +126,18 @@ void DefaultSceneParser::parse(int ac, const char **&av)
 #endif
 }
 
-cpp::Model DefaultSceneParser::model()
+cpp::Model TriangleMeshSceneParser::model() const
 {
   return m_model;
 }
 
-miniSG::Model *DefaultSceneParser::sgmodel()
+ospcommon::box3f TriangleMeshSceneParser::bbox() const
 {
-  return m_msgModel.ptr;
+  return m_msgModel.ptr->getBBox();
 }
 
 cpp::Material
-DefaultSceneParser::createDefaultMaterial(cpp::Renderer renderer)
+TriangleMeshSceneParser::createDefaultMaterial(cpp::Renderer renderer)
 {
   if(!m_createDefaultMaterial) return nullptr;
 
@@ -151,7 +152,7 @@ DefaultSceneParser::createDefaultMaterial(cpp::Renderer renderer)
   return ospMat;
 }
 
-cpp::Material DefaultSceneParser::createMaterial(cpp::Renderer renderer,
+cpp::Material TriangleMeshSceneParser::createMaterial(cpp::Renderer renderer,
                                           miniSG::Material *mat)
 {
   if (mat == nullptr)
@@ -229,7 +230,7 @@ cpp::Material DefaultSceneParser::createMaterial(cpp::Renderer renderer,
   return ospMat;
 }
 
-void DefaultSceneParser::createSpheres()
+void TriangleMeshSceneParser::createSpheres()
 {
   struct Sphere {
     vec3f center;
@@ -283,7 +284,7 @@ void DefaultSceneParser::createSpheres()
   m_model.commit();
 }
 
-void DefaultSceneParser::createCylinders()
+void TriangleMeshSceneParser::createCylinders()
 {
   struct Cylinder {
     vec3f v0;
@@ -341,7 +342,7 @@ void DefaultSceneParser::createCylinders()
   m_model.commit();
 }
 
-void DefaultSceneParser::finalize()
+void TriangleMeshSceneParser::finalize()
 {
   // code does not yet do instancing ... check that the model doesn't
   // contain instances
