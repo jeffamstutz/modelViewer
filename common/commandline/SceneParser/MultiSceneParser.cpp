@@ -17,7 +17,9 @@
 #include "MultiSceneParser.h"
 
 #include "particle/ParticleSceneParser.h"
-#include "tachyon/TachyonSceneParser.h"
+#ifdef OSPRAY_TACHYON_SUPPORT
+#  include "tachyon/TachyonSceneParser.h"
+#endif
 #include "trianglemesh/TriangleMeshSceneParser.h"
 
 using namespace ospray;
@@ -31,19 +33,25 @@ MultiSceneParser::MultiSceneParser(cpp::Renderer renderer) :
 bool MultiSceneParser::parse(int ac, const char **&av)
 {
   TriangleMeshSceneParser triangleMeshParser(m_renderer);
+#ifdef OSPRAY_TACHYON_SUPPORT
   TachyonSceneParser      tachyonParser(m_renderer);
+#endif
   ParticleSceneParser     particleParser(m_renderer);
 
   bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
+#ifdef OSPRAY_TACHYON_SUPPORT
   bool gotTachyonScene      = tachyonParser.parse(ac, av);
+#endif
   bool gotPartileScene      = particleParser.parse(ac, av);
 
   SceneParser *parser = nullptr;
 
   if (gotTriangleMeshScene)
     parser = &triangleMeshParser;
+#ifdef OSPRAY_TACHYON_SUPPORT
   else if (gotTachyonScene)
     parser = &tachyonParser;
+#endif
   else if (gotPartileScene)
     parser = &particleParser;
 

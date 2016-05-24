@@ -18,46 +18,53 @@ include_directories(${CMAKE_CURRENT_LIST_DIR})
 
 set(LIBRARY_NAME ospray_commandline)
 
-# -------------------------------------------------------
-find_program(LEX_EXE flex)
-if(LEX_EXE STREQUAL "LEX_EXE-NOTFOUND")
-  message(FATAL_ERROR "dear user, plase install flex!")
-endif(LEX_EXE STREQUAL "LEX_EXE-NOTFOUND")
+option(OSPRAY_COMMANDLINE_TACHYON_SUPPORT OFF)
+mark_as_advanced(OSPRAY_COMMANDLINE_TACHYON_SUPPORT)
 
-find_program(YACC_EXE bison)
-if(YACC_EXE STREQUAL "YACC_EXE-NOTFOUND")
-  message(FATAL_ERROR "dear user, plase install bison!")
-endif(YACC_EXE STREQUAL "YACC_EXE-NOTFOUND")
+if(OSPRAY_COMMANDLINE_TACHYON_SUPPORT)
+  # -------------------------------------------------------
+  find_program(LEX_EXE flex)
+  if(LEX_EXE STREQUAL "LEX_EXE-NOTFOUND")
+    message(FATAL_ERROR "dear user, plase install flex!")
+  endif()
 
-# reuseable cmake macro for yacc
-MACRO(YACC_FILE _filename)
-  GET_FILENAME_COMPONENT(_basename ${_filename} NAME_WE)
-  ADD_CUSTOM_COMMAND(
-    OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_y.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_y.hpp
-    COMMAND ${YACC_EXE} -d --debug --verbose
-    --output=${_basename}_y.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
-    )
-ENDMACRO(YACC_FILE)
+  find_program(YACC_EXE bison)
+  if(YACC_EXE STREQUAL "YACC_EXE-NOTFOUND")
+    message(FATAL_ERROR "dear user, plase install bison!")
+  endif()
 
-# reuseable cmake macro for lex
-MACRO(LEX_FILE _filename)
-  GET_FILENAME_COMPONENT(_basename ${_filename} NAME_WE)
-  ADD_CUSTOM_COMMAND(
-    OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_l.cpp
-    COMMAND ${LEX_EXE}
-    -o${_basename}_l.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_filename} )
-ENDMACRO(LEX_FILE)
-# -------------------------------------------------------
+  # reuseable cmake macro for yacc
+  macro(yacc_file _filename)
+    get_filename_component(_basename ${_filename} NAME_WE)
+    add_custom_command(
+      OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_y.cpp
+      ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_y.hpp
+      COMMAND ${YACC_EXE} -d --debug --verbose
+      --output=${_basename}_y.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
+      )
+  endmacro()
 
-YACC_FILE(SceneParser/tachyon/parser.yy)
-LEX_FILE(SceneParser/tachyon/lexer.ll)
+  # reuseable cmake macro for lex
+  macro(lex_file _filename)
+    get_filename_component(_basename ${_filename} NAME_WE)
+    add_custom_command(
+      OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/${_basename}_l.cpp
+      COMMAND ${LEX_EXE}
+      -o${_basename}_l.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/${_filename}
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_filename} )
+  endmacro()
+  # -------------------------------------------------------
 
-add_library(${LIBRARY_NAME} SHARED
+  yacc_file(SceneParser/tachyon/parser.yy)
+  lex_file(SceneParser/tachyon/lexer.ll)
+
+  add_definitions(-DOSPRAY_TACHYON_SUPPORT)
+endif()
+
+set(SOURCE_FILES
   CommandLineParser.h
   CameraParser.cpp
   LightsParser.cpp
@@ -70,15 +77,22 @@ add_library(${LIBRARY_NAME} SHARED
   SceneParser/particle/Model.cpp
   SceneParser/particle/uintah.cpp
 
-  SceneParser/tachyon/TachyonSceneParser.cpp
-  SceneParser/tachyon/Model.cpp
-  SceneParser/tachyon/Loc.cpp
-  lexer_l.cpp
-  parser_y.cpp
-
   SceneParser/trianglemesh/TriangleMeshSceneParser.cpp
 
   Utility.h
 )
+
+if(OSPRAY_COMMANDLINE_TACHYON_SUPPORT)
+  set(SOURCE_FILES
+    ${SOURCE_FILES}
+    SceneParser/tachyon/TachyonSceneParser.cpp
+    SceneParser/tachyon/Model.cpp
+    SceneParser/tachyon/Loc.cpp
+    lexer_l.cpp
+    parser_y.cpp
+  )
+endif()
+
+add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
