@@ -14,53 +14,47 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "MultiSceneParser.h"
+#pragma once
 
-#include "particle/ParticleSceneParser.h"
-#include "tachyon/TachyonSceneParser.h"
-#include "trianglemesh/TriangleMeshSceneParser.h"
+#include <common/commandline/SceneParser/SceneParser.h>
+#include <ospray_cpp/Renderer.h>
+#include <common/miniSG/miniSG.h>
 
-using namespace ospray;
-using namespace ospcommon;
+#include <string>
 
-MultiSceneParser::MultiSceneParser(cpp::Renderer renderer) :
-  m_renderer(renderer)
+
+class TriangleMeshSceneParser : public SceneParser
 {
-}
+public:
+  TriangleMeshSceneParser(ospray::cpp::Renderer);
 
-bool MultiSceneParser::parse(int ac, const char **&av)
-{
-  TriangleMeshSceneParser triangleMeshParser(m_renderer);
-  TachyonSceneParser      tachyonParser(m_renderer);
-  ParticleSceneParser     particleParser(m_renderer);
+  bool parse(int ac, const char **&av) override;
 
-  bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
-  bool gotTachyonScene      = tachyonParser.parse(ac, av);
-  bool gotPartileScene      = particleParser.parse(ac, av);
+  ospray::cpp::Model model() const override;
+  ospcommon::box3f   bbox()  const override;
 
-  SceneParser *parser = nullptr;
+private:
 
-  if (gotTriangleMeshScene)
-    parser = &triangleMeshParser;
-  else if (gotTachyonScene)
-    parser = &tachyonParser;
-  else if (gotPartileScene)
-    parser = &particleParser;
+  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
+  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
+                                       ospray::miniSG::Material *mat);
 
-  if (parser) {
-    m_model = parser->model();
-    m_bbox  = parser->bbox();
-  }
+  ospray::cpp::Model    m_model;
+  ospray::cpp::Renderer m_renderer;
 
-  return parser != nullptr;
-}
+  bool m_alpha;
+  bool m_createDefaultMaterial;
+  unsigned int m_maxObjectsToConsider;
 
-cpp::Model MultiSceneParser::model() const
-{
-  return m_model;
-}
+  // if turned on, we'll put each triangle mesh into its own instance,
+  // no matter what
+  bool m_forceInstancing;
 
-box3f MultiSceneParser::bbox() const
-{
-  return m_bbox;
-}
+  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
+  std::vector<ospray::miniSG::Model *> m_msgAnimation;
+
+  void createSpheres();
+  void createCylinders();
+
+  void finalize();
+};

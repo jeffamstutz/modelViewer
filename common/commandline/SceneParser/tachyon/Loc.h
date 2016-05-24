@@ -14,53 +14,39 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "MultiSceneParser.h"
+#pragma once
 
-#include "particle/ParticleSceneParser.h"
-#include "tachyon/TachyonSceneParser.h"
-#include "trianglemesh/TriangleMeshSceneParser.h"
+// tachyon module
+#include "Model.h"
+// std
+#include <string>
+#include <ostream>
 
-using namespace ospray;
-using namespace ospcommon;
+namespace ospray {
+  using std::string;
 
-MultiSceneParser::MultiSceneParser(cpp::Renderer renderer) :
-  m_renderer(renderer)
-{
-}
+  struct Loc {
+    Loc() { name = "(undef/internal)"; line = 0; }
+    const char *name;
+    int line;
+    void Print() const { printf(" @ [%s:%d] ", name, line); }
+    string toString() const;
+  
+    static Loc current;
+  };
 
-bool MultiSceneParser::parse(int ac, const char **&av)
-{
-  TriangleMeshSceneParser triangleMeshParser(m_renderer);
-  TachyonSceneParser      tachyonParser(m_renderer);
-  ParticleSceneParser     particleParser(m_renderer);
-
-  bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
-  bool gotTachyonScene      = tachyonParser.parse(ac, av);
-  bool gotPartileScene      = particleParser.parse(ac, av);
-
-  SceneParser *parser = nullptr;
-
-  if (gotTriangleMeshScene)
-    parser = &triangleMeshParser;
-  else if (gotTachyonScene)
-    parser = &tachyonParser;
-  else if (gotPartileScene)
-    parser = &particleParser;
-
-  if (parser) {
-    m_model = parser->model();
-    m_bbox  = parser->bbox();
+  inline std::ostream &operator<<(std::ostream &o, const Loc &fp)
+  {
+    o << fp.toString();
+    return o;
   }
 
-  return parser != nullptr;
-}
+  void Warning(Loc p, const char *, ...);
+  void Error(Loc p, const char *, ...);
+  void PerformanceNotice(Loc p, const char *, ...);
+  void PerformanceWarning(Loc p, const char *, ...);
 
-cpp::Model MultiSceneParser::model() const
-{
-  return m_model;
-}
+} // ::ospray
 
-box3f MultiSceneParser::bbox() const
-{
-  return m_bbox;
-}
+
+

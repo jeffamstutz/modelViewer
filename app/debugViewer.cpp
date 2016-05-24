@@ -14,10 +14,6 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "common/commandline/CameraParser.h"
-#include "common/commandline/LightsParser.h"
-#include "common/commandline/RendererParser.h"
-#include "common/commandline/SceneParser/TriangleMeshSceneParser.h"
 #include "common/commandline/Utility.h"
 
 #include "ScriptedOSPGlutViewer.h"

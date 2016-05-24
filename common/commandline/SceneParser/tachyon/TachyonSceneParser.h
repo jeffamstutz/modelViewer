@@ -19,26 +19,19 @@
 #include <common/commandline/SceneParser/SceneParser.h>
 #include <ospray_cpp/Renderer.h>
 
-class ParticleSceneParser : public SceneParser
+class TachyonSceneParser : public SceneParser
 {
 public:
-  ParticleSceneParser(ospray::cpp::Renderer);
+  TachyonSceneParser(ospray::cpp::Renderer);
 
   bool parse(int ac, const char **&av) override;
 
   ospray::cpp::Model model() const override;
   ospcommon::box3f   bbox()  const override;
 
-protected:
+private:
 
   ospray::cpp::Renderer m_renderer;
   ospray::cpp::Model    m_model;
   ospcommon::box3f      m_bbox;
-
-private:
-
-  void finalize();
-
-  void createSpheres();
-  void createCylinders();
 };

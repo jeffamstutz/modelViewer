@@ -17,8 +17,8 @@
 #include "ParticleSceneParser.h"
 
 // particle viewer
-#include "particle/Model.h"
-#include "particle/uintah.h"
+#include "Model.h"
+#include "uintah.h"
 
 #include <random>
 
