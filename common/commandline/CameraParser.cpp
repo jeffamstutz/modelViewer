@@ -1,6 +1,6 @@
 #include "CameraParser.h"
 
-void DefaultCameraParser::parse(int ac, const char **&av)
+bool DefaultCameraParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -25,6 +25,8 @@ void DefaultCameraParser::parse(int ac, const char **&av)
   }
 
   finalize();
+
+  return true;
 }
 
 ospray::cpp::Camera DefaultCameraParser::camera()

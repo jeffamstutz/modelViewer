@@ -19,7 +19,7 @@
 class CommandLineParser
 {
 public:
-  virtual ~CommandLineParser(){}
+  virtual ~CommandLineParser() = default;
 
-  virtual void parse(int ac, const char **&av) = 0;
+  virtual bool parse(int ac, const char **&av) = 0;
 };

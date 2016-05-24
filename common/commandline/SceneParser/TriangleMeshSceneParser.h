@@ -28,7 +28,7 @@ class TriangleMeshSceneParser : public SceneParser
 public:
   TriangleMeshSceneParser(ospray::cpp::Renderer);
 
-  void parse(int ac, const char **&av) override;
+  bool parse(int ac, const char **&av) override;
 
   ospray::cpp::Model model() const override;
   ospcommon::box3f   bbox()  const override;

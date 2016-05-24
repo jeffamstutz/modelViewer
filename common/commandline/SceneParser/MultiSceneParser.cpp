@@ -14,31 +14,48 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#pragma once
+#include "MultiSceneParser.h"
 
-#include <common/commandline/SceneParser/SceneParser.h>
-#include <ospray_cpp/Renderer.h>
+#include "ParticleSceneParser.h"
+#include "TriangleMeshSceneParser.h"
 
-class ParticleSceneParser : public SceneParser
+using namespace ospray;
+using namespace ospcommon;
+
+MultiSceneParser::MultiSceneParser(cpp::Renderer renderer) :
+  m_renderer(renderer)
 {
-public:
-  ParticleSceneParser(ospray::cpp::Renderer);
+}
 
-  bool parse(int ac, const char **&av) override;
+bool MultiSceneParser::parse(int ac, const char **&av)
+{
+  TriangleMeshSceneParser triangleMeshParser(m_renderer);
+  ParticleSceneParser     particleParser(m_renderer);
 
-  ospray::cpp::Model model() const override;
-  ospcommon::box3f   bbox()  const override;
+  bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
+  bool gotPartileScene      = particleParser.parse(ac, av);
 
-protected:
+  SceneParser *parser = nullptr;
 
-  ospray::cpp::Renderer m_renderer;
-  ospray::cpp::Model    m_model;
-  ospcommon::box3f      m_bbox;
+  if (gotTriangleMeshScene)
+    parser = &triangleMeshParser;
+  else if (gotPartileScene)
+    parser = &particleParser;
 
-private:
+  if (parser) {
+    m_model = parser->model();
+    m_bbox  = parser->bbox();
+  }
 
-  void finalize();
+  return parser != nullptr;
+}
 
-  void createSpheres();
-  void createCylinders();
-};
+cpp::Model MultiSceneParser::model() const
+{
+  return m_model;
+}
+
+box3f MultiSceneParser::bbox() const
+{
+  return m_bbox;
+}

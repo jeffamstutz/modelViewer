@@ -29,7 +29,7 @@ class DefaultLightsParser : public LightsParser
 {
 public:
   DefaultLightsParser(ospray::cpp::Renderer renderer);
-  virtual void parse(int ac, const char **&av) override;
+  bool parse(int ac, const char **&av) override;
 
 protected:
 

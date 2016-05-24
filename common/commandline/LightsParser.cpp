@@ -12,7 +12,7 @@ DefaultLightsParser::DefaultLightsParser(ospray::cpp::Renderer renderer) :
 {
 }
 
-void DefaultLightsParser::parse(int ac, const char **&av)
+bool DefaultLightsParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -28,6 +28,8 @@ void DefaultLightsParser::parse(int ac, const char **&av)
   }
 
   finalize();
+
+  return true;
 }
 
 void DefaultLightsParser::finalize()

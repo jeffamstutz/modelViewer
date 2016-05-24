@@ -31,7 +31,7 @@ class DefaultCameraParser : public CameraParser
 {
 public:
   DefaultCameraParser() = default;
-  void parse(int ac, const char **&av) override;
+  bool parse(int ac, const char **&av) override;
   ospray::cpp::Camera camera() override;
 
 protected:

@@ -19,10 +19,10 @@
 #include <common/commandline/SceneParser/SceneParser.h>
 #include <ospray_cpp/Renderer.h>
 
-class ParticleSceneParser : public SceneParser
+class MultiSceneParser : public SceneParser
 {
 public:
-  ParticleSceneParser(ospray::cpp::Renderer);
+  MultiSceneParser(ospray::cpp::Renderer);
 
   bool parse(int ac, const char **&av) override;
 
@@ -38,7 +38,4 @@ protected:
 private:
 
   void finalize();
-
-  void createSpheres();
-  void createCylinders();
 };

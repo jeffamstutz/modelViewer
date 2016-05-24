@@ -31,7 +31,7 @@ class DefaultRendererParser : public RendererParser
 {
 public:
   DefaultRendererParser() = default;
-  void parse(int ac, const char **&av) override;
+  bool parse(int ac, const char **&av) override;
   ospray::cpp::Renderer renderer() override;
 
 protected:

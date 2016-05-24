@@ -22,7 +22,7 @@
 
 #include "commandline/CameraParser.h"
 #include "commandline/LightsParser.h"
-#include "commandline/SceneParser/TriangleMeshSceneParser.h"
+#include "commandline/SceneParser/MultiSceneParser.h"
 #include "commandline/RendererParser.h"
 
 #include <tuple>
@@ -70,5 +70,5 @@ inline ParsedOSPObjects parseCommandLine(int ac, const char **&av)
 inline ParsedOSPObjects parseWithDefaultParsers(int ac, const char**& av)
 {
   return parseCommandLine<DefaultRendererParser, DefaultCameraParser,
-                          TriangleMeshSceneParser, DefaultLightsParser>(ac, av);
+                          MultiSceneParser, DefaultLightsParser>(ac, av);
 }

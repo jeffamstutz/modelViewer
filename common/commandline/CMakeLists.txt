@@ -25,6 +25,7 @@ add_library(${LIBRARY_NAME} SHARED
   RendererParser.cpp
 
   SceneParser/SceneParser.h
+  SceneParser/MultiSceneParser.cpp
   SceneParser/ParticleSceneParser.cpp
   SceneParser/TriangleMeshSceneParser.cpp
 

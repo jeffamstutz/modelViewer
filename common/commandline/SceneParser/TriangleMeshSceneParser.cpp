@@ -96,8 +96,10 @@ TriangleMeshSceneParser::TriangleMeshSceneParser(cpp::Renderer renderer) :
 {
 }
 
-void TriangleMeshSceneParser::parse(int ac, const char **&av)
+bool TriangleMeshSceneParser::parse(int ac, const char **&av)
 {
+  bool loadedScene = false;
+
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
     if (arg == "--max-objects") {
@@ -112,25 +114,34 @@ void TriangleMeshSceneParser::parse(int ac, const char **&av)
       FileName fn = arg;
       if (fn.ext() == "stl") {
         miniSG::importSTL(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "msg") {
         miniSG::importMSG(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "tri") {
         miniSG::importTRI(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "xml") {
         miniSG::importRIVL(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "obj") {
         miniSG::importOBJ(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "hbp") {
         miniSG::importHBP(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "x3d") {
         miniSG::importX3D(*m_msgModel,fn);
+        loadedScene = true;
       } else if (fn.ext() == "astl") {
         miniSG::importSTL(m_msgAnimation,fn);
+        loadedScene = true;
       }
     }
   }
 
-  finalize();
+  if (loadedScene) finalize();
+  return loadedScene;
 }
 
 cpp::Model TriangleMeshSceneParser::model() const

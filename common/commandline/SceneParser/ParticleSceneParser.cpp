@@ -65,7 +65,6 @@ OSPData makeMaterials(OSPRenderer renderer, particle::Model *model)
   return data;
 }
 
-
 // Helper types ///////////////////////////////////////////////////////////////
 
 struct DeferredLoadJob {
@@ -88,11 +87,11 @@ struct DeferredLoadJob {
 ParticleSceneParser::ParticleSceneParser(cpp::Renderer renderer) :
   m_renderer(renderer)
 {
-
 }
 
-void ParticleSceneParser::parse(int ac, const char **&av)
+bool ParticleSceneParser::parse(int ac, const char **&av)
 {
+  bool loadedScene = false;
 #if 1
   std::vector<particle::Model *> particleModel;
   std::vector<DeferredLoadJob *> deferredLoadingListXYZ;
@@ -114,63 +113,78 @@ void ParticleSceneParser::parse(int ac, const char **&av)
         int numPerSide = atoi(av[++i]);
         particle::Model *m = createTestCube(numPerSide);
         particleModel.push_back(m);
+        loadedScene = true;
       } else if (fn.ext() == "xyz") {
         particle::Model *m = new particle::Model;
         deferredLoadingListXYZ.push_back(new DeferredLoadJob(m,fn,defFileName));
         particleModel.push_back(m);
+        loadedScene = true;
       } else if (fn.ext() == "xyz2") {
         particle::Model *m = new particle::Model;
         m->loadXYZ2(fn);
         particleModel.push_back(m);
+        loadedScene = true;
+#if 1 // NOTE(jda) - The '.xml' file extension conflicts with RIVL files in
+      //             TriangleMeshSceneParser...disabling here for now until the
+      //             the problem requires a solution.
+      }
+#else
       } else if (fn.ext() == "xml") {
         particle::Model *m = particle::parse__Uintah_timestep_xml(fn);
         particleModel.push_back(m);
+        loadedScene = true;
       }
+#endif
     }
   }
 
-  //TODO: this needs parallelized as it was in ospParticleViewer...
-  for (int i = 0; i < deferredLoadingListXYZ.size(); ++i) {
-    FileName defFileName = deferredLoadingListXYZ[i]->defFileName;
-    FileName xyzFileName = deferredLoadingListXYZ[i]->xyzFileName;
-    particle::Model *model = deferredLoadingListXYZ[i]->model;
+  if (loadedScene) {
+    //TODO: this needs parallelized as it was in ospParticleViewer...
+    for (int i = 0; i < deferredLoadingListXYZ.size(); ++i) {
+      FileName defFileName = deferredLoadingListXYZ[i]->defFileName;
+      FileName xyzFileName = deferredLoadingListXYZ[i]->xyzFileName;
+      particle::Model *model = deferredLoadingListXYZ[i]->model;
 
-    if (defFileName.str() != "")
-      model->readAtomTypeDefinitions(defFileName);
-    model->loadXYZ(xyzFileName);
+      if (defFileName.str() != "")
+        model->readAtomTypeDefinitions(defFileName);
+      model->loadXYZ(xyzFileName);
+    }
+
+    for (int i = 0; i < particleModel.size(); i++) {
+      OSPModel model = ospNewModel();
+      OSPData materialData = makeMaterials(m_renderer.handle(), particleModel[i]);
+
+      OSPData data = ospNewData(particleModel[i]->atom.size()*5,OSP_FLOAT,
+                                &particleModel[i]->atom[0],OSP_DATA_SHARED_BUFFER);
+      ospCommit(data);
+
+      OSPGeometry geom = ospNewGeometry("spheres");
+      ospSet1i(geom,"bytes_per_sphere",sizeof(particle::Model::Atom));
+      ospSet1i(geom,"offset_center",0);
+      ospSet1i(geom,"offset_radius",3*sizeof(float));
+      ospSet1i(geom,"offset_materialID",4*sizeof(float));
+      ospSetData(geom,"spheres",data);
+      ospSetData(geom,"materialList",materialData);
+      ospCommit(geom);
+
+      ospAddGeometry(model,geom);
+      ospCommit(model);
+
+      modelTimeStep.push_back(model);
+    }
+
+    m_model = modelTimeStep[timeStep];
+    m_bbox  = particleModel[0]->getBBox();
   }
-
-  for (int i = 0; i < particleModel.size(); i++) {
-    OSPModel model = ospNewModel();
-    OSPData materialData = makeMaterials(m_renderer.handle(), particleModel[i]);
-
-    OSPData data = ospNewData(particleModel[i]->atom.size()*5,OSP_FLOAT,
-                              &particleModel[i]->atom[0],OSP_DATA_SHARED_BUFFER);
-    ospCommit(data);
-
-    OSPGeometry geom = ospNewGeometry("spheres");
-    ospSet1i(geom,"bytes_per_sphere",sizeof(particle::Model::Atom));
-    ospSet1i(geom,"offset_center",0);
-    ospSet1i(geom,"offset_radius",3*sizeof(float));
-    ospSet1i(geom,"offset_materialID",4*sizeof(float));
-    ospSetData(geom,"spheres",data);
-    ospSetData(geom,"materialList",materialData);
-    ospCommit(geom);
-
-    ospAddGeometry(model,geom);
-    ospCommit(model);
-
-    modelTimeStep.push_back(model);
-  }
-
-  m_model = modelTimeStep[timeStep];
-  m_bbox  = particleModel[0]->getBBox();
 
 #elif 1
   createSpheres();
+  loadedScene = true;
 #else
   createCylinders();
+  loadedScene = true;
 #endif
+  return loadedScene;
 }
 
 ospray::cpp::Model ParticleSceneParser::model() const

@@ -1,6 +1,6 @@
 #include "RendererParser.h"
 
-void DefaultRendererParser::parse(int ac, const char **&av)
+bool DefaultRendererParser::parse(int ac, const char **&av)
 {
   for (int i = 1; i < ac; i++) {
     const std::string arg = av[i];
@@ -13,6 +13,8 @@ void DefaultRendererParser::parse(int ac, const char **&av)
   }
 
   finalize();
+
+  return true;
 }
 
 ospray::cpp::Renderer DefaultRendererParser::renderer()
