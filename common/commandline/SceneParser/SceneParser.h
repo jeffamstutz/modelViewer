@@ -18,10 +18,7 @@
 
 #include <common/commandline/CommandLineParser.h>
 #include <ospray_cpp/Model.h>
-#include <ospray_cpp/Renderer.h>
-#include <common/miniSG/miniSG.h>
-
-#include <string>
+#include <common/box.h>
 
 class SceneParser : public CommandLineParser
 {

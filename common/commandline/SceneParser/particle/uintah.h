@@ -14,49 +14,13 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#pragma once
+#include "Model.h"
 
-#include <common/commandline/SceneParser/SceneParser.h>
-#include <ospray_cpp/Renderer.h>
-#include <common/miniSG/miniSG.h>
+namespace ospray {
+  namespace particle {
 
-#include <string>
+    //! parse given uintah-format timestep.xml file, and return in a model
+    Model *parse__Uintah_timestep_xml(const std::string &s);
 
-
-class TriangleMeshSceneParser : public SceneParser
-{
-public:
-  TriangleMeshSceneParser(ospray::cpp::Renderer);
-
-  void parse(int ac, const char **&av) override;
-
-  ospray::cpp::Model model() const override;
-  ospcommon::box3f   bbox()  const override;
-
-protected:
-
-  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
-  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
-                                       ospray::miniSG::Material *mat);
-
-  ospray::cpp::Model    m_model;
-  ospray::cpp::Renderer m_renderer;
-
-  bool m_alpha;
-  bool m_createDefaultMaterial;
-  unsigned int m_maxObjectsToConsider;
-
-  // if turned on, we'll put each triangle mesh into its own instance,
-  // no matter what
-  bool m_forceInstancing;
-
-  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
-  std::vector<ospray::miniSG::Model *> m_msgAnimation;
-
-private:
-
-  void createSpheres();
-  void createCylinders();
-
-  void finalize();
-};
+  } // ::ospray::particle
+} // ::ospray

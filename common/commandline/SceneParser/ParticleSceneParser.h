@@ -16,54 +16,29 @@
 
 #pragma once
 
-#include <common/commandline/CommandLineParser.h>
-#include <ospray_cpp/Model.h>
+#include <common/commandline/SceneParser/SceneParser.h>
 #include <ospray_cpp/Renderer.h>
-#include <common/miniSG/miniSG.h>
 
-#include <string>
-
-class SceneParser : public CommandLineParser
+class ParticleSceneParser : public SceneParser
 {
 public:
-  virtual ospray::cpp::Model     model()   = 0;
-  virtual ospray::miniSG::Model* sgmodel() = 0;
-};
+  ParticleSceneParser(ospray::cpp::Renderer);
 
-class DefaultSceneParser : public SceneParser
-{
-public:
-  DefaultSceneParser(ospray::cpp::Renderer);
+  void parse(int ac, const char **&av) override;
 
-  virtual void parse(int ac, const char **&av) override;
-
-  ospray::cpp::Model     model() override;
-  ospray::miniSG::Model* sgmodel() override;
+  ospray::cpp::Model model() const override;
+  ospcommon::box3f   bbox()  const override;
 
 protected:
 
-  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
-  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
-                                       ospray::miniSG::Material *mat);
-
-  ospray::cpp::Model    m_model;
   ospray::cpp::Renderer m_renderer;
-
-  bool m_alpha;
-  bool m_createDefaultMaterial;
-  unsigned int m_maxObjectsToConsider;
-
-  // if turned on, we'll put each triangle mesh into its own instance,
-  // no matter what
-  bool m_forceInstancing;
-
-  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
-  std::vector<ospray::miniSG::Model *> m_msgAnimation;
+  ospray::cpp::Model    m_model;
+  ospcommon::box3f      m_bbox;
 
 private:
 
+  void finalize();
+
   void createSpheres();
   void createCylinders();
-
-  void finalize();
 };
