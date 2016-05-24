@@ -77,6 +77,8 @@ set(SOURCE_FILES
   SceneParser/particle/Model.cpp
   SceneParser/particle/uintah.cpp
 
+  SceneParser/streamlines/StreamLineSceneParser.cpp
+
   SceneParser/trianglemesh/TriangleMeshSceneParser.cpp
 
   Utility.h

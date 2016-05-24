@@ -23,10 +23,10 @@
 #include <string>
 
 
-class TriangleMeshSceneParser : public SceneParser
+class StreamLineSceneParser : public SceneParser
 {
 public:
-  TriangleMeshSceneParser(ospray::cpp::Renderer);
+  StreamLineSceneParser(ospray::cpp::Renderer);
 
   bool parse(int ac, const char **&av) override;
 
@@ -35,23 +35,9 @@ public:
 
 private:
 
-  ospray::cpp::Material createDefaultMaterial(ospray::cpp::Renderer renderer);
-  ospray::cpp::Material createMaterial(ospray::cpp::Renderer renderer,
-                                       ospray::miniSG::Material *mat);
-
   ospray::cpp::Model    m_model;
   ospray::cpp::Renderer m_renderer;
-
-  bool m_alpha;
-  bool m_createDefaultMaterial;
-  unsigned int m_maxObjectsToConsider;
-
-  // if turned on, we'll put each triangle mesh into its own instance,
-  // no matter what
-  bool m_forceInstancing;
-
-  ospcommon::Ref<ospray::miniSG::Model> m_msgModel;
-  std::vector<ospray::miniSG::Model *> m_msgAnimation;
+  ospcommon::box3f      m_bbox;
 
   void finalize();
 };

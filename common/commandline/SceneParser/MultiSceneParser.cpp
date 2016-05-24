@@ -17,6 +17,7 @@
 #include "MultiSceneParser.h"
 
 #include "particle/ParticleSceneParser.h"
+#include "streamlines/StreamLineSceneParser.h"
 #ifdef OSPRAY_TACHYON_SUPPORT
 #  include "tachyon/TachyonSceneParser.h"
 #endif
@@ -37,12 +38,14 @@ bool MultiSceneParser::parse(int ac, const char **&av)
   TachyonSceneParser      tachyonParser(m_renderer);
 #endif
   ParticleSceneParser     particleParser(m_renderer);
+  StreamLineSceneParser   streamlineParser(m_renderer);
 
   bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
 #ifdef OSPRAY_TACHYON_SUPPORT
   bool gotTachyonScene      = tachyonParser.parse(ac, av);
 #endif
   bool gotPartileScene      = particleParser.parse(ac, av);
+  bool gotStreamLineScene   = streamlineParser.parse(ac, av);
 
   SceneParser *parser = nullptr;
 
@@ -54,6 +57,8 @@ bool MultiSceneParser::parse(int ac, const char **&av)
 #endif
   else if (gotPartileScene)
     parser = &particleParser;
+  else if (gotStreamLineScene)
+    parser = &streamlineParser;
 
   if (parser) {
     m_model = parser->model();
