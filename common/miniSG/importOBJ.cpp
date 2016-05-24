@@ -421,12 +421,7 @@ namespace ospray {
     void importOBJ(Model &model,
                    const ospcommon::FileName &fileName)
     {
-      std::cout << "ospray::miniSG::importOBJ: importing from "
-                << fileName << endl;
       OBJLoader(model,fileName);
-      std::cout << "ospray::miniSG::importOBJ: found "
-                << model.numUniqueTriangles() << " in "
-                << model.numMeshes() << std::endl;
     }
 
   } // ::ospray::minisg

@@ -21,7 +21,6 @@
 using namespace ospray;
 using namespace ospcommon;
 
-
 #include <iostream>
 using std::cerr;
 using std::endl;
@@ -171,18 +170,10 @@ TriangleMeshSceneParser::createDefaultMaterial(cpp::Renderer renderer)
 }
 
 cpp::Material TriangleMeshSceneParser::createMaterial(cpp::Renderer renderer,
-                                          miniSG::Material *mat)
+                                                      miniSG::Material *mat)
 {
-  if (mat == nullptr)
-  {
-    static int numWarnings = 0;
-    if (++numWarnings < 10)
-    {
-      cerr << "WARNING: model does not have materials! "
-           << "(assigning default)" << endl;
-    }
-    return createDefaultMaterial(renderer);
-  }
+  if (mat == nullptr) return createDefaultMaterial(renderer);
+
   static std::map<miniSG::Material *, cpp::Material> alreadyCreatedMaterials;
 
   if (alreadyCreatedMaterials.find(mat) != alreadyCreatedMaterials.end()) {
