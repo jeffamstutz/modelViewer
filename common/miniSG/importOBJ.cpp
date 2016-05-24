@@ -37,9 +37,9 @@ namespace ospray {
     /*! Three-index vertex, indexing start at 0, -1 means invalid vertex. */
     struct Vertex {
       int v, vt, vn;
-      Vertex() {};
-      Vertex(int v) : v(v), vt(v), vn(v) {};
-      Vertex(int v, int vt, int vn) : v(v), vt(vt), vn(vn) {};
+      Vertex() {}
+      Vertex(int v) : v(v), vt(v), vn(v) {}
+      Vertex(int v, int vt, int vn) : v(v), vt(vt), vn(vn) {}
     };
     
     static inline bool operator < ( const Vertex& a, const Vertex& b ) {
@@ -54,7 +54,9 @@ namespace ospray {
       size_t len = strlen(token);
       if (len == 0) return token;
       char* pe = (char*)(token + len - 1);
-      while ((*pe == ' ' || *pe == '\t' || *pe == '\r') && pe >= token) *pe-- = 0;
+      while ((*pe == ' ' || *pe == '\t' || *pe == '\r') && pe >= token) {
+        *pe-- = 0;
+      }
       return token;
     }
     
@@ -154,9 +156,6 @@ namespace ospray {
       }
 
       // /* generate default material */
-      // Handle<Device::RTMaterial> defaultMaterial = g_device->rtNewMaterial("matte");
-      // g_device->rtSetFloat3(defaultMaterial, "reflectance", 0.5f, 0.5f, 0.5f);
-      // g_device->rtCommit(defaultMaterial);
       defaultMaterial = nullptr;
       curMaterial = defaultMaterial;
 
@@ -179,13 +178,16 @@ namespace ospray {
           if (token[0] == 0) continue;
 
           /*! parse position */
-          if (token[0] == 'v' && isSep(token[1]))                    { v.push_back(getVec3f(token += 2)); continue; }
+          if (token[0] == 'v' && isSep(token[1]))
+          { v.push_back(getVec3f(token += 2)); continue; }
 
           /* parse normal */
-          if (token[0] == 'v' && token[1] == 'n' && isSep(token[2])) { vn.push_back(getVec3f(token += 3)); continue; }
+          if (token[0] == 'v' && token[1] == 'n' && isSep(token[2]))
+          { vn.push_back(getVec3f(token += 3)); continue; }
 
           /* parse texcoord */
-          if (token[0] == 'v' && token[1] == 't' && isSep(token[2])) { vt.push_back(getVec2f(token += 3)); continue; }
+          if (token[0] == 'v' && token[1] == 't' && isSep(token[2]))
+          { vt.push_back(getVec2f(token += 3)); continue; }
 
           /*! parse face */
           if (token[0] == 'f' && isSep(token[1]))
@@ -206,8 +208,10 @@ namespace ospray {
             {
               flushFaceGroup();
               std::string name(parseSep(token += 6));
-              if (material.find(name) == material.end()) curMaterial = defaultMaterial;
-              else curMaterial = material[name];
+              if (material.find(name) == material.end())
+                curMaterial = defaultMaterial;
+              else
+                curMaterial = material[name];
               continue;
             }
 
@@ -384,11 +388,6 @@ namespace ospray {
     {
       if (curGroup.empty()) return;
 
-      // temporary data arrays
-      // std::vector<vec3fa> &positions = ;
-      // std::vector<vec3fa> &normals;
-      // std::vector<vec2f> &texcoords;
-      // std::vector<Triangle> &triangles;
       std::map<Vertex, uint32_t> vertexMap;
       Mesh *mesh = new Mesh;
       model.mesh.push_back(mesh);
@@ -413,7 +412,7 @@ namespace ospray {
             tri.v0 = v0;
             tri.v1 = v1;
             tri.v2 = v2;
-            mesh->triangle.push_back(tri); //Vec3i(v0, v1, v2));
+            mesh->triangle.push_back(tri);
           }
         }
       curGroup.clear();
@@ -422,9 +421,12 @@ namespace ospray {
     void importOBJ(Model &model,
                    const ospcommon::FileName &fileName)
     {
-      std::cout << "ospray::miniSG::importOBJ: importing from " << fileName << endl;
-      OBJLoader loader(model,fileName);
-      std::cout << "ospray::miniSG::importOBJ: found " << model.numUniqueTriangles() << " in " << model.numMeshes() << std::endl;
+      std::cout << "ospray::miniSG::importOBJ: importing from "
+                << fileName << endl;
+      OBJLoader(model,fileName);
+      std::cout << "ospray::miniSG::importOBJ: found "
+                << model.numUniqueTriangles() << " in "
+                << model.numMeshes() << std::endl;
     }
 
   } // ::ospray::minisg
