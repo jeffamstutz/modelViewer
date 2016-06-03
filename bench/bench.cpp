@@ -14,6 +14,13 @@ BENCHMARK_F(OSPRayFixture, test1, 1, 100)
   renderer->renderFrame(*fb, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
 
+// NOTE(jda) - Implement make_unique() as it didn't show up until C++14...
+template<typename T, typename ...Args>
+std::unique_ptr<T> make_unique(Args&& ...args)
+{
+  return std::unique_ptr<T>(new T( std::forward<Args>(args)... ));
+}
+
 void printUsageAndExit()
 {
   cout << "Usage: ospBenchmark [options] model_file" << endl;
@@ -153,14 +160,10 @@ void allocateFixtureObjects()
   // NOTE(jda) - Have to allocate objects here, because we can't allocate them
   //             statically (before ospInit) and can't in the fixture's
   //             constructor because they need to exist during parseCommandLine.
-  OSPRayFixture::renderer =
-      std::unique_ptr<ospray::cpp::Renderer>(new ospray::cpp::Renderer);
-  OSPRayFixture::camera =
-      std::unique_ptr<ospray::cpp::Camera>(new ospray::cpp::Camera);
-  OSPRayFixture::model =
-      std::unique_ptr<ospray::cpp::Model>(new ospray::cpp::Model);
-  OSPRayFixture::fb =
-      std::unique_ptr<ospray::cpp::FrameBuffer>(new ospray::cpp::FrameBuffer);
+  OSPRayFixture::renderer = make_unique<ospray::cpp::Renderer>();
+  OSPRayFixture::camera   = make_unique<ospray::cpp::Camera>();
+  OSPRayFixture::model    = make_unique<ospray::cpp::Model>();
+  OSPRayFixture::fb       = make_unique<ospray::cpp::FrameBuffer>();
 }
 
 int main(int argc, const char *argv[])
