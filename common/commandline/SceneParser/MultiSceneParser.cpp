@@ -22,6 +22,7 @@
 #  include "tachyon/TachyonSceneParser.h"
 #endif
 #include "trianglemesh/TriangleMeshSceneParser.h"
+#include "volume/VolumeSceneParser.h"
 
 using namespace ospray;
 using namespace ospcommon;
@@ -39,6 +40,7 @@ bool MultiSceneParser::parse(int ac, const char **&av)
 #endif
   ParticleSceneParser     particleParser(m_renderer);
   StreamLineSceneParser   streamlineParser(m_renderer);
+  VolumeSceneParser       volumeParser(m_renderer);
 
   bool gotTriangleMeshScene = triangleMeshParser.parse(ac, av);
 #ifdef OSPRAY_TACHYON_SUPPORT
@@ -46,6 +48,7 @@ bool MultiSceneParser::parse(int ac, const char **&av)
 #endif
   bool gotPartileScene      = particleParser.parse(ac, av);
   bool gotStreamLineScene   = streamlineParser.parse(ac, av);
+  bool gotVolumeScene       = volumeParser.parse(ac, av);
 
   SceneParser *parser = nullptr;
 
@@ -59,6 +62,8 @@ bool MultiSceneParser::parse(int ac, const char **&av)
     parser = &particleParser;
   else if (gotStreamLineScene)
     parser = &streamlineParser;
+  else if (gotVolumeScene)
+    parser = &volumeParser;
 
   if (parser) {
     m_model = parser->model();

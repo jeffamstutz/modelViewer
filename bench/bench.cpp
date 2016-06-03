@@ -168,12 +168,12 @@ int main(int argc, const char *argv[])
   parseCommandLine(argc, argv);
 
 # if 0
-  hayai::ConsoleOutputter consoleOutputter;
-  hayai::Benchmarker::AddOutputter(consoleOutputter);
+  hayai::ConsoleOutputter outputter;
 #else
-  hayai::SimpleOutputter simpleOutputter;
-  hayai::Benchmarker::AddOutputter(simpleOutputter);
+  hayai::SimpleOutputter outputter;
 #endif
+
+  hayai::Benchmarker::AddOutputter(outputter);
 
   hayai::Benchmarker::RunAllTests();
   return 0;

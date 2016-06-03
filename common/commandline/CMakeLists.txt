@@ -81,6 +81,8 @@ set(SOURCE_FILES
 
   SceneParser/trianglemesh/TriangleMeshSceneParser.cpp
 
+  SceneParser/volume/VolumeSceneParser.cpp
+
   Utility.h
 )
 
@@ -96,5 +98,7 @@ if(OSPRAY_COMMANDLINE_TACHYON_SUPPORT)
 endif()
 
 add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
+
+target_link_libraries(${LIBRARY_NAME} ospray_importer)
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
