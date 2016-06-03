@@ -14,49 +14,64 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include <mpi.h>
-#include <stdexcept>
-
-#define MPI_CALL(cmd) { int rc = MPI_##cmd; if (rc != MPI_SUCCESS) throw std::runtime_error("mpi error"); }
-
-#define error(msg) throw std::runtime_error(msg)
-    
+#include "vec.h"
 
 namespace ospcommon {
-
-  struct MPIComm {
-    MPI_Comm comm;
-    int size, rank, isInterComm;
-
-    void setTo(MPI_Comm comm);
-    void dupFrom(MPI_Comm comm);
-    void setSizeAndRank();
-  };
-
-  inline void MPIComm::setSizeAndRank() 
+  // -------------------------------------------------------
+  // parsing from strings
+  // -------------------------------------------------------
+  vec2f toVec2f(const char *ptr)
   {
-    MPI_CALL(Comm_test_inter(comm,&isInterComm));
-    if (isInterComm) {
-      MPI_CALL(Comm_remote_size(comm,&size));
-      rank = -1;
-    } else {
-      MPI_CALL(Comm_size(comm,&size));
-      MPI_CALL(Comm_rank(comm,&rank));
-    }
+    assert(ptr);
+    vec2f v;
+    int rc = sscanf(ptr,"%f %f",&v.x,&v.y); 
+    assert(rc == 2);
+    return v;
   }
 
-  inline void MPIComm::setTo(MPI_Comm comm)
-  { 
-    this->comm = comm;
-    setSizeAndRank();
+  vec3f toVec3f(const char *ptr)
+  {
+    assert(ptr);
+    vec3f v;
+    int rc = sscanf(ptr,"%f %f %f",&v.x,&v.y,&v.z); 
+    assert(rc == 3);
+    return v;
   }
 
-  inline void MPIComm::dupFrom(MPI_Comm comm)
-  { 
-    MPI_CALL(Comm_dup(comm,&this->comm));
-    setSizeAndRank();
+  vec4f toVec4f(const char *ptr)
+  {
+    assert(ptr);
+    vec4f v;
+    int rc = sscanf(ptr,"%f %f %f %f",&v.x,&v.y,&v.z,&v.w); 
+    assert(rc == 4);
+    return v;
+  }
+
+  vec2i toVec2i(const char *ptr)
+  {
+    assert(ptr);
+    vec2i v;
+    int rc = sscanf(ptr,"%i %i",&v.x,&v.y); 
+    assert(rc == 2);
+    return v;
+  }
+
+  vec3i toVec3i(const char *ptr)
+  {
+    assert(ptr);
+    vec3i v;
+    int rc = sscanf(ptr,"%i %i %i",&v.x,&v.y,&v.z); 
+    assert(rc == 3);
+    return v;
+  }
+
+  vec4i toVec4i(const char *ptr)
+  {
+    assert(ptr);
+    vec4i v;
+    int rc = sscanf(ptr,"%i %i %i %i",&v.x,&v.y,&v.z,&v.w); 
+    assert(rc == 4);
+    return v;
   }
 
 } // ::ospcommon
-
-

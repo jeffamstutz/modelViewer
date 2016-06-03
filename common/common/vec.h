@@ -16,9 +16,9 @@
 
 #pragma once
 
-#include "../common/common.h"
-#include "./constants.h"
-#include "./math.h"
+#include "common.h"
+#include "constants.h"
+#include "math.h"
 
 namespace ospcommon {
 
@@ -155,10 +155,10 @@ namespace ospcommon {
   template<typename T> inline vec_t<T,4> op(const vec_t<T,4> &v)\
   { return vec_t<T,4>(op(v.x),op(v.y),op(v.z),op(v.w)); }\
 
-  unary_functor(rcp)
-  unary_functor(abs)
-  unary_functor(sin)
-  unary_functor(cos)
+  unary_functor(rcp);
+  unary_functor(abs);
+  unary_functor(sin);
+  unary_functor(cos);
 #undef unary_functor
   
   // -------------------------------------------------------
@@ -213,10 +213,11 @@ namespace ospcommon {
                          const vec_t<T,4> &b)                           \
   { return vec_t<T,4>(a op b.x,a op b.y,a op b.z,a op b.w); }           \
   
-  binary_operator(operator+,+)
-  binary_operator(operator-,-)
-  binary_operator(operator*,*)
-  binary_operator(operator/,/)
+  binary_operator(operator+,+);
+  binary_operator(operator-,-);
+  binary_operator(operator*,*);
+  binary_operator(operator/,/);
+  binary_operator(operator%,%);
 #undef binary_operator
 
   // -------------------------------------------------------
@@ -255,10 +256,10 @@ namespace ospcommon {
                           const T &b)                                   \
   { a.x op b; a.y op b; a.z op b; a.w op b; return a; }                 \
   
-  binary_operator(operator+=,+=)
-  binary_operator(operator-=,-=)
-  binary_operator(operator*=,*=)
-  binary_operator(operator/=,/=)
+  binary_operator(operator+=,+=);
+  binary_operator(operator-=,-=);
+  binary_operator(operator*=,*=);
+  binary_operator(operator/=,/=);
 #undef binary_operator
 
   // -------------------------------------------------------
@@ -405,9 +406,9 @@ namespace ospcommon {
     inline vec_t<T,4> f(const vec_t<T,4> &a, const vec_t<T,4> &b)	\
     { return vec_t<T,4>(f(a.x,b.x),f(a.y,b.y),f(a.z,b.z),f(a.w,b.w)); }	\
   
-  define_functor(min)
-  define_functor(max)
-  define_functor(divRoundUp)
+  define_functor(min);
+  define_functor(max);
+  define_functor(divRoundUp);
 #undef define_functor
 
   // -------------------------------------------------------
@@ -422,6 +423,16 @@ namespace ospcommon {
   template<typename T, int A>
   inline T reduce_add(const vec_t<T,4,A> &v)
   { return v.x+v.y+v.z+v.w; }
+
+  template<typename T, int A>
+  inline T reduce_mul(const vec_t<T,2,A> &v)
+  { return v.x*v.y; }
+  template<typename T, int A>
+  inline T reduce_mul(const vec_t<T,3,A> &v)
+  { return v.x*v.y*v.z; }
+  template<typename T, int A>
+  inline T reduce_mul(const vec_t<T,4,A> &v)
+  { return v.x*v.y*v.z*v.w; }
 
   template<typename T, int A>
   inline T reduce_min(const vec_t<T,2,A> &v)
@@ -488,6 +499,16 @@ namespace ospcommon {
   typedef vec_t<int64_t,4>  vec4l;
   typedef vec_t<float,4>    vec4f;
   typedef vec_t<double,4>   vec4d;
+
+  // -------------------------------------------------------
+  // parsing from strings
+  // -------------------------------------------------------
+  vec2f toVec2f(const char *ptr);
+  vec3f toVec3f(const char *ptr);
+  vec4f toVec4f(const char *ptr);
+  vec2i toVec2i(const char *ptr);
+  vec3i toVec3i(const char *ptr);
+  vec4i toVec4i(const char *ptr);
 
 
 } // ::ospcommon

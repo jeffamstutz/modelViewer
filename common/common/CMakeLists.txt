@@ -23,6 +23,7 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   malloc.cpp
   library.cpp
   thread.cpp
+  vec.cpp
 
   AffineSpace.h
   box.h
@@ -30,11 +31,9 @@ ADD_LIBRARY(${LIBRARY_NAME} SHARED
   intrinsics.h
   LinearSpace.h
   math.h
-  mpi.h
   platform.h
   Quaternion.h
   RefCount.h
-  vec.h
 )
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
