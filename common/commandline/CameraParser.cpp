@@ -42,6 +42,6 @@ void DefaultCameraParser::finalize()
   m_camera = ospray::cpp::Camera(m_cameraType.c_str());
   m_camera.set("pos", m_eye);
   m_camera.set("up",  m_up);
-  m_camera.set("dir", m_gaze);
+  m_camera.set("dir", m_gaze - m_eye);
   m_camera.commit();
 }

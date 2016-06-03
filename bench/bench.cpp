@@ -3,13 +3,15 @@
 
 #include "OSPRayFixture.h"
 
+#include "commandline/Utility.h"
+
 using std::cout;
 using std::endl;
 using std::string;
 
 BENCHMARK_F(OSPRayFixture, test1, 1, 100)
 {
-  renderer.renderFrame(fb, OSP_FB_COLOR | OSP_FB_ACCUM);
+  renderer->renderFrame(*fb, OSP_FB_COLOR | OSP_FB_ACCUM);
 }
 
 void printUsageAndExit()
@@ -96,7 +98,8 @@ void printUsageAndExit()
   cout << "                          default: 1.0" << endl;
 
   cout << endl;
-  cout << "    -is | --surface --> Specify an isosurface at value: val " << endl;
+  cout << "    -is | --surface --> Specify an isosurface at value: val "
+       << endl;
 
   exit(0);
 }
@@ -109,62 +112,54 @@ void parseCommandLine(int argc, const char *argv[])
 
   for (int i = 1; i < argc; ++i) {
     string arg = argv[i];
-    if (arg == "-vp" || arg == "--eye") {
-      auto &pos = OSPRayFixture::pos;
-      pos.x = atof(argv[++i]);
-      pos.y = atof(argv[++i]);
-      pos.z = atof(argv[++i]);
-      OSPRayFixture::customView = true;
-    } else if (arg == "-vu" || arg == "--up") {
-      auto &up = OSPRayFixture::up;
-      up.x = atof(argv[++i]);
-      up.y = atof(argv[++i]);
-      up.z = atof(argv[++i]);
-      OSPRayFixture::customView = true;
-    } else if (arg == "-vi" || arg == "--gaze") {
-      auto &at = OSPRayFixture::at;
-      at.x = atof(argv[++i]);
-      at.y = atof(argv[++i]);
-      at.z = atof(argv[++i]);
-      OSPRayFixture::customView = true;
-    } else if (arg == "-r" || arg == "--renderer") {
-      OSPRayFixture::renderer_type = argv[++i];
-    } else if (arg == "-i" || arg == "--image") {
+    if (arg == "-i" || arg == "--image") {
       OSPRayFixture::imageOutputFile = argv[++i];
     } else if (arg == "-w" || arg == "--width") {
       OSPRayFixture::width = atoi(argv[++i]);
     } else if (arg == "-h" || arg == "--height") {
       OSPRayFixture::height = atoi(argv[++i]);
-    } else if (arg == "-s" || arg == "--sampling-rate") {
-      OSPRayFixture::samplingRate = atof(argv[++i]);
-    } else if (arg == "-tfc" || arg == "--tf-color") {
-      ospcommon::vec4f color;
-      color.x = atof(argv[++i]);
-      color.y = atof(argv[++i]);
-      color.z = atof(argv[++i]);
-      color.w = atof(argv[++i]);
-      OSPRayFixture::tf_colors.push_back(color);
-    } else if (arg == "-tfs" || arg == "--tf-scale") {
-      OSPRayFixture::tf_scale = atof(argv[++i]);
-    } else if (arg == "-dr" || arg == "--data-range") {
-      OSPRayFixture::volume_data_range.x = atof(argv[++i]);
-      OSPRayFixture::volume_data_range.y = atof(argv[++i]);
-    } else if (arg == "-is" || arg == "--surface") {
-      OSPRayFixture::isosurfaces.push_back(atof(argv[++i]));
     } else if (arg == "-bg" || arg == "--background") {
       ospcommon::vec3f &color = OSPRayFixture::bg_color;
       color.x = atof(argv[++i]);
       color.y = atof(argv[++i]);
       color.z = atof(argv[++i]);
-    } else {
-      OSPRayFixture::benchmarkModelFiles.push_back(arg);
     }
   }
+
+  auto ospObjs = parseWithDefaultParsers(argc, argv);
+
+  ospcommon::box3f bbox;
+  std::tie(bbox,
+           *OSPRayFixture::model,
+           *OSPRayFixture::renderer,
+           *OSPRayFixture::camera) = ospObjs;
+
+  float width  = OSPRayFixture::width;
+  float height = OSPRayFixture::height;
+  auto &camera = *OSPRayFixture::camera;
+  camera.set("aspect", width/height);
+  camera.commit();
+}
+
+void allocateFixtureObjects()
+{
+  // NOTE(jda) - Have to allocate objects here, because we can't allocate them
+  //             statically (before ospInit) and can't in the fixture's
+  //             constructor because they need to exist during parseCommandLine.
+  OSPRayFixture::renderer =
+      std::unique_ptr<ospray::cpp::Renderer>(new ospray::cpp::Renderer);
+  OSPRayFixture::camera =
+      std::unique_ptr<ospray::cpp::Camera>(new ospray::cpp::Camera);
+  OSPRayFixture::model =
+      std::unique_ptr<ospray::cpp::Model>(new ospray::cpp::Model);
+  OSPRayFixture::fb =
+      std::unique_ptr<ospray::cpp::FrameBuffer>(new ospray::cpp::FrameBuffer);
 }
 
 int main(int argc, const char *argv[])
 {
   ospInit(&argc, argv);
+  allocateFixtureObjects();
   parseCommandLine(argc, argv);
 
 # if 0
