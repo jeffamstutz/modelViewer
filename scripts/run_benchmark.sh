@@ -64,6 +64,9 @@ echo -n "test[$test_num] : "
 # CSAFE/scivis/view 1
 ${exe} ${csafe} \
     -r scivis \
+    -vp 286.899994 422.800018 -30.200012 \
+    -vi 151.000000 151.000000 151.000000
+    -vu 0 1 0 \
     -tfc 0 0 0 0.00 \
     -tfc 1 0 0 0.11 \
     -tfc 1 1 0 0.22 \
