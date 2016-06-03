@@ -25,7 +25,7 @@ ospray::cpp::Renderer DefaultRendererParser::renderer()
 void DefaultRendererParser::finalize()
 {
   if (m_rendererType.empty())
-    m_rendererType = "ao1";
+    m_rendererType = "scivis";
 
   m_renderer = ospray::cpp::Renderer(m_rendererType.c_str());
 
