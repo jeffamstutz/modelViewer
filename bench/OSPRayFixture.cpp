@@ -16,6 +16,8 @@ std::vector<string> OSPRayFixture::benchmarkModelFiles;
 int OSPRayFixture::width  = 1024;
 int OSPRayFixture::height = 1024;
 
+int OSPRayFixture::numWarmupFrames = 10;
+
 vec3f OSPRayFixture::bg_color = {1.f, 1.f, 1.f};
 
 // helper function to write the rendered image as PPM file
@@ -56,6 +58,10 @@ void OSPRayFixture::SetUp()
   renderer->set("spp", 1);
 
   renderer->commit();
+
+  for (int i = 0; i < numWarmupFrames; ++i) {
+    renderer->renderFrame(*fb, OSP_FB_COLOR | OSP_FB_ACCUM);
+  }
 }
 
 void OSPRayFixture::TearDown()

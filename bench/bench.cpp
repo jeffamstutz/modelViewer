@@ -55,8 +55,13 @@ void printUsageAndExit()
   cout << "                        default: ao1" << endl;
 
   cout << endl;
-  cout << "    -bg | --background --> Specify the background color: R G B "
+  cout << "    -bg | --background --> Specify the background color: R G B"
        << endl;
+
+  cout << endl;
+  cout << "    -wf | --warmup --> Specify the number of warmup frames: N"
+       << endl;
+  cout << "                       default: 10" << endl;
 
   cout << endl;
   cout << "**camera rendering options**" << endl;
@@ -118,6 +123,8 @@ void parseCommandLine(int argc, const char *argv[])
       OSPRayFixture::width = atoi(argv[++i]);
     } else if (arg == "-h" || arg == "--height") {
       OSPRayFixture::height = atoi(argv[++i]);
+    } else if (arg == "-wf" || arg == "--warmup") {
+      OSPRayFixture::numWarmupFrames = atoi(argv[++i]);
     } else if (arg == "-bg" || arg == "--background") {
       ospcommon::vec3f &color = OSPRayFixture::bg_color;
       color.x = atof(argv[++i]);
