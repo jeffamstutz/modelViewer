@@ -14,12 +14,48 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-option(BUILD_GLUT_VIEWER "Enable/Disable building of GLUT viewer app" ON)
-if(BUILD_GLUT_VIEWER)
-  add_subdirectory(glutViewer)
+set(APP_NAME ospDebugViewer)
+
+find_package(Readline)
+
+if(READLINE_FOUND)
+  add_definitions(-DUSE_SYSTEM_READLINE)
+  set(Readline_INC ${Readline_INCLUDE_DIR})
+  set(Readline_LIB ${Readline_LIBRARY})
+else()
+  message(STATUS "Readline NOT found, command history feature NOT enabled.")
 endif()
 
-option(BUILD_QT_VIEWER "Enable/Disable building of Qt viewer app" ON)
-if(BUILD_QT_VIEWER)
-  add_subdirectory(qtViewer)
-endif()
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/script
+  ${Readline_INC}
+)
+
+# --------------------------------------------
+# main executable
+# --------------------------------------------
+add_executable(${APP_NAME}
+  DebugViewerScriptHandler.cpp
+  DebugViewerScriptHandler.h
+  OSPGlutViewer.cpp
+  OSPGlutViewer.h
+  ScriptedOSPGlutViewer.cpp
+  ScriptedOSPGlutViewer.h
+  debugViewer.cpp
+)
+
+target_link_libraries(${APP_NAME}
+  ospray_commandline
+  ospray_common
+  ospray_glut3d
+  ospray_minisg
+  ospray_script
+  ${OPENGL_LIBRARIES}
+  ${GLUT_LIBRARIES}
+  ${OSPRAY_LIBRARIES}
+  ${Readline_LIB}
+)
+# ------------------------------------------------------------
+
+install(TARGETS ${APP_NAME} DESTINATION bin)

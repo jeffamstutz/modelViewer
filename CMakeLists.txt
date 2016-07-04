@@ -97,14 +97,5 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # common utility classes
 add_subdirectory(common)
 
-# debug app
-option(BUILD_VIEWER "Enable/Disable building of viewer app" ON)
-if(BUILD_VIEWER)
-  add_subdirectory(app)
-endif()
-
-# benchmarks
-option(BUILD_BENCHMARKS "Enable/Disable building of benchmark app" ON)
-if(BUILD_BENCHMARKS)
-  add_subdirectory(bench)
-endif()
+# apps
+add_subdirectory(app)

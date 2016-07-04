@@ -14,12 +14,38 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-option(BUILD_GLUT_VIEWER "Enable/Disable building of GLUT viewer app" ON)
-if(BUILD_GLUT_VIEWER)
-  add_subdirectory(glutViewer)
-endif()
+set(APP_NAME ospDebugViewerQt)
 
-option(BUILD_QT_VIEWER "Enable/Disable building of Qt viewer app" ON)
-if(BUILD_QT_VIEWER)
-  add_subdirectory(qtViewer)
-endif()
+project(${APP_NAME})
+
+find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
+
+include(${QT_USE_FILE})
+
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}
+  ${CMAKE_CURRENT_LIST_DIR}/script
+  ${PROJECT_BINARY_DIR}
+)
+
+qt4_wrap_ui(UIS MainWindow.ui)
+
+qt4_wrap_cpp(CPPS MainWindow.h)
+
+add_executable(${APP_NAME}
+  main.cpp
+  MainWindow.cpp
+  ${UIS}
+  ${CPPS}
+)
+
+target_link_libraries(${APP_NAME}
+  ospray_commandline
+  ospray_common
+  ospray_minisg
+  ospray_script
+  ${OSPRAY_LIBRARIES}
+  ${QT_LIBRARIES}
+)
+
+install(TARGETS ${APP_NAME} DESTINATION bin)
