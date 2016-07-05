@@ -41,6 +41,7 @@ private slots:
   void on_actionTile_triggered();
   void on_actionCascade_triggered();
   void on_actionTabbed_triggered();
+  void on_actionAbout_triggered();
 
 private:
 

@@ -130,3 +130,10 @@ void MainWindow::addRenderSubWindow(OSPRenderer renderer,
   window->setRenderingEnabled(true);
   window->setWorldBounds(bounds);
 }
+
+void MainWindow::on_actionAbout_triggered()
+{
+  QString msg = "OSPRay Debug Viewer\n\n";
+  msg += "Source code at: http://github.com/jeffamstutz/ospDebugViewer";
+  QMessageBox::about(this, "About", msg);
+}

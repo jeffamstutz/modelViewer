@@ -205,11 +205,7 @@ void QOSPRayWindow::mouseReleaseEvent(QMouseEvent * event)
 
 void QOSPRayWindow::mouseMoveEvent(QMouseEvent *event)
 {
-  /* Pause continuous rendering during interaction and cancel any render restart
-     timers. This keeps interaction more responsive (especially with low frame
-     rates). */
-  renderTimer.stop();
-  renderRestartTimer.stop();
+  stopRenderTimers();
 
   resetAccumulationBuffer();
 
@@ -246,18 +242,12 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent *event)
 
   updateGL();
 
-  // after a 0.5s delay, restart continuous rendering.
-  renderRestartTimer.setSingleShot(true);
-  renderRestartTimer.start(500);
+  startRenderTimers();
 }
 
 void QOSPRayWindow::wheelEvent(QWheelEvent *event)
 {
-  /* Pause continuous rendering during interaction and cancel any render restart
-     timers. This keeps interaction more responsive (especially with low frame
-     rates). */
-  renderTimer.stop();
-  renderRestartTimer.stop();
+  stopRenderTimers();
 
   resetAccumulationBuffer();
 
@@ -265,9 +255,7 @@ void QOSPRayWindow::wheelEvent(QWheelEvent *event)
 
   updateGL();
 
-  // after a 0.5s delay, restart continuous rendering.
-  renderRestartTimer.setSingleShot(true);
-  renderRestartTimer.start(500);
+  startRenderTimers();
 }
 
 void QOSPRayWindow::closeEvent(QCloseEvent *e)
@@ -321,4 +309,20 @@ void QOSPRayWindow::dolly(float d)
   viewport.frame.p = viewport.from;
 
   viewport.modified = true;
+}
+
+void QOSPRayWindow::stopRenderTimers()
+{
+  /* Pause continuous rendering during interaction and cancel any render restart
+     timers. This keeps interaction more responsive (especially with low frame
+     rates). */
+  renderTimer.stop();
+  renderRestartTimer.stop();
+}
+
+void QOSPRayWindow::startRenderTimers()
+{
+  // after a 0.5s delay, restart continuous rendering.
+  renderRestartTimer.setSingleShot(true);
+  renderRestartTimer.start(500);
 }

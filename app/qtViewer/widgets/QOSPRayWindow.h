@@ -64,6 +64,9 @@ private:
 
   void dolly(float d);
 
+  void stopRenderTimers();
+  void startRenderTimers();
+
   // Private data /////////////////////////////////////////////////////////////
 
   /*! Parent Qt window. */
