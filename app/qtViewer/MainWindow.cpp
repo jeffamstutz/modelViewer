@@ -82,6 +82,7 @@ std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
   // Create a basic AO renderer
   ospray::cpp::Renderer renderer("scivis");
   renderer.set("aoSamples", 1);
+  renderer.set("shadowsEnabled", 1);
 
   // Fake a command line to reuse parser library
   auto f = fileName.toStdString();
