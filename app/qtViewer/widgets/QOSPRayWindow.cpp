@@ -51,6 +51,11 @@ QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
   // connect signals and slots
   connect(&renderTimer, SIGNAL(timeout()), this, SLOT(updateGL()));
   connect(&renderRestartTimer, SIGNAL(timeout()), &renderTimer, SLOT(start()));
+
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
+          this, SLOT(showContextMenu(const QPoint &)));
 }
 
 QOSPRayWindow::~QOSPRayWindow()
@@ -101,6 +106,17 @@ void QOSPRayWindow::setWorldBounds(const ospcommon::box3f &worldBounds)
   rotateCenter(1.f, 1.f);
 
   updateGL();
+}
+
+void QOSPRayWindow::showContextMenu(const QPoint &pos)
+{
+  QMenu contextMenu(tr("Context menu"), this);
+
+  QAction action1("Close Window", this);
+  connect(&action1, SIGNAL(triggered()), this, SLOT(close()));
+  contextMenu.addAction(&action1);
+
+  contextMenu.exec(mapToGlobal(pos));
 }
 
 void QOSPRayWindow::resetAccumulationBuffer()
@@ -187,7 +203,7 @@ void QOSPRayWindow::mouseReleaseEvent(QMouseEvent * event)
   renderTimer.start();
 }
 
-void QOSPRayWindow::mouseMoveEvent(QMouseEvent * event)
+void QOSPRayWindow::mouseMoveEvent(QMouseEvent *event)
 {
   /* Pause continuous rendering during interaction and cancel any render restart
      timers. This keeps interaction more responsive (especially with low frame
@@ -200,7 +216,11 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent * event)
   int dx = event->x() - lastMousePosition.x();
   int dy = event->y() - lastMousePosition.y();
 
-  if(event->buttons() & Qt::LeftButton) {
+  bool leftButton  = event->buttons() & Qt::LeftButton;
+  bool midButton   = event->buttons() & Qt::MidButton;
+  bool rightButton = event->buttons() & Qt::RightButton;
+
+  if(leftButton) {
 
     // camera rotation about center point
     const float rotationSpeed = 0.003f;
@@ -209,8 +229,7 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent * event)
     float dv = dy * rotationSpeed;
 
     rotateCenter(du, dv);
-  }
-  else if(event->buttons() & Qt::MidButton) {
+  } else if(leftButton && rightButton) {//NOTE(jda) - needs fixed...
 
     // camera strafe of from / at point
     const float strafeSpeed = 0.001f * length(worldBounds.size());
@@ -219,8 +238,7 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent * event)
     float dv = dy * strafeSpeed;
 
     strafe(du, dv);
-  }
-  else if(event->buttons() & Qt::RightButton) {
+  } else if(midButton) {
     dolly(dy);
   }
 
@@ -231,6 +249,31 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent * event)
   // after a 0.5s delay, restart continuous rendering.
   renderRestartTimer.setSingleShot(true);
   renderRestartTimer.start(500);
+}
+
+void QOSPRayWindow::wheelEvent(QWheelEvent *event)
+{
+  /* Pause continuous rendering during interaction and cancel any render restart
+     timers. This keeps interaction more responsive (especially with low frame
+     rates). */
+  renderTimer.stop();
+  renderRestartTimer.stop();
+
+  resetAccumulationBuffer();
+
+  dolly(event->delta() / 10.f);
+
+  updateGL();
+
+  // after a 0.5s delay, restart continuous rendering.
+  renderRestartTimer.setSingleShot(true);
+  renderRestartTimer.start(500);
+}
+
+void QOSPRayWindow::closeEvent(QCloseEvent *e)
+{
+  QGLWidget::closeEvent(e);
+  emit closing();
 }
 
 void QOSPRayWindow::rotateCenter(float du, float dv)

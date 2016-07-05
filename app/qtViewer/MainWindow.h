@@ -18,7 +18,7 @@
 
 #include <QMainWindow>
 
-#include <ospray/ospray.h>
+#include <ospray_cpp/Model.h>
 #include <common/box.h>
 
 namespace Ui
@@ -52,5 +52,7 @@ private:
   // Private data /////////////////////////////////////////////////////////////
 
   Ui::MainWindow *ui;
+  using NamedModel = std::pair<std::string, ospray::cpp::Model>;
+  std::vector<NamedModel> m_loadedModels;
 };
 

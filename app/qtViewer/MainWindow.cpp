@@ -85,9 +85,9 @@ std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
   renderer.set("shadowsEnabled", 1);
 
   // Fake a command line to reuse parser library
-  auto f = fileName.toStdString();
-  const char *commandline[2] = {nullptr, f.data()};
-  const char ** cl = (const char **)commandline;
+  auto file = fileName.toStdString();
+  const char *commandline[2] = {nullptr, file.data()};
+  const char **cl = (const char **)commandline;
 
   MultiSceneParser    msParser(renderer);
   DefaultLightsParser lParser(renderer);
@@ -95,14 +95,16 @@ std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
   auto loadedScene = msParser.parse(2, cl);
   if (!loadedScene) {
     std::string msg = "ERROR: Failed to open file...\n\n";
-    msg += fileName.toStdString();
+    msg += file;
     throw std::runtime_error(msg);
   }
 
   lParser.parse(2, cl);
 
-  renderer.set("model", msParser.model());
+  auto model = msParser.model();
+  renderer.set("model", model);
   renderer.commit();
+  m_loadedModels.push_back({file.substr(file.find_last_of('/')+1), model});
 
   return {renderer.handle(), msParser.bbox()};
 }
@@ -113,6 +115,8 @@ void MainWindow::addRenderSubWindow(OSPRenderer renderer,
   // Create window in the MdiArea
   auto *window = new QOSPRayWindow(this, renderer, true);
   auto *subWindow = ui->mdiArea->addSubWindow(window);
+
+  connect(window, SIGNAL(closing()), subWindow, SLOT(close()));
 
   subWindow->setMinimumSize(200, 200);
 
