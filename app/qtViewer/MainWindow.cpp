@@ -79,7 +79,7 @@ void MainWindow::on_actionTabbed_triggered()
 
 std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
 {
-  // Create a basic AO renderer
+  // Create a basic renderer
   ospray::cpp::Renderer renderer("scivis");
   renderer.set("aoSamples", 1);
   renderer.set("shadowsEnabled", 1);
