@@ -18,6 +18,9 @@
 
 #include <QMainWindow>
 
+#include <ospray/ospray.h>
+#include <common/box.h>
+
 namespace Ui
 {
   class MainWindow;
@@ -40,6 +43,13 @@ private slots:
   void on_actionTabbed_triggered();
 
 private:
+
+  // Helper functions /////////////////////////////////////////////////////////
+
+  std::pair<OSPRenderer, ospcommon::box3f> openFile(QString fileName);
+  void addRenderSubWindow(OSPRenderer renderer, const ospcommon::box3f &bounds);
+
+  // Private data /////////////////////////////////////////////////////////////
 
   Ui::MainWindow *ui;
 };
