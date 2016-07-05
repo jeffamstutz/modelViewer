@@ -99,6 +99,10 @@ endif()
 
 add_library(${LIBRARY_NAME} SHARED ${SOURCE_FILES})
 
-target_link_libraries(${LIBRARY_NAME} ospray_importer)
+target_link_libraries(${LIBRARY_NAME}
+  ospray_xml
+  ospray_minisg
+  ospray_importer
+)
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION lib)
