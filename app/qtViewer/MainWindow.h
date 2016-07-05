@@ -21,6 +21,7 @@
 #include "ui_MainWindow.h"
 
 #include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
 #include <common/box.h>
 #include <common/common.h>
 
@@ -44,8 +45,11 @@ private:
 
   // Helper functions /////////////////////////////////////////////////////////
 
-  std::pair<OSPRenderer, ospcommon::box3f> openFile(QString fileName);
-  void addRenderSubWindow(OSPRenderer renderer, const ospcommon::box3f &bounds);
+  std::pair<ospray::cpp::Renderer, ospcommon::box3f>
+  openFile(QString fileName);
+
+  void addRenderSubWindow(ospray::cpp::Renderer renderer,
+                          const ospcommon::box3f &bounds);
 
   // Private data /////////////////////////////////////////////////////////////
 

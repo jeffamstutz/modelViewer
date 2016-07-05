@@ -18,35 +18,23 @@
 
 #include "QOSPRayWindow.h"
 
-QOSPRayWindow::QOSPRayWindow(QMainWindow *parent, 
-                             OSPRenderer renderer, 
+QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
+                             ospray::cpp::Renderer _renderer,
                              bool showFrameRate) :
   parent(parent),
   showFrameRate(showFrameRate),
   renderingEnabled(false),
   rotationRate(0.f),
-  frameBuffer(nullptr),
-  renderer(renderer),
-  camera(nullptr)
+  renderer(_renderer)
 {
-  // assign renderer
-  if(!renderer) {
-    throw std::runtime_error("QOSPRayWindow: must be constructed with an"
-                             " existing renderer");
-  }
-
   // setup camera
-  camera = ospNewCamera("perspective");
+  camera = ospray::cpp::Camera("perspective");
 
-  if(!camera) {
-    throw std::runtime_error("QOSPRayWindow: could not create camera type"
-                             " 'perspective'");
-  }
+  camera.commit();
 
-  ospCommit(camera);
-
-  ospSetObject(renderer, "camera", camera);
-  ospCommit(renderer);
+  renderer.set("camera", camera);
+  renderer.set("backgroundEnabled", 1);
+  renderer.commit();
 
   // connect signals and slots
   connect(&renderTimer, SIGNAL(timeout()), this, SLOT(updateGL()));
@@ -60,13 +48,8 @@ QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
 
 QOSPRayWindow::~QOSPRayWindow()
 {
-  // free the frame buffer and camera
-  // we don't own the renderer!
-  if(frameBuffer)
-    ospFreeFrameBuffer(frameBuffer);
-
-  if(camera)
-    ospRelease(camera);
+  if(camera.handle())
+    ospRelease(camera.handle());
 }
 
 void QOSPRayWindow::setRenderingEnabled(bool renderingEnabled)
@@ -121,34 +104,33 @@ void QOSPRayWindow::showContextMenu(const QPoint &pos)
 
 void QOSPRayWindow::resetAccumulationBuffer()
 {
-  ospFrameBufferClear(frameBuffer, OSP_FB_ACCUM);
+  frameBuffer.clear(OSP_FB_ACCUM);
 }
 
 void QOSPRayWindow::paintGL()
 {
-  if(!renderingEnabled || !frameBuffer || !renderer)
+  if(!renderingEnabled || !frameBuffer.handle())
     return;
 
   // update OSPRay camera if viewport has been modified
   if(viewport.modified) {
     const ospcommon::vec3f dir =  viewport.at - viewport.from;
-    ospSetVec3f(camera,"pos" ,(const osp::vec3f&)viewport.from);
-    ospSetVec3f(camera,"dir" ,(const osp::vec3f&)dir);
-    ospSetVec3f(camera,"up", (const osp::vec3f&)viewport.up);
-    ospSetf(camera,"aspect", viewport.aspect);
-    ospSetf(camera,"fovy", viewport.fovY);
+    camera.set("pos", viewport.from);
+    camera.set("dir", dir);
+    camera.set("up", viewport.up);
+    camera.set("aspect", viewport.aspect);
+    camera.set("fovy", viewport.fovY);
 
-    ospCommit(camera);
+    camera.commit();
 
     viewport.modified = false;
   }
 
   renderFrameTimer.start();
 
-  ospSet1i(renderer, "backgroundEnabled", 1);
-  ospCommit(renderer);
+  renderer.commit();
 
-  ospRenderFrame(frameBuffer, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
+  renderer.renderFrame(frameBuffer, OSP_FB_COLOR | OSP_FB_ACCUM);
   double framesPerSecond = 1000.0 / renderFrameTimer.elapsed();
   char title[1024];
   sprintf(title, "OSPRay Debug Viewer (%.4f fps)", framesPerSecond);
@@ -156,12 +138,12 @@ void QOSPRayWindow::paintGL()
   if (showFrameRate == true)
     this->setWindowTitle(title);
 
-  uint32_t *mappedFrameBuffer = (unsigned int *)ospMapFrameBuffer(frameBuffer);
+  uint32_t *mappedFrameBuffer = (unsigned int *)frameBuffer.map(OSP_FB_COLOR);
 
   glDrawPixels(windowSize.x, windowSize.y,
                GL_RGBA, GL_UNSIGNED_BYTE, mappedFrameBuffer);
 
-  ospUnmapFrameBuffer(mappedFrameBuffer, frameBuffer);
+  frameBuffer.unmap(mappedFrameBuffer);
 
   // automatic rotation
   if(rotationRate != 0.f) {
@@ -174,12 +156,9 @@ void QOSPRayWindow::resizeGL(int width, int height)
 {
   windowSize = ospcommon::vec2i(width, height);
 
-  // reallocate OSPRay framebuffer for new size
-  if(frameBuffer)
-    ospFreeFrameBuffer(frameBuffer);
-
-  frameBuffer = ospNewFrameBuffer((const osp::vec2i&)windowSize,
-                                  OSP_FB_SRGBA, OSP_FB_COLOR | OSP_FB_ACCUM);
+  frameBuffer = ospray::cpp::FrameBuffer((const osp::vec2i&)windowSize,
+                                         OSP_FB_SRGBA,
+                                         OSP_FB_COLOR | OSP_FB_ACCUM);
 
   resetAccumulationBuffer();
 

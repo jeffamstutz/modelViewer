@@ -71,7 +71,8 @@ void MainWindow::on_actionTabbed_triggered()
   ui->mdiArea->setViewMode(QMdiArea::TabbedView);
 }
 
-std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
+std::pair<ospray::cpp::Renderer, ospcommon::box3f>
+MainWindow::openFile(QString fileName)
 {
   // Create a basic renderer
   ospray::cpp::Renderer renderer("scivis");
@@ -100,10 +101,10 @@ std::pair<OSPRenderer, ospcommon::box3f> MainWindow::openFile(QString fileName)
   renderer.commit();
   m_loadedModels.push_back({file.substr(file.find_last_of('/')+1), model});
 
-  return {renderer.handle(), msParser.bbox()};
+  return {renderer, msParser.bbox()};
 }
 
-void MainWindow::addRenderSubWindow(OSPRenderer renderer,
+void MainWindow::addRenderSubWindow(ospray::cpp::Renderer renderer,
                                     const ospcommon::box3f &bounds)
 {
   // Create window in the MdiArea

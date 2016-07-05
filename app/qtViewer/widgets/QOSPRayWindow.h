@@ -17,8 +17,10 @@
 #pragma once
 
 #include "Viewport.h"
-// ospray public
-#include <ospray/ospray.h>
+// ospray wrappers
+#include <ospray_cpp/Camera.h>
+#include <ospray_cpp/FrameBuffer.h>
+#include <ospray_cpp/Renderer.h>
 // qt
 #include <QtGui>
 #include <QGLWidget>
@@ -29,7 +31,9 @@ class QOSPRayWindow : public QGLWidget
 
 public:
 
-  QOSPRayWindow(QMainWindow *parent, OSPRenderer renderer, bool showFrameRate);
+  QOSPRayWindow(QMainWindow *parent,
+                ospray::cpp::Renderer renderer,
+                bool showFrameRate);
   virtual ~QOSPRayWindow();
 
   void setRenderingEnabled(bool renderingEnabled);
@@ -98,7 +102,7 @@ private:
   ospcommon::box3f worldBounds;
   QPoint lastMousePosition;
 
-  OSPFrameBuffer frameBuffer;
-  OSPRenderer renderer;
-  OSPCamera camera;
+  ospray::cpp::FrameBuffer frameBuffer;
+  ospray::cpp::Renderer renderer;
+  ospray::cpp::Camera camera;
 };
