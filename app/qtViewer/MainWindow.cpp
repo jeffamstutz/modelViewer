@@ -19,6 +19,7 @@
 
 #include "widgets/QOSPRayWindow.h"
 
+#include "common/commandline/LightsParser.h"
 #include "common/commandline/SceneParser/MultiSceneParser.h"
 
 #include <QFileDialog>
@@ -48,23 +49,26 @@ void MainWindow::on_actionFileOpen_triggered()
 
   Q_FOREACH (auto file, files) {
     // Create a basic AO renderer
-    ospray::cpp::Renderer renderer("ao1");
+    ospray::cpp::Renderer renderer("scivis");
+    renderer.set("aoSamples", 1);
 
     // Fake a command line to reuse parser library
     auto f = file.toStdString();
     const char *commandline[2] = {nullptr, f.data()};
     const char ** cl = (const char **)commandline;
 
-    MultiSceneParser parser(renderer);
-    parser.parse(2, cl);
+    MultiSceneParser    msParser(renderer);
+    DefaultLightsParser lParser(renderer);
+    msParser.parse(2, cl);
+    lParser.parse(2, cl);
 
-    renderer.set("model", parser.model());
+    renderer.set("model", msParser.model());
+    renderer.commit();
 
     // Create window in the MdiArea
     auto *window = new QOSPRayWindow(this, renderer.handle(), true);
     auto *subWindow = ui->mdiArea->addSubWindow(window);
 
-    //subWindow->setWindowTitle("OSPRay Window");
     subWindow->setMinimumSize(200, 200);
 
     if (ui->mdiArea->subWindowList().count() >= 1) {
@@ -75,7 +79,7 @@ void MainWindow::on_actionFileOpen_triggered()
       subWindow->showMaximized();
 
     window->setRenderingEnabled(true);
-    window->setWorldBounds(parser.bbox());
+    window->setWorldBounds(msParser.bbox());
   }
 }
 
