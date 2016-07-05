@@ -59,7 +59,17 @@ void MainWindow::on_actionFileOpen_triggered()
 
     MultiSceneParser    msParser(renderer);
     DefaultLightsParser lParser(renderer);
-    msParser.parse(2, cl);
+
+    auto loadedScene = msParser.parse(2, cl);
+    if (!loadedScene) {
+      QMessageBox msgBox;
+      QString msg = "ERROR: Failed to open file...\n\n";
+      msg += file;
+      msgBox.setText(msg);
+      msgBox.exec();
+      continue;
+    }
+
     lParser.parse(2, cl);
 
     renderer.set("model", msParser.model());
