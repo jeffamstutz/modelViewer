@@ -37,40 +37,46 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionFileOpen_triggered()
 {
-  // Create a basic AO renderer
-  ospray::cpp::Renderer renderer("ao1");
-
   // Get a file from the user
   QFileDialog dialog;
-  dialog.exec();
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  auto file = dialog.selectedFiles()[0].toStdString();
+  dialog.setFileMode(QFileDialog::ExistingFiles);
 
-  // Fake a command line to reuse parser library
-  const char *commandline[2] = {nullptr, file.data()};
-  const char ** cl = (const char **)commandline;
+  if (!dialog.exec())
+    return;// cancel button clicked...
 
-  MultiSceneParser parser(renderer);
-  parser.parse(2, cl);
+  auto files = dialog.selectedFiles();
 
-  renderer.set("model", parser.model());
+  Q_FOREACH (auto file, files) {
+    // Create a basic AO renderer
+    ospray::cpp::Renderer renderer("ao1");
 
-  // Create window in the MdiArea
-  auto *window = new QOSPRayWindow(this, renderer.handle(), true);
-  auto *subWindow = ui->mdiArea->addSubWindow(window);
+    // Fake a command line to reuse parser library
+    auto f = file.toStdString();
+    const char *commandline[2] = {nullptr, f.data()};
+    const char ** cl = (const char **)commandline;
 
-  //subWindow->setWindowTitle("OSPRay Window");
-  subWindow->setMinimumSize(200, 200);
+    MultiSceneParser parser(renderer);
+    parser.parse(2, cl);
 
-  if (ui->mdiArea->subWindowList().count() >= 1) {
-    subWindow->show();
-    on_actionTile_triggered();
+    renderer.set("model", parser.model());
+
+    // Create window in the MdiArea
+    auto *window = new QOSPRayWindow(this, renderer.handle(), true);
+    auto *subWindow = ui->mdiArea->addSubWindow(window);
+
+    //subWindow->setWindowTitle("OSPRay Window");
+    subWindow->setMinimumSize(200, 200);
+
+    if (ui->mdiArea->subWindowList().count() >= 1) {
+      subWindow->show();
+      on_actionTile_triggered();
+    }
+    else
+      subWindow->showMaximized();
+
+    window->setRenderingEnabled(true);
+    window->setWorldBounds(parser.bbox());
   }
-  else
-    subWindow->showMaximized();
-
-  window->setRenderingEnabled(true);
-  window->setWorldBounds(parser.bbox());
 }
 
 void MainWindow::on_actionTile_triggered()
