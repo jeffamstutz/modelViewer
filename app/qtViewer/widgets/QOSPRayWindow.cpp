@@ -169,12 +169,12 @@ void QOSPRayWindow::resizeGL(int width, int height)
   updateGL();
 }
 
-void QOSPRayWindow::mousePressEvent(QMouseEvent * event)
+void QOSPRayWindow::mousePressEvent(QMouseEvent *event)
 {
   lastMousePosition = event->pos();
 }
 
-void QOSPRayWindow::mouseReleaseEvent(QMouseEvent * event)
+void QOSPRayWindow::mouseReleaseEvent(QMouseEvent *event)
 {
   lastMousePosition = event->pos();
 
@@ -191,12 +191,11 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent *event)
   int dx = event->x() - lastMousePosition.x();
   int dy = event->y() - lastMousePosition.y();
 
-  bool leftButton  = event->buttons() & Qt::LeftButton;
-  bool midButton   = event->buttons() & Qt::MidButton;
-  bool rightButton = event->buttons() & Qt::RightButton;
+  bool leftButton = event->buttons() & Qt::LeftButton;
+  bool midButton  = event->buttons() & Qt::MidButton;
+  bool controlKey = event->modifiers() == Qt::ControlModifier;
 
-  if(leftButton) {
-
+  if(leftButton && !controlKey) {
     // camera rotation about center point
     const float rotationSpeed = 0.003f;
 
@@ -204,8 +203,7 @@ void QOSPRayWindow::mouseMoveEvent(QMouseEvent *event)
     float dv = dy * rotationSpeed;
 
     rotateCenter(du, dv);
-  } else if(leftButton && rightButton) {//NOTE(jda) - needs fixed...
-
+  } else if(leftButton && controlKey) {
     // camera strafe of from / at point
     const float strafeSpeed = 0.001f * length(worldBounds.size());
 
