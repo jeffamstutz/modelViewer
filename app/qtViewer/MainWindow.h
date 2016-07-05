@@ -32,15 +32,15 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
-public slots:
-
 private slots:
 
   void on_actionFileOpen_triggered();
+  void on_actionTile_triggered();
+  void on_actionCascade_triggered();
+  void on_actionTabbed_triggered();
 
 private:
 
   Ui::MainWindow *ui;
-
 };
 

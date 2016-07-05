@@ -72,9 +72,8 @@
      <string>Windows</string>
     </property>
     <addaction name="actionTile"/>
-    <addaction name="actionTileHorizontally"/>
-    <addaction name="actionTileVertically"/>
     <addaction name="actionCascade"/>
+    <addaction name="actionTabbed"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWindows"/>
@@ -118,12 +117,12 @@
   </action>
   <action name="actionTile">
    <property name="text">
-    <string>Tile</string>
+    <string>Show Tiled</string>
    </property>
   </action>
   <action name="actionCascade">
    <property name="text">
-    <string>Cascade</string>
+    <string>Show Cascade</string>
    </property>
   </action>
   <action name="actionTileVertically">
@@ -149,6 +148,11 @@
   <action name="actionFileOpenAs">
    <property name="text">
     <string>OpenAs ...</string>
+   </property>
+  </action>
+  <action name="actionTabbed">
+   <property name="text">
+    <string>Show Tabbed</string>
    </property>
   </action>
  </widget>

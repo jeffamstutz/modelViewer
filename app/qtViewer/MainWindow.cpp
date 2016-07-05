@@ -59,10 +59,33 @@ void MainWindow::on_actionFileOpen_triggered()
   auto *window = new QOSPRayWindow(this, renderer.handle(), true);
   auto *subWindow = ui->mdiArea->addSubWindow(window);
 
-  subWindow->setWindowTitle("OSPRay Window");
+  //subWindow->setWindowTitle("OSPRay Window");
   subWindow->setMinimumSize(200, 200);
-  subWindow->showMaximized();
+
+  if (ui->mdiArea->subWindowList().count() >= 1) {
+    subWindow->show();
+    on_actionTile_triggered();
+  }
+  else
+    subWindow->showMaximized();
 
   window->setRenderingEnabled(true);
   window->setWorldBounds(parser.bbox());
+}
+
+void MainWindow::on_actionTile_triggered()
+{
+  ui->mdiArea->setViewMode(QMdiArea::SubWindowView);
+  ui->mdiArea->tileSubWindows();
+}
+
+void MainWindow::on_actionCascade_triggered()
+{
+  ui->mdiArea->setViewMode(QMdiArea::SubWindowView);
+  ui->mdiArea->cascadeSubWindows();
+}
+
+void MainWindow::on_actionTabbed_triggered()
+{
+  ui->mdiArea->setViewMode(QMdiArea::TabbedView);
 }
