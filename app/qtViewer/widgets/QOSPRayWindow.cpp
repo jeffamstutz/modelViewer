@@ -135,7 +135,7 @@ void QOSPRayWindow::paintGL()
   ospRenderFrame(frameBuffer, renderer, OSP_FB_COLOR | OSP_FB_ACCUM);
   double framesPerSecond = 1000.0 / renderFrameTimer.elapsed();
   char title[1024];
-  sprintf(title, "OSPRay Volume Viewer (%.4f fps)", framesPerSecond);
+  sprintf(title, "OSPRay Debug Viewer (%.4f fps)", framesPerSecond);
 
   if (showFrameRate == true)
     this->setWindowTitle(title);
