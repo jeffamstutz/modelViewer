@@ -18,13 +18,11 @@
 
 #include <QMainWindow>
 
+#include "ui_MainWindow.h"
+
 #include <ospray_cpp/Model.h>
 #include <common/box.h>
-
-namespace Ui
-{
-  class MainWindow;
-}
+#include <common/common.h>
 
 class MainWindow : public QMainWindow
 {
@@ -33,7 +31,6 @@ class MainWindow : public QMainWindow
 public:
 
   MainWindow(QWidget *parent = nullptr);
-  ~MainWindow();
 
 private slots:
 
@@ -52,7 +49,8 @@ private:
 
   // Private data /////////////////////////////////////////////////////////////
 
-  Ui::MainWindow *ui;
+  std::unique_ptr<Ui::MainWindow> ui;
+
   using NamedModel = std::pair<std::string, ospray::cpp::Model>;
   std::vector<NamedModel> m_loadedModels;
 };

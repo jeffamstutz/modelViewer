@@ -20,6 +20,7 @@
 // c runtime
 #include <math.h>
 // std
+#include <memory>
 #include <stdexcept>
 
 #ifdef _WIN32
@@ -80,5 +81,12 @@ namespace ospcommon {
   OSPCOMMON_INTERFACE void removeArgs(int &ac, char **&av, int where, int howMany);
   OSPCOMMON_INTERFACE void  loadLibrary(const std::string &_name);
   OSPCOMMON_INTERFACE void *getSymbol(const std::string &name);
+
+  // NOTE(jda) - Implement make_unique() as it didn't show up until C++14...
+  template<typename T, typename ...Args>
+  inline std::unique_ptr<T> make_unique(Args&& ...args)
+  {
+    return std::unique_ptr<T>(new T( std::forward<Args>(args)... ));
+  }
 
 } // ::ospcommon
