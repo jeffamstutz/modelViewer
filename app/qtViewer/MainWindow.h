@@ -36,6 +36,8 @@ public slots:
 
 private slots:
 
+  void on_actionFileOpen_triggered();
+
 private:
 
   Ui::MainWindow *ui;

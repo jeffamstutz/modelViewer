@@ -19,6 +19,7 @@ set(APP_NAME ospDebugViewerQt)
 project(${APP_NAME})
 
 find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED)
+find_package(OpenGL REQUIRED)
 
 include(${QT_USE_FILE})
 
@@ -28,11 +29,18 @@ include_directories(
   ${PROJECT_BINARY_DIR}
 )
 
-qt4_wrap_ui(UIS MainWindow.ui)
+qt4_wrap_ui(UIS
+  MainWindow.ui
+)
 
-qt4_wrap_cpp(CPPS MainWindow.h)
+qt4_wrap_cpp(CPPS
+  widgets/QOSPRayWindow.h
+  MainWindow.h
+)
 
 add_executable(${APP_NAME}
+  widgets/QOSPRayWindow.cpp
+  widgets/Viewport.h
   main.cpp
   MainWindow.cpp
   ${UIS}
@@ -46,6 +54,7 @@ target_link_libraries(${APP_NAME}
   ospray_script
   ${OSPRAY_LIBRARIES}
   ${QT_LIBRARIES}
+  ${OPENGL_LIBRARIES}
 )
 
 install(TARGETS ${APP_NAME} DESTINATION bin)

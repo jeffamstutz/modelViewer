@@ -17,6 +17,12 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "widgets/QOSPRayWindow.h"
+
+#include "common/commandline/SceneParser/MultiSceneParser.h"
+
+#include <QFileDialog>
+
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow)
@@ -27,4 +33,36 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
   delete ui;
+}
+
+void MainWindow::on_actionFileOpen_triggered()
+{
+  // Create a basic AO renderer
+  ospray::cpp::Renderer renderer("ao1");
+
+  // Get a file from the user
+  QFileDialog dialog;
+  dialog.exec();
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  auto file = dialog.selectedFiles()[0].toStdString();
+
+  // Fake a command line to reuse parser library
+  const char *commandline[2] = {nullptr, file.data()};
+  const char ** cl = (const char **)commandline;
+
+  MultiSceneParser parser(renderer);
+  parser.parse(2, cl);
+
+  renderer.set("model", parser.model());
+
+  // Create window in the MdiArea
+  auto *window = new QOSPRayWindow(this, renderer.handle(), true);
+  auto *subWindow = ui->mdiArea->addSubWindow(window);
+
+  subWindow->setWindowTitle("OSPRay Window");
+  subWindow->setMinimumSize(200, 200);
+  subWindow->showMaximized();
+
+  window->setRenderingEnabled(true);
+  window->setWorldBounds(parser.bbox());
 }
