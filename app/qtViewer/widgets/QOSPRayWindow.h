@@ -47,6 +47,7 @@ signals:
 private slots:
 
   void showContextMenu(const QPoint &);
+  void showConsole();
 
 private:
 

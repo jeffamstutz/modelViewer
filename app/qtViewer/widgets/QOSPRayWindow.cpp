@@ -17,6 +17,7 @@
 #include <string>
 
 #include "QOSPRayWindow.h"
+#include "QChaiConsole.h"
 
 QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
                              ospray::cpp::Renderer _renderer,
@@ -95,11 +96,23 @@ void QOSPRayWindow::showContextMenu(const QPoint &pos)
 {
   QMenu contextMenu(tr("Context menu"), this);
 
-  QAction action1("Close Window", this);
-  connect(&action1, SIGNAL(triggered()), this, SLOT(close()));
-  contextMenu.addAction(&action1);
+  QAction closeAction("Close Window", this);
+  connect(&closeAction, SIGNAL(triggered()), this, SLOT(close()));
+  contextMenu.addAction(&closeAction);
+
+  contextMenu.addSeparator();
+
+  QAction consoleAction("Open Console", this);
+  connect(&consoleAction, SIGNAL(triggered()), this, SLOT(showConsole()));
+  contextMenu.addAction(&consoleAction);
 
   contextMenu.exec(mapToGlobal(pos));
+}
+
+void QOSPRayWindow::showConsole()
+{
+  static QChaiConsole console;
+  console.show();
 }
 
 void QOSPRayWindow::resetAccumulationBuffer()
