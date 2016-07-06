@@ -14,18 +14,18 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#pragma once
+#include "QOSPRayConsole.h"
 
-#include "QConsole.h"
+#include <iostream>
 
-class QChaiConsole : public QConsole
+QOSPRayConsole::QOSPRayConsole(QWidget *parent) :
+  QConsole(parent)
 {
-  Q_OBJECT
+}
 
-public:
-
-  QChaiConsole(QWidget *parent = nullptr);
-
-  //execute a validated command
-  QString interpretCommand(const QString &command, int *res) override;
-};
+QString QOSPRayConsole::interpretCommand(const QString &command, int *res)
+{
+  *res = 0;
+  QConsole::interpretCommand(command, res);
+  return "RUN!";
+}

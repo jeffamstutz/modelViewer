@@ -17,7 +17,7 @@
 #include <string>
 
 #include "QOSPRayWindow.h"
-#include "QChaiConsole.h"
+#include "QOSPRayConsole.h"
 
 QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
                              ospray::cpp::Renderer _renderer,
@@ -111,7 +111,7 @@ void QOSPRayWindow::showContextMenu(const QPoint &pos)
 
 void QOSPRayWindow::showConsole()
 {
-  static QChaiConsole console;
+  static QOSPRayConsole console;
   console.show();
 }
 

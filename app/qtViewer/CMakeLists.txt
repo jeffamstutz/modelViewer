@@ -35,14 +35,14 @@ qt4_wrap_ui(UIS
 
 qt4_wrap_cpp(CPPS
   widgets/QConsole.h
-  widgets/QChaiConsole.h
+  widgets/QOSPRayConsole.h
   widgets/QOSPRayWindow.h
   MainWindow.h
 )
 
 add_executable(${APP_NAME}
   widgets/QConsole.cpp
-  widgets/QChaiConsole.cpp
+  widgets/QOSPRayConsole.cpp
   widgets/QOSPRayWindow.cpp
   widgets/Viewport.h
   main.cpp
