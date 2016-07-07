@@ -16,63 +16,24 @@
 
 #pragma once
 
-#include <thread>
+// ChaiScript
+#include "chaiscript/chaiscript.hpp"
 
 #include <ospray_cpp/Camera.h>
 #include <ospray_cpp/Model.h>
 #include <ospray_cpp/Renderer.h>
 
-// ChaiScript
-#include "chaiscript/chaiscript.hpp"
-
 namespace ospray {
+namespace script {
 
-class OSPRayScriptHandler
-{
-public:
+void registerScriptObjects(chaiscript::ChaiScript &chai,
+                           ospray::cpp::Model model,
+                           ospray::cpp::Renderer renderer,
+                           ospray::cpp::Camera camera);
 
-  OSPRayScriptHandler(OSPModel model, OSPRenderer renderer, OSPCamera camera);
-  ~OSPRayScriptHandler();
+void registerScriptTypes(chaiscript::ChaiScript &chai);
 
-  void runScriptFromFile(const std::string &file);
+void registerScriptFunctions(chaiscript::ChaiScript &chai);
 
-  void start();
-  void stop();
-
-  bool running();
-
-protected:
-
-  //! \brief ChaiScript engine, only accessable if the interactive thread isn't
-  //!        running.
-  //!
-  //! \note Allow anyone who extends (inherits from) OSPRayScriptHandler to
-  //!       have access to the engine to let them add custom functions or types.
-  chaiscript::ChaiScript &scriptEngine();
-
-  //! \note Child classes should append this string with any additional help
-  //!       text that is desired when 'help' is invoked in the script engine.
-  std::string m_helpText;
-
-private:
-
-  void consoleLoop();
-
-  void runChaiLine(const std::string &line);
-  void runChaiFile(const std::string &file);
-
-  // Data //
-
-  cpp::Model    m_model;
-  cpp::Renderer m_renderer;
-  cpp::Camera   m_camera;
-
-  chaiscript::ChaiScript m_chai;
-
-  bool m_running;
-
-  //! \brief background thread to handle the scripting commands from the console
-  std::thread m_thread;
-};
-
+}// namespace script
 }// namespace ospray

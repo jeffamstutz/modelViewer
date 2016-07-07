@@ -16,16 +16,48 @@
 
 #include "QOSPRayConsole.h"
 
-#include <iostream>
+#include "common/script/OSPRayChaiUtil.h"
+#include "common/script/chaiscript/chaiscript_stdlib.hpp"
 
 QOSPRayConsole::QOSPRayConsole(QWidget *parent) :
-  QConsole(parent)
+  QConsole(parent),
+  m_chai(chaiscript::Std_Lib::library())
 {
+  ospray::script::registerScriptTypes(m_chai);
+  ospray::script::registerScriptFunctions(m_chai);
+
+  this->setWindowTitle("Script Window");
 }
 
-QString QOSPRayConsole::interpretCommand(const QString &command, int *res)
+void QOSPRayConsole::setOSPRayModel(ospray::cpp::Model model)
 {
-  *res = 0;
+  m_model = model;
+}
+
+void QOSPRayConsole::setOSPRayRenderer(ospray::cpp::Renderer renderer)
+{
+  m_renderer = renderer;
+}
+
+void QOSPRayConsole::setOSPRayCamera(ospray::cpp::Camera camera)
+{
+  m_camera = camera;
+}
+
+QString QOSPRayConsole::interpretCommand(const QString &command, int &res)
+{
+  res = 0;
+
   QConsole::interpretCommand(command, res);
-  return "RUN!";
+
+  ospray::script::registerScriptObjects(m_chai, m_model, m_renderer, m_camera);
+
+  try {
+    m_chai.eval(command.toStdString());
+  } catch (const chaiscript::exception::eval_error &e) {
+    res = 1;
+    return e.what();
+  }
+
+  return "success";
 }

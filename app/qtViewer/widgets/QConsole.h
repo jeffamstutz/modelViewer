@@ -157,11 +157,11 @@ signals:
 
 private:
 
-  void dropEvent( QDropEvent * event);
-  void dragMoveEvent( QDragMoveEvent * event);
+  void dropEvent(QDropEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
 
-  void keyPressEvent(QKeyEvent * e);
-  void contextMenuEvent( QContextMenuEvent * event);
+  void keyPressEvent(QKeyEvent *e);
+  void contextMenuEvent(QContextMenuEvent *event);
 
   //Return false if the command is incomplete (e.g. unmatched braces)
   virtual bool isCommandComplete(const QString &command);
@@ -212,7 +212,7 @@ protected:
   // the return value of the function is the string result
   // res must hold back the return value of the command
   // (0: passed; else: error)
-  virtual QString interpretCommand(const QString &command, int *res);
+  virtual QString interpretCommand(const QString &command, int &res);
   //give suggestions to autocomplete a command (should be reimplemented)
   //the return value of the function is the string list of all suggestions
   //the returned prefix is useful to complete "sub-commands"

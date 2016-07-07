@@ -18,6 +18,13 @@
 
 #include "QConsole.h"
 
+#include <ospray_cpp/Camera.h>
+#include <ospray_cpp/Model.h>
+#include <ospray_cpp/Renderer.h>
+
+// ChaiScript
+#include "common/script/chaiscript/chaiscript.hpp"
+
 class QOSPRayConsole : public QConsole
 {
   Q_OBJECT
@@ -26,6 +33,18 @@ public:
 
   QOSPRayConsole(QWidget *parent = nullptr);
 
+  void setOSPRayModel(ospray::cpp::Model model);
+  void setOSPRayRenderer(ospray::cpp::Renderer renderer);
+  void setOSPRayCamera(ospray::cpp::Camera camera);
+
+private:
+
   //execute a validated command
-  QString interpretCommand(const QString &command, int *res) override;
+  QString interpretCommand(const QString &command, int &res) override;
+
+  ospray::cpp::Model    m_model;
+  ospray::cpp::Renderer m_renderer;
+  ospray::cpp::Camera   m_camera;
+
+  chaiscript::ChaiScript m_chai;
 };

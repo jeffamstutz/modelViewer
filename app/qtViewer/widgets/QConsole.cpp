@@ -604,10 +604,10 @@ bool QConsole::isSelectionInEditionZone()
 
 //Basically, puts the command into the history list
 //And emits a signal (should be called by reimplementations)
-QString QConsole::interpretCommand(const QString &command, int *res)
+QString QConsole::interpretCommand(const QString &command, int &res)
 {
   //Add the command to the recordedScript list
-  if (!*res)
+  if (!res)
     recordedScript.append(command);
   //update the history and its index
   QString modifiedCommand = command;
@@ -637,7 +637,7 @@ bool QConsole::execCommand(const QString &command, bool writeCommand,
   }
   //execute the command and get back its text result and its return value
   int res = 0;
-  QString strRes = interpretCommand(modifiedCommand, &res);
+  QString strRes = interpretCommand(modifiedCommand, res);
   //According to the return value, display the result either in red or in blue
   if (res == 0)
     setTextColor(outColor_);
@@ -764,6 +764,7 @@ void QConsole::contextMenuEvent(QContextMenuEvent *event)
   del->setShortcut(tr("Del"));
   QAction *selectAll = new QAction(tr("Select All"), this);
   selectAll->setShortcut(tr("Ctrl+A"));
+  QAction *close = new QAction(tr("Close Window"), this);
 
   menu->addAction(undo);
   menu->addAction(redo);
@@ -774,6 +775,8 @@ void QConsole::contextMenuEvent(QContextMenuEvent *event)
   menu->addAction(del);
   menu->addSeparator();
   menu->addAction(selectAll);
+  menu->addSeparator();
+  menu->addAction(close);
 
   connect(undo, SIGNAL(triggered()), this, SLOT(undo()));
   connect(redo, SIGNAL(triggered()), this, SLOT(redo()));
@@ -782,7 +785,7 @@ void QConsole::contextMenuEvent(QContextMenuEvent *event)
   connect(paste, SIGNAL(triggered()), this, SLOT(paste()));
   connect(del, SIGNAL(triggered()), this, SLOT(del()));
   connect(selectAll, SIGNAL(triggered()), this, SLOT(selectAll()));
-
+  connect(close, SIGNAL(triggered()), this, SLOT(close()));
 
   menu->exec(event->globalPos());
 

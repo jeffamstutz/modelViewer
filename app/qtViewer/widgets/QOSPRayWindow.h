@@ -17,6 +17,7 @@
 #pragma once
 
 #include "Viewport.h"
+#include "QOSPRayConsole.h"
 // ospray wrappers
 #include <ospray_cpp/Camera.h>
 #include <ospray_cpp/FrameBuffer.h>
@@ -106,4 +107,6 @@ private:
   ospray::cpp::FrameBuffer frameBuffer;
   ospray::cpp::Renderer renderer;
   ospray::cpp::Camera camera;
+
+  std::unique_ptr<QOSPRayConsole> m_console;
 };

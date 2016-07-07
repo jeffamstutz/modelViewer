@@ -17,7 +17,6 @@
 #include <string>
 
 #include "QOSPRayWindow.h"
-#include "QOSPRayConsole.h"
 
 QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
                              ospray::cpp::Renderer _renderer,
@@ -26,7 +25,8 @@ QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
   showFrameRate(showFrameRate),
   renderingEnabled(false),
   rotationRate(0.f),
-  renderer(_renderer)
+  renderer(_renderer),
+  m_console(ospcommon::make_unique<QOSPRayConsole>())
 {
   // setup camera
   camera = ospray::cpp::Camera("perspective");
@@ -36,6 +36,9 @@ QOSPRayWindow::QOSPRayWindow(QMainWindow *parent,
   renderer.set("camera", camera);
   renderer.set("backgroundEnabled", 1);
   renderer.commit();
+
+  m_console->setOSPRayRenderer(renderer);
+  m_console->hide();
 
   // connect signals and slots
   connect(&renderTimer, SIGNAL(timeout()), this, SLOT(updateGL()));
@@ -85,7 +88,6 @@ void QOSPRayWindow::setWorldBounds(const ospcommon::box3f &worldBounds)
   viewport.snapUp();
 
   // NOTE(jda) - this is a horrible hack to deal with view initialization issues
-
   dolly(1.f);
   rotateCenter(1.f, 1.f);
 
@@ -111,8 +113,7 @@ void QOSPRayWindow::showContextMenu(const QPoint &pos)
 
 void QOSPRayWindow::showConsole()
 {
-  static QOSPRayConsole console;
-  console.show();
+  m_console->show();
 }
 
 void QOSPRayWindow::resetAccumulationBuffer()

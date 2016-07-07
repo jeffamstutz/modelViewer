@@ -17,6 +17,8 @@
 set(LIBRARY_NAME ospray_script)
 
 add_library(${LIBRARY_NAME}
+  OSPRayChaiUtil.cpp
+  OSPRayChaiUtil.h
   OSPRayScriptHandler.cpp
   OSPRayScriptHandler.h
 )
