@@ -98,15 +98,15 @@ void QOSPRayWindow::showContextMenu(const QPoint &pos)
 {
   QMenu contextMenu(tr("Context menu"), this);
 
-  QAction closeAction("Close Window", this);
-  connect(&closeAction, SIGNAL(triggered()), this, SLOT(close()));
-  contextMenu.addAction(&closeAction);
+  QAction consoleAction("Show Console", this);
+  connect(&consoleAction, SIGNAL(triggered()), this, SLOT(showConsole()));
+  contextMenu.addAction(&consoleAction);
 
   contextMenu.addSeparator();
 
-  QAction consoleAction("Open Console", this);
-  connect(&consoleAction, SIGNAL(triggered()), this, SLOT(showConsole()));
-  contextMenu.addAction(&consoleAction);
+  QAction closeAction("Close Window", this);
+  connect(&closeAction, SIGNAL(triggered()), this, SLOT(close()));
+  contextMenu.addAction(&closeAction);
 
   contextMenu.exec(mapToGlobal(pos));
 }
