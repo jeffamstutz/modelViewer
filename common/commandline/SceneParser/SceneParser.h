@@ -18,7 +18,7 @@
 
 #include <common/commandline/CommandLineParser.h>
 #include <ospray_cpp/Model.h>
-#include <common/box.h>
+#include <ospcommon/box.h>
 
 class SceneParser : public CommandLineParser
 {

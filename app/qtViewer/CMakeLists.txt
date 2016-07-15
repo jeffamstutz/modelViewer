@@ -53,7 +53,6 @@ add_executable(${APP_NAME}
 
 target_link_libraries(${APP_NAME}
   ospray_commandline
-  ospray_common
   ospray_minisg
   ospray_script
   ${OSPRAY_LIBRARIES}

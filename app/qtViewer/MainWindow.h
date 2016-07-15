@@ -22,8 +22,8 @@
 
 #include <ospray_cpp/Model.h>
 #include <ospray_cpp/Renderer.h>
-#include <common/box.h>
-#include <common/common.h>
+#include <ospcommon/box.h>
+#include <ospcommon/common.h>
 
 class MainWindow : public QMainWindow
 {

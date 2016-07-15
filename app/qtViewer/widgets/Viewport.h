@@ -17,7 +17,7 @@
 #pragma once
 
 #include <ostream>
-#include <common/AffineSpace.h>
+#include <ospcommon/AffineSpace.h>
 
 struct Viewport
 {

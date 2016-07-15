@@ -16,7 +16,6 @@
 
 subdirs(
   commandline
-  common
   importer
   miniSG
   script
