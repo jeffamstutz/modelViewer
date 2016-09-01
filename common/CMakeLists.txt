@@ -19,6 +19,5 @@ subdirs(
   importer
   miniSG
   script
-  widgets
   xml
 )

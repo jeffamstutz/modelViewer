@@ -14,7 +14,7 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(APP_NAME ospDebugViewerQt)
+set(APP_NAME ospDebugViewer)
 
 project(${APP_NAME})
 

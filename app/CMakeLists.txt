@@ -14,12 +14,6 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-option(BUILD_GLUT_VIEWER "Enable/Disable building of GLUT viewer app" ON)
-mark_as_advanced(BUILD_GLUT_VIEWER)
-if(BUILD_GLUT_VIEWER)
-  add_subdirectory(glutViewer)
-endif()
-
 option(BUILD_QT_VIEWER "Enable/Disable building of Qt viewer app" ON)
 mark_as_advanced(BUILD_QT_VIEWER)
 if(BUILD_QT_VIEWER)
